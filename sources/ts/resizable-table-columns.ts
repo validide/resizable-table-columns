@@ -1,0 +1,13 @@
+class ResizableTableColumns {
+  /**
+   *
+   */
+  constructor() {
+
+
+  }
+
+  dispose() {
+
+  }
+}
