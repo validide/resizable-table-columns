@@ -1,9 +1,0 @@
-{
-	"version": 3,
-	"file": "../dist/css/resizable-table-columns.css",
-	"sources": [
-		"../sources/scss/resizable-table-columns.scss"
-	],
-	"names": [],
-	"mappings": ""
-}

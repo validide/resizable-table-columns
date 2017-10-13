@@ -15,7 +15,8 @@
     "dev": "concurrently --raw \"npm run scss-base:w\" \"npm run tsc:w\" ",
     "post-css": "postcss --no-map --use autoprefixer --autoprefixer.browsers \"Chrome >= 35, Firefox >= 38, Edge >= 12, Explorer >= 10, iOS >= 8, Safari >= 8, Android 2.3, Android >= 4, Opera >= 12\" --replace ./dist/css/*.css",
     "post-process-dist": "npm run post-css && npm run minify-files",
-    "build-dist": "npm run build-dev && npm run post-process-dist"
+    "bundle-files": "rollup ./dist/js/resizable-table-columns.js --output.format iife --output.file ./dist/js/resizable-table-columns.bundle.js",
+    "build-dist": "npm run build-dev && npm run bundle-files && npm run post-process-dist"
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,7 @@
     "node-sass": "^4.5.3",
     "postcss-cli": "^4.1.1",
     "rimraf": "latest",
+    "rollup": "^0.50.0",
     "typescript": "^2.5.3"
   }
 }
