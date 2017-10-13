@@ -1,6 +1,6 @@
 import UtilitiesDOM from './utilities-dom'
 
-class ResizableTableColumns {
+export default class ResizableTableColumns {
   constructor() {
   }
 

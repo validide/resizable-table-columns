@@ -1,4 +1,4 @@
-(function () {
+var ResizableTableColumns = (function () {
 'use strict';
 
 var Utilities = (function () {
@@ -47,5 +47,7 @@ var ResizableTableColumns = (function () {
     };
     return ResizableTableColumns;
 }());
+
+return ResizableTableColumns;
 
 }());

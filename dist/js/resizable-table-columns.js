@@ -10,3 +10,4 @@ var ResizableTableColumns = (function () {
     };
     return ResizableTableColumns;
 }());
+export default ResizableTableColumns;
