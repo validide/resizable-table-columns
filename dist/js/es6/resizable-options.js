@@ -1,3 +1,4 @@
+import UtilitiesDOM from './utilities-dom';
 var ResizableOptions = (function () {
     function ResizableOptions(options, element) {
         this.resizeFromBody = true;
@@ -22,10 +23,7 @@ var ResizableOptions = (function () {
     ResizableOptions.prototype.overrideValuesFromElement = function (element) {
         if (!element)
             return;
-        var elementOptions = {};
-        for (var i = 0; i < element.attributes.length; i++) {
-            elementOptions[element.attributes[i].name] = element.attributes[i].value;
-        }
+        var elementOptions = UtilitiesDOM.getDataAttributesValues(element);
         this.overrideValues(elementOptions);
     };
     return ResizableOptions;

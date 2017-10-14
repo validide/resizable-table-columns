@@ -1,5 +1,6 @@
-import UtilitiesDOM from './utilities-dom'
 import ResizableOptions from './resizable-options'
+import Utilities from './utilities'
+import UtilitiesDOM from './utilities-dom'
 
 export default class ResizableTableColumns {
   table: HTMLTableElement;
@@ -11,7 +12,6 @@ export default class ResizableTableColumns {
   }
 
   init() {
-    //UtilitiesDOM.addClass(null, '');
   }
 
   dispose() {

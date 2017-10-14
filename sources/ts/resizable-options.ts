@@ -1,3 +1,5 @@
+import UtilitiesDOM from './utilities-dom'
+
 export default class ResizableOptions {
   resizeFromBody: boolean;
   minWidth: null | number;
@@ -36,10 +38,7 @@ export default class ResizableOptions {
     if (!element)
       return;
 
-    const elementOptions = {};
-    for (let i=0; i < element.attributes.length; i++) {
-      elementOptions[element.attributes[i].name] = element.attributes[i].value;
-    }
+    const elementOptions = UtilitiesDOM.getDataAttributesValues(element);
     this.overrideValues(elementOptions)
   }
 }

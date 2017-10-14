@@ -23,4 +23,20 @@ export default class UtilitiesDOM {
     else
       return !!el.className.match(new RegExp('(\\s|^)' + Utilities.escapeRegExp(className) + '(\\s|$)'))
   }
+
+  static getDataAttributesValues(el: HTMLElement): object {
+    if (!el)
+      return null;
+
+    const returnValue = {}
+    for (let i=0; i < el.attributes.length; i++) {
+      if (!/^data\-/.test(el.attributes[i].name))
+        continue;
+
+      const name = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
+      returnValue[name] = el.attributes[i].value;
+    }
+
+    return returnValue;
+  }
 }

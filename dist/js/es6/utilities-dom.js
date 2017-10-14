@@ -22,6 +22,18 @@ var UtilitiesDOM = (function () {
         else
             return !!el.className.match(new RegExp('(\\s|^)' + Utilities.escapeRegExp(className) + '(\\s|$)'));
     };
+    UtilitiesDOM.getDataAttributesValues = function (el) {
+        if (!el)
+            return null;
+        var returnValue = {};
+        for (var i = 0; i < el.attributes.length; i++) {
+            if (!/^data\-/.test(el.attributes[i].name))
+                continue;
+            var name_1 = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
+            returnValue[name_1] = el.attributes[i].value;
+        }
+        return returnValue;
+    };
     return UtilitiesDOM;
 }());
 export default UtilitiesDOM;
