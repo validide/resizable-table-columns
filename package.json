@@ -16,7 +16,8 @@
     "post-css": "postcss --no-map --use autoprefixer --autoprefixer.browsers \"Chrome >= 35, Firefox >= 38, Edge >= 12, Explorer >= 10, iOS >= 8, Safari >= 8, Android 2.3, Android >= 4, Opera >= 12\" --replace ./dist/css/*.css",
     "post-process-dist": "npm run post-css && npm run minify-files",
     "rollup-files": "rollup --config ./rollup.config.js",
-    "build-dist": "npm run build-dev && npm run rollup-files && npm run post-process-dist"
+    "test": "node ./node_modules/mocha/bin/mocha \"./tests/**/*.js\" --require babel-register --reporter spec",
+    "build-dist": "npm run build-dev && npm test && npm run rollup-files && npm run post-process-dist"
   },
   "repository": {
     "type": "git",
@@ -34,10 +35,16 @@
   },
   "homepage": "https://github.com/validide/resizable-table-columns#readme",
   "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.43",
     "autoprefixer": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
     "concurrently": "^3.5.0",
     "glob": "^7.1.2",
     "minifier": "^0.8.1",
+    "mocha": "^4.0.1",
     "node-sass": "^4.5.3",
     "postcss-cli": "^4.1.1",
     "rimraf": "latest",

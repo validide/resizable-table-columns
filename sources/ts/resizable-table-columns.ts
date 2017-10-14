@@ -1,12 +1,17 @@
 import UtilitiesDOM from './utilities-dom'
+import ResizableOptions from './resizable-options'
 
 export default class ResizableTableColumns {
-  constructor() {
+  table: HTMLTableElement;
+  options: ResizableOptions;
+
+  constructor(table: HTMLTableElement, options: ResizableOptions) {
+    this.table = table;
+    this.options = new ResizableOptions(options, table);
   }
 
   init() {
-    var utils = new UtilitiesDOM();
-    utils.addClass(null, '');
+    //UtilitiesDOM.addClass(null, '');
   }
 
   dispose() {

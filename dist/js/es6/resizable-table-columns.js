@@ -1,10 +1,10 @@
-import UtilitiesDOM from './utilities-dom';
+import ResizableOptions from './resizable-options';
 var ResizableTableColumns = (function () {
-    function ResizableTableColumns() {
+    function ResizableTableColumns(table, options) {
+        this.table = table;
+        this.options = new ResizableOptions(options, table);
     }
     ResizableTableColumns.prototype.init = function () {
-        var utils = new UtilitiesDOM();
-        utils.addClass(null, '');
     };
     ResizableTableColumns.prototype.dispose = function () {
     };

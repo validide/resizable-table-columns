@@ -1,8 +1,8 @@
 export default {
-  input: './dist/js/resizable-table-columns.js',
+  input: './dist/js/es6/resizable-table-columns.js',
   output: {
     format: 'iife',
     name: 'ResizableTableColumns',
-    file: './dist/js/resizable-table-columns.bundle.js'
+    file: './dist/js/bundle/resizable-table-columns.bundle.js'
   }
 }

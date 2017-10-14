@@ -2,21 +2,21 @@ import Utilities from './utilities';
 var UtilitiesDOM = (function () {
     function UtilitiesDOM() {
     }
-    UtilitiesDOM.prototype.addClass = function (el, className) {
+    UtilitiesDOM.addClass = function (el, className) {
         if (el.classList)
             el.classList.add(className);
-        else if (!this.hasClass(el, className))
+        else if (!UtilitiesDOM.hasClass(el, className))
             el.className += " " + className;
     };
-    UtilitiesDOM.prototype.removeClass = function (el, className) {
+    UtilitiesDOM.removeClass = function (el, className) {
         if (el.classList)
             el.classList.remove(className);
-        else if (this.hasClass(el, className)) {
+        else if (UtilitiesDOM.hasClass(el, className)) {
             var reg = new RegExp('(\\s|^)' + Utilities.escapeRegExp(className) + '(\\s|$)');
             el.className = el.className.replace(reg, ' ');
         }
     };
-    UtilitiesDOM.prototype.hasClass = function (el, className) {
+    UtilitiesDOM.hasClass = function (el, className) {
         if (el.classList)
             return el.classList.contains(className);
         else

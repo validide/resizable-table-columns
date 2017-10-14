@@ -2,7 +2,7 @@ const minifier = require("minifier");
 const options = {};
 const pathsToMinify = [
   "./dist/css",
-  "./dist/js/resizable-table-columns.bundle.js"
+  "./dist/js/bundle"
 ];
 
 minifier.on("error", function(err) {

@@ -9,6 +9,6 @@
     "removeComments": true,
     "noImplicitAny": false,
     "rootDir": "./sources/ts",
-    "outDir": "./dist/js"
+    "outDir": "./dist/js/es6"
   }
 }
