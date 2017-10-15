@@ -28,13 +28,22 @@ export default class UtilitiesDOM {
     if (!el)
       return null;
 
-    const returnValue = {}
-    for (let i=0; i < el.attributes.length; i++) {
-      if (!/^data\-/.test(el.attributes[i].name))
-        continue;
+    const returnValue: object = {};
+    if (el.dataset) {
+      for (let prop in el.dataset) {
+        if (el.dataset.hasOwnProperty(prop)) {
+          returnValue[prop] = Utilities.parseStringToType(el.dataset[prop]);
+        }
+      }
+    }
+    else {
+      for (let i=0; i < el.attributes.length; i++) {
+        if (!/^data\-/.test(el.attributes[i].name))
+          continue;
 
-      const name = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
-      returnValue[name] = el.attributes[i].value;
+        const name = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
+        returnValue[name] = Utilities.parseStringToType(el.attributes[i].value);
+      }
     }
 
     return returnValue;

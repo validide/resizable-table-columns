@@ -26,11 +26,20 @@ var UtilitiesDOM = (function () {
         if (!el)
             return null;
         var returnValue = {};
-        for (var i = 0; i < el.attributes.length; i++) {
-            if (!/^data\-/.test(el.attributes[i].name))
-                continue;
-            var name_1 = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
-            returnValue[name_1] = el.attributes[i].value;
+        if (el.dataset) {
+            for (var prop in el.dataset) {
+                if (el.dataset.hasOwnProperty(prop)) {
+                    returnValue[prop] = Utilities.parseStringToType(el.dataset[prop]);
+                }
+            }
+        }
+        else {
+            for (var i = 0; i < el.attributes.length; i++) {
+                if (!/^data\-/.test(el.attributes[i].name))
+                    continue;
+                var name_1 = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
+                returnValue[name_1] = Utilities.parseStringToType(el.attributes[i].value);
+            }
         }
         return returnValue;
     };
