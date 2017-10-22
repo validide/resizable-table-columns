@@ -48,4 +48,20 @@ export default class UtilitiesDOM {
 
     return returnValue;
   }
+
+  static getMinCssWidth(el): number | null {
+		const minWidth = Utilities.parseStyleDimension(el.style.minWidth, true);
+    if (typeof minWidth === 'number' && !isNaN(minWidth))
+				return minWidth;
+
+		return null;
+  }
+
+  static getMaxCssWidth(el): number | null {
+		const maxWidth = Utilities.parseStyleDimension(el.style.maxWidth, true);
+    if (typeof maxWidth === 'number' && !isNaN(maxWidth))
+      return maxWidth;
+
+		return null;
+	}
 }

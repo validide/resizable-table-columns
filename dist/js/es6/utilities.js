@@ -21,6 +21,28 @@ var Utilities = (function () {
         }
         return str;
     };
+    Utilities.parseStyleDimension = function (dimension, returnOriginal) {
+        if (typeof dimension === 'string') {
+            if (dimension.length) {
+                var toParse = dimension
+                    .replace('px', '')
+                    .replace(',', '.');
+                var parsed = parseFloat(toParse);
+                if (!isNaN(parsed)) {
+                    return parsed;
+                }
+            }
+        }
+        else if (typeof dimension === 'number') {
+            return dimension;
+        }
+        if (returnOriginal) {
+            return dimension;
+        }
+        else {
+            return 0;
+        }
+    };
     Utilities.regexEscapeRegex = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;
     Utilities.kebabCaseRegex = /(\-\w)/g;
     Utilities.trueRegex = /^true$/i;

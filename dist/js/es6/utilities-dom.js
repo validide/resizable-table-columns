@@ -43,6 +43,18 @@ var UtilitiesDOM = (function () {
         }
         return returnValue;
     };
+    UtilitiesDOM.getMinCssWidth = function (el) {
+        var minWidth = Utilities.parseStyleDimension(el.style.minWidth, true);
+        if (typeof minWidth === 'number' && !isNaN(minWidth))
+            return minWidth;
+        return null;
+    };
+    UtilitiesDOM.getMaxCssWidth = function (el) {
+        var maxWidth = Utilities.parseStyleDimension(el.style.maxWidth, true);
+        if (typeof maxWidth === 'number' && !isNaN(maxWidth))
+            return maxWidth;
+        return null;
+    };
     return UtilitiesDOM;
 }());
 export default UtilitiesDOM;
