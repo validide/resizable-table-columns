@@ -44,16 +44,77 @@ var UtilitiesDOM = (function () {
         return returnValue;
     };
     UtilitiesDOM.getMinCssWidth = function (el) {
-        var minWidth = Utilities.parseStyleDimension(el.style.minWidth, true);
+        var computedStyle = el.ownerDocument.defaultView.getComputedStyle(el).minWidth;
+        var minWidth = Utilities.parseStyleDimension(computedStyle, true);
         if (typeof minWidth === 'number' && !isNaN(minWidth))
             return minWidth;
         return null;
     };
     UtilitiesDOM.getMaxCssWidth = function (el) {
-        var maxWidth = Utilities.parseStyleDimension(el.style.maxWidth, true);
+        var computedStyle = el.ownerDocument.defaultView.getComputedStyle(el).maxWidth;
+        var maxWidth = Utilities.parseStyleDimension(computedStyle, true);
         if (typeof maxWidth === 'number' && !isNaN(maxWidth))
             return maxWidth;
         return null;
+    };
+    UtilitiesDOM.getOuterWidth = function (el, includeMargin) {
+        if (includeMargin === void 0) { includeMargin = false; }
+        var width = el.offsetWidth;
+        if (!includeMargin)
+            return width;
+        var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
+        var marginTop = Utilities.parseStyleDimension(computedStyles.marginTop, false);
+        var marginBottom = Utilities.parseStyleDimension(computedStyles.marginBottom, false);
+        return width + marginTop + marginBottom;
+    };
+    UtilitiesDOM.getInnerWidth = function (el) {
+        var width = UtilitiesDOM.getOuterWidth(el);
+        var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
+        var borderLeft = Utilities.parseStyleDimension(computedStyles.borderLeft, false);
+        var borderRight = Utilities.parseStyleDimension(computedStyles.borderRight, false);
+        return width - borderLeft - borderRight;
+    };
+    UtilitiesDOM.getWidth = function (el) {
+        var width = UtilitiesDOM.getOuterWidth(el);
+        var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
+        var paddingLeft = Utilities.parseStyleDimension(computedStyles.paddingLeft, false);
+        var paddingRight = Utilities.parseStyleDimension(computedStyles.paddingRight, false);
+        var borderLeft = Utilities.parseStyleDimension(computedStyles.borderLeft, false);
+        var borderRight = Utilities.parseStyleDimension(computedStyles.borderRight, false);
+        return width - paddingLeft - paddingRight - borderLeft - borderRight;
+    };
+    UtilitiesDOM.getOuterHeight = function (el, includeMargin) {
+        if (includeMargin === void 0) { includeMargin = false; }
+        var height = el.offsetHeight;
+        if (!includeMargin)
+            return height;
+        var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
+        var marginTop = Utilities.parseStyleDimension(computedStyles.marginTop, false);
+        var marginBottom = Utilities.parseStyleDimension(computedStyles.marginBottom, false);
+        return height + marginTop + marginBottom;
+    };
+    UtilitiesDOM.getInnerHeight = function (el) {
+        var height = UtilitiesDOM.getOuterHeight(el);
+        var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
+        var borderTop = Utilities.parseStyleDimension(computedStyles.borderTop, false);
+        var borderBottom = Utilities.parseStyleDimension(computedStyles.borderBottom, false);
+        return height - borderTop - borderBottom;
+    };
+    UtilitiesDOM.getHeight = function (el) {
+        var height = UtilitiesDOM.getOuterHeight(el);
+        var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
+        var paddingTop = Utilities.parseStyleDimension(computedStyles.paddingTop, false);
+        var paddingBottom = Utilities.parseStyleDimension(computedStyles.paddingBottom, false);
+        var borderTop = Utilities.parseStyleDimension(computedStyles.borderTop, false);
+        var borderBottom = Utilities.parseStyleDimension(computedStyles.borderBottom, false);
+        return height - paddingTop - paddingBottom - borderTop - borderBottom;
+    };
+    UtilitiesDOM.getOffset = function (el) {
+        var rect = el.getBoundingClientRect();
+        return {
+            top: rect.top + el.ownerDocument.body.scrollTop,
+            left: rect.left + el.ownerDocument.body.scrollLeft
+        };
     };
     return UtilitiesDOM;
 }());

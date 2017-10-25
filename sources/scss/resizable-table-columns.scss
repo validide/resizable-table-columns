@@ -1,8 +1,60 @@
+$cursorResize: ew-resize;
+$handleWidth: 1px;
+$handleMargin: 3px;
+
+.rtc-hidden {
+  display: none!important;
+}
+
 .rtc-wrapper {
   position: relative;
+  overflow-x: auto;
 
-  .rtc-table {
+  table.rtc-table {
     table-layout: fixed;
     border-collapse: collapse;
+    white-space: nowrap;
+    margin: 0;
+
+    thead, tbody, tfoot {
+      margin: 0;
+      tr {
+        margin: 0;
+        th,
+        td {
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    &.rtc-table-resizing {
+      cursor: $cursorResize;
+
+      thead, thead > th, thead > th > a {
+        cursor: $cursorResize;
+      }
+    }
+  }
+
+  .rtc-handle-container {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    border: 0;
+
+    .rtc-handle {
+      position: absolute;
+      width: 2 * $handleMargin + $handleWidth;
+      margin-left: -1 * $handleMargin;
+      z-index: 2;
+      cursor: $cursorResize;
+
+      &:last-of-type {
+        width: $handleMargin + $handleWidth;
+      }
+    }
   }
 }

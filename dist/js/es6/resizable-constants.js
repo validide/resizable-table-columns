@@ -3,11 +3,22 @@ var ResizableConstants = (function () {
     }
     ResizableConstants.dataPropertyname = 'rtc_data_object';
     ResizableConstants.classes = {
-        tableClass: 'rtc-table',
-        wrapperClass: 'rtc-wrapper'
+        table: 'rtc-table',
+        wrapper: 'rtc-wrapper',
+        handleContainer: 'rtc-handle-container',
+        handle: 'rtc-handle',
+        hidden: 'rtc-hidden'
     };
     ResizableConstants.attibutes = {
-        dataResizable: 'data-resizable'
+        dataResizable: 'data-rtc-resizable',
+        dataResizableTable: 'data-rtc-resizable-table'
+    };
+    ResizableConstants.data = {
+        resizable: 'rtcResizable',
+        resizableTable: 'rtcResizableTable'
+    };
+    ResizableConstants.events = {
+        pointerDown: ['mousedown', 'touchstart']
     };
     return ResizableConstants;
 }());

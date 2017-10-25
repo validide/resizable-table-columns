@@ -49,7 +49,6 @@ export default class Utilities {
       return dimension;
     }
 
-
     if (returnOriginal) {
       return dimension;
     } else {
