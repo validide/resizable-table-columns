@@ -7,7 +7,9 @@ var ResizableConstants = (function () {
         wrapper: 'rtc-wrapper',
         handleContainer: 'rtc-handle-container',
         handle: 'rtc-handle',
-        hidden: 'rtc-hidden'
+        hidden: 'rtc-hidden',
+        tableResizing: 'rtc-table-resizing',
+        columnResizing: 'rtc-column-resizing',
     };
     ResizableConstants.attibutes = {
         dataResizable: 'data-rtc-resizable',
@@ -18,7 +20,13 @@ var ResizableConstants = (function () {
         resizableTable: 'rtcResizableTable'
     };
     ResizableConstants.events = {
-        pointerDown: ['mousedown', 'touchstart']
+        pointerDown: ['mousedown', 'touchstart'],
+        pointerMove: ['mousemove', 'touchmove'],
+        pointerUp: ['mouseup', 'touchend'],
+        windowResize: ['resize'],
+        eventResizeStart: 'eventResizeStart.rtc',
+        eventResize: 'eventResize.rtc',
+        eventResizeStop: 'eventResizeStop.rtc'
     };
     return ResizableConstants;
 }());

@@ -140,12 +140,64 @@ export default class UtilitiesDOM {
   }
 
   static getOffset(el: HTMLElement): { top: number, left: number } {
-    //TODO: Unit test this}
+    //TODO: Unit test this
     const rect = el.getBoundingClientRect();
 
     return {
       top: rect.top + el.ownerDocument.body.scrollTop,
       left: rect.left + el.ownerDocument.body.scrollLeft
     }
+  }
+
+  static matches(el: Element, selector: string): boolean {
+    //TODO: Unit test this
+    let matchesFn;
+    // find vendor prefix
+    const matchNames = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
+    for (let index = 0; index < matchNames.length; index++) {
+      if (typeof el.ownerDocument.body[matchNames[index]] === 'function') {
+        matchesFn = matchNames[index];
+        break;
+      }
+    }
+
+    return el[matchesFn](selector);
+  }
+
+  static closest(el: Element, selector: string): Element | null {
+    //TODO: Unit test this
+    if (!el)
+      return null;
+
+    if (typeof el.closest === 'function')
+      return el.closest(selector);
+
+    let element: Node = el;
+
+    while (element && element.nodeType === 1) {
+      if (UtilitiesDOM.matches(<Element>element, selector)) {
+        return <Element>element;
+      }
+      element = element.parentNode;
+    }
+
+    return null;
+  }
+
+  static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number {
+    //TODO: Unit test this
+    if (!contentElement || !measurementElement)
+      return 0;
+
+    var text = contentElement.textContent.trim().replace(/\s/g, '&nbsp;') + '&nbsp;'; //add extra space to ensure we are not elipsing anything
+
+    const styles = contentElement.ownerDocument.defaultView.getComputedStyle(contentElement);
+    ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border']
+      .forEach((prop) => {
+        measurementElement.style[prop] = styles[prop];
+      });
+
+    measurementElement.innerHTML = text;
+    return UtilitiesDOM.getOuterWidth(measurementElement, true);
   }
 }

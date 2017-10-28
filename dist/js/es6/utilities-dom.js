@@ -116,6 +116,43 @@ var UtilitiesDOM = (function () {
             left: rect.left + el.ownerDocument.body.scrollLeft
         };
     };
+    UtilitiesDOM.matches = function (el, selector) {
+        var matchesFn;
+        var matchNames = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
+        for (var index = 0; index < matchNames.length; index++) {
+            if (typeof el.ownerDocument.body[matchNames[index]] === 'function') {
+                matchesFn = matchNames[index];
+                break;
+            }
+        }
+        return el[matchesFn](selector);
+    };
+    UtilitiesDOM.closest = function (el, selector) {
+        if (!el)
+            return null;
+        if (typeof el.closest === 'function')
+            return el.closest(selector);
+        var element = el;
+        while (element && element.nodeType === 1) {
+            if (UtilitiesDOM.matches(element, selector)) {
+                return element;
+            }
+            element = element.parentNode;
+        }
+        return null;
+    };
+    UtilitiesDOM.getTextWidth = function (contentElement, measurementElement) {
+        if (!contentElement || !measurementElement)
+            return 0;
+        var text = contentElement.textContent.trim().replace(/\s/g, '&nbsp;') + '&nbsp;';
+        var styles = contentElement.ownerDocument.defaultView.getComputedStyle(contentElement);
+        ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border']
+            .forEach(function (prop) {
+            measurementElement.style[prop] = styles[prop];
+        });
+        measurementElement.innerHTML = text;
+        return UtilitiesDOM.getOuterWidth(measurementElement, true);
+    };
     return UtilitiesDOM;
 }());
 export default UtilitiesDOM;
