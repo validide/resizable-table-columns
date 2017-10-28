@@ -7,7 +7,6 @@ var ResizableConstants = (function () {
         wrapper: 'rtc-wrapper',
         handleContainer: 'rtc-handle-container',
         handle: 'rtc-handle',
-        hidden: 'rtc-hidden',
         tableResizing: 'rtc-table-resizing',
         columnResizing: 'rtc-column-resizing',
     };

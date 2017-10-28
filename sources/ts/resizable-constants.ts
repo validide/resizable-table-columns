@@ -3,7 +3,6 @@ interface IClassesConstants {
   wrapper: string;
   handleContainer: string;
   handle: string;
-  hidden: string;
   tableResizing: string;
   columnResizing: string;
 }
@@ -35,7 +34,6 @@ export default class ResizableConstants {
     wrapper: 'rtc-wrapper',
     handleContainer: 'rtc-handle-container',
     handle: 'rtc-handle',
-    hidden: 'rtc-hidden',
     tableResizing:'rtc-table-resizing',
     columnResizing:'rtc-column-resizing',
   };
