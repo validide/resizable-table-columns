@@ -7,9 +7,10 @@ import { JSDOM } from '../node_modules/jsdom/lib/api';
 import UtilitiesDOM from '../dist/js/es6/utilities-dom';
 
 describe('UtilitiesDOM', function () {
-  const DOM = new JSDOM(`<!DOCTYPE html><html><head></head><body data-test-value-one="one" data-test-value-two="two" test-value-missing="one"></body></html>`);
+  const DOM = new JSDOM(`<!DOCTYPE html><html><head></head><body data-test-value-one="one" data-test-value-two="two" test-value-missing="one" class="matches-test"><span id="closest-test" class="closest-test-class"></span></body></html>`);
   const testClass = 'test-class';
   const otherTestClass = 'other-test-class';
+
   describe('.hasClass', function () {
     it('Should be true', function () {
       const el = DOM.window.document.createElement('span');
@@ -126,29 +127,100 @@ describe('UtilitiesDOM', function () {
     });
   });
 
-    describe('.getMaxCssWidth', function () {
-      it('Should be null', function () {
-        const el = DOM.window.document.createElement('span');
-        assert.equal(UtilitiesDOM.getMaxCssWidth(el), null);
-      });
-
-      it('Should be null 2', function () {
-        const el = DOM.window.document.createElement('span');
-        el.style.maxWidth = 'random.px'
-        assert.equal(UtilitiesDOM.getMaxCssWidth(el), null);
-      });
-
-      it('Should be 13.25', function () {
-        const el = DOM.window.document.createElement('span');
-        el.style.maxWidth = '13.25'
-        assert.equal(UtilitiesDOM.getMaxCssWidth(el), 13.25);
-      });
-
-      it('Should be 25.15', function () {
-        const el = DOM.window.document.createElement('span');
-        el.style.maxWidth = '25.15px'
-        assert.equal(UtilitiesDOM.getMaxCssWidth(el), 25.15);
-      });
+  describe('.getMaxCssWidth', function () {
+    it('Should be null', function () {
+      const el = DOM.window.document.createElement('span');
+      assert.equal(UtilitiesDOM.getMaxCssWidth(el), null);
     });
+
+    it('Should be null 2', function () {
+      const el = DOM.window.document.createElement('span');
+      el.style.maxWidth = 'random.px'
+      assert.equal(UtilitiesDOM.getMaxCssWidth(el), null);
+    });
+
+    it('Should be 13.25', function () {
+      const el = DOM.window.document.createElement('span');
+      el.style.maxWidth = '13.25'
+      assert.equal(UtilitiesDOM.getMaxCssWidth(el), 13.25);
+    });
+
+    it('Should be 25.15', function () {
+      const el = DOM.window.document.createElement('span');
+      el.style.maxWidth = '25.15px'
+      assert.equal(UtilitiesDOM.getMaxCssWidth(el), 25.15);
+    });
+  });
+
+  describe('.getOffset', function () {
+    it('Should be null', function () {
+      assert.equal(UtilitiesDOM.getOffset(null), null);
+    });
+  });
+
+  describe('.matches', function () {
+    it('Should be true', function () {
+      const body = DOM.window.document.body;
+      assert.equal(UtilitiesDOM.matches(body, '[data-test-value-one="one"]'), true);
+    });
+    it('Should be true', function () {
+      const body = DOM.window.document.body;
+      assert.equal(UtilitiesDOM.matches(body, '[data-test-value-one]'), true);
+    });
+    it('Should be true', function () {
+      const body = DOM.window.document.body;
+      assert.equal(UtilitiesDOM.matches(body, '.matches-test'), true);
+    });
+    it('Should be false', function () {
+      const body = DOM.window.document.body;
+      assert.equal(UtilitiesDOM.matches(body, '.not-matches-test'), false);
+    });
+    it('Should be false', function () {
+      const body = DOM.window.document.body;
+      assert.equal(UtilitiesDOM.matches(body, '[data-test-value-one="not-one"]'), false);
+    });
+  });
+
+  describe('.closest', function () {
+    it('Should be the same element', function () {
+      const el = DOM.window.document.getElementById('closest-test');
+      assert.isNotNull(el, 'Element should be found in dom');
+      const closest = UtilitiesDOM.closest(el, '.closest-test-class');
+      assert.equal(closest, el);
+    });
+    it('Should be the body element', function () {
+      const el = DOM.window.document.getElementById('closest-test');
+      assert.isNotNull(el, 'Element should be found in dom');
+      const body = DOM.window.document.body;
+      const closest = UtilitiesDOM.closest(el, '[data-test-value-one="one"]');
+      assert.equal(closest, body);
+    });
+    it('Should be the body element', function () {
+      const el = DOM.window.document.getElementById('closest-test');
+      assert.isNotNull(el, 'Element should be found in dom');
+      const body = DOM.window.document.body;
+      const closest = UtilitiesDOM.closest(el, '[data-test-value-one]');
+      assert.equal(closest, body);
+    });
+    it('Should be the body element', function () {
+      const el = DOM.window.document.getElementById('closest-test');
+      assert.isNotNull(el, 'Element should be found in dom');
+      const body = DOM.window.document.body;
+      const closest = UtilitiesDOM.closest(el, '.matches-test');
+      assert.equal(closest, body);
+    });
+    it('Should be null', function () {
+      const el = DOM.window.document.getElementById('closest-test');
+      assert.isNotNull(el, 'Element should be found in dom');
+      const closest = UtilitiesDOM.closest(el, '.not-matches-test');
+      assert.equal(closest, null);
+    });
+    it('Should be null', function () {
+      const el = DOM.window.document.getElementById('closest-test');
+      assert.isNotNull(el, 'Element should be found in dom');
+      const closest = UtilitiesDOM.closest(el, '[data-test-value-one="not-one"]');
+      assert.equal(closest, null);
+    });
+  });
 
 });

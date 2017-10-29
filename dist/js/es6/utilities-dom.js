@@ -110,6 +110,8 @@ var UtilitiesDOM = (function () {
         return height - paddingTop - paddingBottom - borderTop - borderBottom;
     };
     UtilitiesDOM.getOffset = function (el) {
+        if (!el)
+            return null;
         var rect = el.getBoundingClientRect();
         return {
             top: rect.top + el.ownerDocument.body.scrollTop,

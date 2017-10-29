@@ -443,5 +443,29 @@ describe('ResizableTableColumns', function () {
       assert.isTrue(theError.indexOf('Markup validation: thead row count') == 0, theError);
     });
 
+    it('Each new object should have a new id', function () {
+      const el = DOM.window.document.getElementById('valid-table');
+      assert.isNotNull(el, 'Table element should be found in dom');
+
+      if (typeof el[ResizableConstants.dataPropertyname] !== 'undefined') {
+        el[ResizableConstants.dataPropertyname].dispose();
+      }
+
+      let rtc = new ResizableTableColumns(el, null);
+      const id1 = rtc.id;
+      rtc.dispose();
+
+      rtc = new ResizableTableColumns(el, null);
+      const id2 = rtc.id;
+      rtc.dispose();
+
+      rtc = new ResizableTableColumns(el, null);
+      const id3 = rtc.id;
+      rtc.dispose();
+
+      assert.equal(id2, id1 +1);
+      assert.equal(id3, id2 +1);
+    });
+
   });
 });

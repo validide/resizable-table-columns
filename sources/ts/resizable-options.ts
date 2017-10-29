@@ -2,10 +2,10 @@ import UtilitiesDOM from './utilities-dom'
 
 export default class ResizableOptions {
   resizeFromBody: boolean;
-  minWidth: null | number;  //experimental
-  maxWidth: null | number;  //experimental
-  obeyCssMinWidth: boolean; //experimental
-  obeyCssMaxWidth: boolean; //experimental
+  minWidth: null | number;
+  maxWidth: null | number;
+  obeyCssMinWidth: boolean;
+  obeyCssMaxWidth: boolean;
   doubleClickDelay: number;
   store: any;
 

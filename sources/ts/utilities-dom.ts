@@ -68,7 +68,7 @@ export default class UtilitiesDOM {
   }
 
   static getOuterWidth(el: HTMLElement, includeMargin: boolean = false): number {
-    //TODO: Unit test this
+    //TODO: Try to unit test this
     const width = el.offsetWidth;
     if (!includeMargin)
       return width;
@@ -79,8 +79,8 @@ export default class UtilitiesDOM {
     return width + marginTop + marginBottom;
   }
 
-  static getInnerWidth(el: HTMLElement): number | null {
-    //TODO: Unit test this
+  static getInnerWidth(el: HTMLElement): number {
+    //TODO: Try to unit test this
     const width = UtilitiesDOM.getOuterWidth(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -90,8 +90,8 @@ export default class UtilitiesDOM {
     return width - borderLeft - borderRight;
   }
 
-  static getWidth(el: HTMLElement): number | null {
-    //TODO: Unit test this
+  static getWidth(el: HTMLElement): number {
+    //TODO: Try to unit test this
     const width = UtilitiesDOM.getOuterWidth(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -104,7 +104,7 @@ export default class UtilitiesDOM {
   }
 
   static getOuterHeight(el: HTMLElement, includeMargin: boolean = false): number {
-    //TODO: Unit test this
+    //TODO: Try to unit test this
     const height = el.offsetHeight;
     if (!includeMargin)
       return height;
@@ -115,8 +115,8 @@ export default class UtilitiesDOM {
     return height + marginTop + marginBottom;
   }
 
-  static getInnerHeight(el: HTMLElement): number | null {
-    //TODO: Unit test this
+  static getInnerHeight(el: HTMLElement): number {
+    //TODO: Try to unit test this
     const height = UtilitiesDOM.getOuterHeight(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -126,8 +126,8 @@ export default class UtilitiesDOM {
     return height - borderTop - borderBottom;
   }
 
-  static getHeight(el: HTMLElement): number | null {
-    //TODO: Unit test this
+  static getHeight(el: HTMLElement): number {
+    //TODO: Try to unit test this
     const height = UtilitiesDOM.getOuterHeight(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -140,7 +140,9 @@ export default class UtilitiesDOM {
   }
 
   static getOffset(el: HTMLElement): { top: number, left: number } {
-    //TODO: Unit test this
+    if (!el)
+      return null;
+
     const rect = el.getBoundingClientRect();
 
     return {
@@ -150,7 +152,6 @@ export default class UtilitiesDOM {
   }
 
   static matches(el: Element, selector: string): boolean {
-    //TODO: Unit test this
     let matchesFn;
     // find vendor prefix
     const matchNames = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
@@ -165,7 +166,6 @@ export default class UtilitiesDOM {
   }
 
   static closest(el: Element, selector: string): Element | null {
-    //TODO: Unit test this
     if (!el)
       return null;
 
@@ -185,7 +185,7 @@ export default class UtilitiesDOM {
   }
 
   static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number {
-    //TODO: Unit test this
+    //TODO: Try to unit test this
     if (!contentElement || !measurementElement)
       return 0;
 

@@ -233,19 +233,16 @@ export default class ResizableTableColumns {
     let result: number = width;
     const minWidth = this.options.obeyCssMinWidth
       ? UtilitiesDOM.getMinCssWidth(el)
-      : null;
+      : -Infinity;
 
-    if (minWidth != null) {
-      result = Math.max(minWidth, result, this.options.minWidth);
-    }
+    result = Math.max(minWidth, result, this.options.minWidth || -Infinity);
 
     const maxWidth = this.options.obeyCssMaxWidth
       ? UtilitiesDOM.getMaxCssWidth(el)
-      : null;
+      : +Infinity;
 
-    if (maxWidth != null) {
-      result = Math.min(maxWidth, result, this.options.maxWidth);
-    }
+    result = Math.min(maxWidth, result, this.options.maxWidth || +Infinity);
+
     return result;
   }
 
@@ -302,35 +299,42 @@ export default class ResizableTableColumns {
     if (!this.options.store)
       return;
 
-    this.tableHeaders
-      .forEach((el, idx) => {
-        if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable))
-          return;
+    const tableId = this.generateTableId();
+    if (tableId.length === 0)
+      return;
 
-        const width = this.options.store.get(this.generateColumnId(el));
+    this.getResizableHeaders()
+      .forEach((el, idx) => {
+        const width = this.options.store.get(this.generateColumnId(el, tableId));
         if (width != null) {
           ResizableTableColumns.setWidth(el, width);
         }
       });
+    const tableWidth = this.options.store.get(tableId);
+    if (tableWidth != null) {
+      ResizableTableColumns.setWidth(this.table, tableWidth);
+    }
   }
 
-  generateColumnId(el) {
+  generateColumnId(el: HTMLElement, tableId: string): string {
     //TODO: Unit test this
     const columnId = (el.getAttribute(ResizableConstants.attibutes.dataResizable) || '')
       .trim()
       .replace(/\./g, '_');
 
-    return `${this.generateTableId()}-${columnId}`;
+    return `${tableId}/${columnId}`;
   }
 
-  generateTableId() {
+  generateTableId(): string {
     //TODO: Unit test this
-    const tableId = (this.table.getAttribute(ResizableConstants.attibutes.dataResizableTable) || '')
+    const tableId = (this.table.getAttribute(ResizableConstants.attibutes.dataResizableTable)
+      || this.table.id
+      || '')
       .trim()
       .replace(/\./g, '_');
 
-    return tableId.length === 0
-      ? `rtc-table-${this.id}`
+    return tableId.length
+      ? `rtc/${tableId}`
       : tableId;
   }
 
@@ -450,7 +454,7 @@ export default class ResizableTableColumns {
     eventData.column = column;
     eventData.dragHandler = dragHandler;
     eventData.pointer = {
-      x: this.getPointerX(event),
+      x: ResizableTableColumns.getPointerX(event),
       isDoubleClick: isDoubleClick
     };
     eventData.originalWidths = {
@@ -486,7 +490,7 @@ export default class ResizableTableColumns {
     if (!this.eventData)
       return;
 
-    const difference = this.getPointerX(event) - this.eventData.pointer.x;
+    const difference = ResizableTableColumns.getPointerX(event) - this.eventData.pointer.x;
     if (difference === 0) {
       return;
     }
@@ -628,14 +632,6 @@ export default class ResizableTableColumns {
     this.table.dispatchEvent(eventToDispatch);
   }
 
-  getPointerX(event): number {
-    //TODO: Unit test this
-    if (event.type.indexOf('touch') === 0) {
-      return (event.touches[0] || event.changedTouches[0]).pageX;
-    }
-    return event.pageX;
-  }
-
   attachHandlers(): void {
     //TODO: Unit test this
     ResizableConstants.events.pointerMove
@@ -663,14 +659,12 @@ export default class ResizableTableColumns {
   }
 
   refreshWrapperStyle(): void {
-    //TODO: Unit test this
     if (this.wrapper == null)
       return;
 
     const original = this.wrapper.style.overflowX;
     this.wrapper.style.overflowX = 'hidden';
     this.wrapper.style.overflowX = original;
-
   }
 
   saveColumnWidths() {
@@ -678,12 +672,15 @@ export default class ResizableTableColumns {
     if (!this.options.store)
       return;
 
+    const tableId = this.generateTableId();
+    if (tableId.length === 0)
+      return;
+
     this.getResizableHeaders()
       .forEach((el, idx) => {
-        this.options.store.set(
-          this.generateColumnId(el),
-          <number>Utilities.parseStyleDimension(el.style.width, false));
+        this.options.store.set(this.generateColumnId(el, tableId), ResizableTableColumns.getWidth(el));
       });
+    this.options.store.set(tableId, ResizableTableColumns.getWidth(this.table));
   }
 
   createHandlerReferences() {
@@ -714,10 +711,15 @@ export default class ResizableTableColumns {
     }
   }
 
-  static getWidth(el: HTMLElement): number {
-    if (!el)
-      return;
+  static getPointerX(event): number {
+    //TODO: Unit test this
+    if (event.type.indexOf('touch') === 0) {
+      return (event.touches[0] || event.changedTouches[0]).pageX;
+    }
+    return event.pageX;
+  }
 
+  static getWidth(el: HTMLElement): number {
     if (el.style.width === '')
       return UtilitiesDOM.getWidth(el);
 
@@ -725,14 +727,12 @@ export default class ResizableTableColumns {
   }
 
   static setWidth(element: HTMLElement, width: number) {
-    //TODO: Unit test this
     let strWidth = width.toFixed(2);
     strWidth = width > 0 ? strWidth : '0';
     element.style.width = `${strWidth}px`;
   }
 
   static getInstanceId(): number {
-    //TODO: Unit test this
     return ResizableTableColumns.instancesCount++;
   }
 }
