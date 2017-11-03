@@ -1,4 +1,4 @@
-$cursorResize: ew-resize;
+$cursorResize: col-resize;
 $handleWidth: 1px;
 $handleMargin: 3px;
 
@@ -36,6 +36,14 @@ $handleMargin: 3px;
       thead, thead > th, thead > th > a {
         cursor: $cursorResize;
       }
+    }
+
+    thead tr.invisible,
+    thead tr.invisible th {
+      border: none;
+      margin: 0;
+      padding: 0;
+      height: 0!important;
     }
   }
 

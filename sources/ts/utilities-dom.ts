@@ -68,7 +68,7 @@ export default class UtilitiesDOM {
   }
 
   static getOuterWidth(el: HTMLElement, includeMargin: boolean = false): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     const width = el.offsetWidth;
     if (!includeMargin)
       return width;
@@ -80,7 +80,7 @@ export default class UtilitiesDOM {
   }
 
   static getInnerWidth(el: HTMLElement): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     const width = UtilitiesDOM.getOuterWidth(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -91,7 +91,7 @@ export default class UtilitiesDOM {
   }
 
   static getWidth(el: HTMLElement): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     const width = UtilitiesDOM.getOuterWidth(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -104,7 +104,7 @@ export default class UtilitiesDOM {
   }
 
   static getOuterHeight(el: HTMLElement, includeMargin: boolean = false): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     const height = el.offsetHeight;
     if (!includeMargin)
       return height;
@@ -116,7 +116,7 @@ export default class UtilitiesDOM {
   }
 
   static getInnerHeight(el: HTMLElement): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     const height = UtilitiesDOM.getOuterHeight(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -127,7 +127,7 @@ export default class UtilitiesDOM {
   }
 
   static getHeight(el: HTMLElement): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     const height = UtilitiesDOM.getOuterHeight(el);
 
     const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
@@ -184,8 +184,16 @@ export default class UtilitiesDOM {
     return null;
   }
 
+  static getPointerX(event): number {
+    //TODO: Browser test this
+    if (event.type.indexOf('touch') === 0) {
+      return (event.touches[0] || event.changedTouches[0]).pageX;
+    }
+    return event.pageX;
+  }
+
   static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number {
-    //TODO: Try to unit test this
+    //TODO: Browser test this
     if (!contentElement || !measurementElement)
       return 0;
 

@@ -143,6 +143,12 @@ var UtilitiesDOM = (function () {
         }
         return null;
     };
+    UtilitiesDOM.getPointerX = function (event) {
+        if (event.type.indexOf('touch') === 0) {
+            return (event.touches[0] || event.changedTouches[0]).pageX;
+        }
+        return event.pageX;
+    };
     UtilitiesDOM.getTextWidth = function (contentElement, measurementElement) {
         if (!contentElement || !measurementElement)
             return 0;

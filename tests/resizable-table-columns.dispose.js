@@ -50,12 +50,10 @@ describe('ResizableTableColumns', function () {
       assert.isNotNull(el, 'Table element should be found in dom');
 
       const rtc = new ResizableTableColumns(el, null);
-
       rtc.dispose();
 
       assert.isObject(rtc);
       assert.isTrue(typeof el[ResizableConstants.dataPropertyname] === 'undefined');
     });
-
   });
 });

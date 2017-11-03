@@ -28,7 +28,7 @@ var ResizableTableColumns = (function () {
         this.validateMarkup();
         this.wrapTable();
         this.asignTableHeaders();
-        this.storeHeaderOriginalWidths();
+        this.storeOriginalWidths();
         this.setHeaderWidths();
         this.createDragHandles();
         this.restoreColumnWidths();
@@ -48,7 +48,7 @@ var ResizableTableColumns = (function () {
             win.removeEventListener(evt, _this.windowResizeHandlerRef, false);
         });
         this.destroyDragHandles();
-        this.restoreHeaderOriginalWidths();
+        this.restoreOriginalWidths();
         this.unwrapTable();
         this.windowResizeHandlerRef = null;
         this.onPointerDownRef = null;
@@ -147,25 +147,21 @@ var ResizableTableColumns = (function () {
             }
         }
     };
-    ResizableTableColumns.prototype.storeHeaderOriginalWidths = function () {
+    ResizableTableColumns.prototype.storeOriginalWidths = function () {
         var _this = this;
         this.tableHeaders
             .forEach(function (el, idx) {
-            if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable))
-                return;
-            var columnName = el.getAttribute(ResizableConstants.attibutes.dataResizable);
-            _this.originalWidths["___." + columnName] = el.style.width;
+            _this.originalWidths["___." + idx] = el.style.width;
         });
+        this.originalWidths["___.table"] = this.table.style.width;
     };
-    ResizableTableColumns.prototype.restoreHeaderOriginalWidths = function () {
+    ResizableTableColumns.prototype.restoreOriginalWidths = function () {
         var _this = this;
         this.tableHeaders
             .forEach(function (el, idx) {
-            if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable))
-                return;
-            var columnName = el.getAttribute(ResizableConstants.attibutes.dataResizable);
-            el.style.width = _this.originalWidths["___." + columnName];
+            el.style.width = _this.originalWidths["___." + idx];
         });
+        this.table.style.width = this.originalWidths["___.table"];
     };
     ResizableTableColumns.prototype.setHeaderWidths = function () {
         var _this = this;
@@ -181,11 +177,11 @@ var ResizableTableColumns = (function () {
         var minWidth = this.options.obeyCssMinWidth
             ? UtilitiesDOM.getMinCssWidth(el)
             : -Infinity;
-        result = Math.max(minWidth, result, this.options.minWidth || -Infinity);
+        result = Math.max(result, minWidth, this.options.minWidth || -Infinity);
         var maxWidth = this.options.obeyCssMaxWidth
             ? UtilitiesDOM.getMaxCssWidth(el)
             : +Infinity;
-        result = Math.min(maxWidth, result, this.options.maxWidth || +Infinity);
+        result = Math.min(result, maxWidth, this.options.maxWidth || +Infinity);
         return result;
     };
     ResizableTableColumns.prototype.createDragHandles = function () {
@@ -195,10 +191,8 @@ var ResizableTableColumns = (function () {
         this.dragHandlesContainer = this.ownerDocument.createElement('div');
         this.wrapper.insertBefore(this.dragHandlesContainer, this.table);
         UtilitiesDOM.addClass(this.dragHandlesContainer, ResizableConstants.classes.handleContainer);
-        this.tableHeaders
+        this.getResizableHeaders()
             .forEach(function (el, idx) {
-            if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable))
-                return;
             var handler = _this.ownerDocument.createElement('div');
             UtilitiesDOM.addClass(handler, ResizableConstants.classes.handle);
             _this.dragHandlesContainer.appendChild(handler);
@@ -227,39 +221,24 @@ var ResizableTableColumns = (function () {
             : new Array();
     };
     ResizableTableColumns.prototype.restoreColumnWidths = function () {
-        var _this = this;
         if (!this.options.store)
             return;
-        var tableId = this.generateTableId();
+        var tableId = ResizableTableColumns.generateTableId(this.table);
         if (tableId.length === 0)
+            return;
+        var data = this.options.store.get(tableId);
+        if (!data)
             return;
         this.getResizableHeaders()
             .forEach(function (el, idx) {
-            var width = _this.options.store.get(_this.generateColumnId(el, tableId));
-            if (width != null) {
+            var width = data.columns[ResizableTableColumns.generateColumnId(el)];
+            if (typeof width !== 'undefined') {
                 ResizableTableColumns.setWidth(el, width);
             }
         });
-        var tableWidth = this.options.store.get(tableId);
-        if (tableWidth != null) {
-            ResizableTableColumns.setWidth(this.table, tableWidth);
+        if (typeof data.table !== 'undefined') {
+            ResizableTableColumns.setWidth(this.table, data.table);
         }
-    };
-    ResizableTableColumns.prototype.generateColumnId = function (el, tableId) {
-        var columnId = (el.getAttribute(ResizableConstants.attibutes.dataResizable) || '')
-            .trim()
-            .replace(/\./g, '_');
-        return tableId + "/" + columnId;
-    };
-    ResizableTableColumns.prototype.generateTableId = function () {
-        var tableId = (this.table.getAttribute(ResizableConstants.attibutes.dataResizableTable)
-            || this.table.id
-            || '')
-            .trim()
-            .replace(/\./g, '_');
-        return tableId.length
-            ? "rtc/" + tableId
-            : tableId;
     };
     ResizableTableColumns.prototype.checkTableWidth = function () {
         var wrappperWidth = UtilitiesDOM.getWidth(this.wrapper);
@@ -351,7 +330,7 @@ var ResizableTableColumns = (function () {
         eventData.column = column;
         eventData.dragHandler = dragHandler;
         eventData.pointer = {
-            x: ResizableTableColumns.getPointerX(event),
+            x: UtilitiesDOM.getPointerX(event),
             isDoubleClick: isDoubleClick
         };
         eventData.originalWidths = {
@@ -380,7 +359,7 @@ var ResizableTableColumns = (function () {
     ResizableTableColumns.prototype.handlePointerMove = function (event) {
         if (!this.eventData)
             return;
-        var difference = ResizableTableColumns.getPointerX(event) - this.eventData.pointer.x;
+        var difference = UtilitiesDOM.getPointerX(event) - this.eventData.pointer.x;
         if (difference === 0) {
             return;
         }
@@ -528,17 +507,20 @@ var ResizableTableColumns = (function () {
         this.wrapper.style.overflowX = original;
     };
     ResizableTableColumns.prototype.saveColumnWidths = function () {
-        var _this = this;
         if (!this.options.store)
             return;
-        var tableId = this.generateTableId();
+        var tableId = ResizableTableColumns.generateTableId(this.table);
         if (tableId.length === 0)
             return;
+        var data = {
+            table: ResizableTableColumns.getWidth(this.table),
+            columns: {}
+        };
         this.getResizableHeaders()
             .forEach(function (el, idx) {
-            _this.options.store.set(_this.generateColumnId(el, tableId), ResizableTableColumns.getWidth(el));
+            data.columns[ResizableTableColumns.generateColumnId(el)] = ResizableTableColumns.getWidth(el);
         });
-        this.options.store.set(tableId, ResizableTableColumns.getWidth(this.table));
+        this.options.store.set(tableId, data);
     };
     ResizableTableColumns.prototype.createHandlerReferences = function () {
         var _this = this;
@@ -564,11 +546,19 @@ var ResizableTableColumns = (function () {
             };
         }
     };
-    ResizableTableColumns.getPointerX = function (event) {
-        if (event.type.indexOf('touch') === 0) {
-            return (event.touches[0] || event.changedTouches[0]).pageX;
-        }
-        return event.pageX;
+    ResizableTableColumns.generateColumnId = function (el) {
+        var columnId = (el.getAttribute(ResizableConstants.attibutes.dataResizable) || '')
+            .trim()
+            .replace(/\./g, '_');
+        return columnId;
+    };
+    ResizableTableColumns.generateTableId = function (table) {
+        var tableId = (table.getAttribute(ResizableConstants.attibutes.dataResizableTable) || '')
+            .trim()
+            .replace(/\./g, '_');
+        return tableId.length
+            ? "rtc/" + tableId
+            : tableId;
     };
     ResizableTableColumns.getWidth = function (el) {
         if (el.style.width === '')

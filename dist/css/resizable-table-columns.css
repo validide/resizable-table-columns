@@ -33,11 +33,19 @@
 }
 
 .rtc-wrapper table.rtc-table.rtc-table-resizing {
-  cursor: ew-resize;
+  cursor: col-resize;
 }
 
 .rtc-wrapper table.rtc-table.rtc-table-resizing thead, .rtc-wrapper table.rtc-table.rtc-table-resizing thead > th, .rtc-wrapper table.rtc-table.rtc-table-resizing thead > th > a {
-  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+.rtc-wrapper table.rtc-table thead tr.invisible,
+.rtc-wrapper table.rtc-table thead tr.invisible th {
+  border: none;
+  margin: 0;
+  padding: 0;
+  height: 0 !important;
 }
 
 .rtc-wrapper .rtc-handle-container {
@@ -52,7 +60,7 @@
   width: 7px;
   margin-left: -3px;
   z-index: 2;
-  cursor: ew-resize;
+  cursor: col-resize;
 }
 
 .rtc-wrapper .rtc-handle-container .rtc-handle:last-of-type {
