@@ -57,12 +57,12 @@
 
 .rtc-wrapper .rtc-handle-container .rtc-handle {
   position: absolute;
-  width: 7px;
+  width: 9px;
   margin-left: -3px;
   z-index: 2;
   cursor: col-resize;
 }
 
 .rtc-wrapper .rtc-handle-container .rtc-handle:last-of-type {
-  width: 4px;
+  width: 6px;
 }

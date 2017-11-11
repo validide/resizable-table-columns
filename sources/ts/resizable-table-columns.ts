@@ -4,8 +4,9 @@ import ResizableEventData from './resizable-event-data';
 import Utilities from './utilities'
 import UtilitiesDOM from './utilities-dom'
 
-export default class ResizableTableColumns {
+class ResizableTableColumns {
   static instancesCount: number = 0;
+  static windowResizeHandlerRegistered: boolean = false;
 
   table: HTMLTableElement;
   options: ResizableOptions;
@@ -18,7 +19,6 @@ export default class ResizableTableColumns {
   originalWidths: { [id: string]: string; };
   eventData: ResizableEventData | null;
   lastPointerDown: number;
-  windowResizeHandlerRef: any;
   onPointerDownRef: any;
   onPointerMoveRef: any;
   onPointerUpRef: any;
@@ -49,8 +49,8 @@ export default class ResizableTableColumns {
   }
 
   init() {
-    this.createHandlerReferences();
     this.validateMarkup();
+    this.createHandlerReferences();
     this.wrapTable();
     this.asignTableHeaders();
     this.storeOriginalWidths();
@@ -59,26 +59,13 @@ export default class ResizableTableColumns {
     this.restoreColumnWidths();
     this.checkTableWidth();
     this.syncHandleWidths();
-
-
-    const win = this.ownerDocument.defaultView;
-    ResizableConstants.events.windowResize
-      .forEach((evt, idx) => {
-        win.addEventListener(evt, this.windowResizeHandlerRef, false);
-      });
+    this.registerWindowResizeHandler();
   }
 
   dispose() {
-    const win = this.ownerDocument.defaultView;
-    ResizableConstants.events.windowResize
-      .forEach((evt, idx) => {
-        win.removeEventListener(evt, this.windowResizeHandlerRef, false);
-      });
-
     this.destroyDragHandles();
     this.restoreOriginalWidths();
     this.unwrapTable();
-    this.windowResizeHandlerRef = null;
     this.onPointerDownRef = null;
     this.onPointerMoveRef = null;
     this.onPointerUpRef = null;
@@ -639,13 +626,6 @@ export default class ResizableTableColumns {
   }
 
   createHandlerReferences() {
-    if (!this.windowResizeHandlerRef) {
-      this.windowResizeHandlerRef = () => {
-        this.checkTableWidth();
-        this.syncHandleWidths();
-      };
-    }
-
     if (!this.onPointerDownRef) {
       this.onPointerDownRef = (evt) => {
         this.handlePointerDown(evt);
@@ -662,6 +642,38 @@ export default class ResizableTableColumns {
       this.onPointerUpRef = (evt) => {
         this.handlePointerUp(evt);
       };
+    }
+  }
+
+  registerWindowResizeHandler(): void {
+    const win = this.ownerDocument.defaultView;
+    if (ResizableTableColumns.windowResizeHandlerRegistered)
+      return;
+
+    ResizableTableColumns.windowResizeHandlerRegistered = true;
+    ResizableConstants.events.windowResize
+      .forEach((evt, idx) => {
+        win.addEventListener(evt, ResizableTableColumns.onWindowResize, false);
+      });
+  }
+
+  handleWindowResize(): void {
+    this.checkTableWidth();
+    this.syncHandleWidths();
+  }
+
+  static onWindowResize(event: Event): void {
+    const target = event.target as Window;
+    if (target == null)
+      return;
+
+    const tables = target.document.querySelectorAll(`.${ResizableConstants.classes.table}`);
+    for (let index = 0; index < tables.length; index++) {
+      const table = tables[index];
+      if (typeof table[ResizableConstants.dataPropertyname] !== 'object')
+        continue;
+
+      table[ResizableConstants.dataPropertyname].handleWindowResize();
     }
   }
 
@@ -700,3 +712,5 @@ export default class ResizableTableColumns {
     return ResizableTableColumns.instancesCount++;
   }
 }
+
+export default ResizableTableColumns;

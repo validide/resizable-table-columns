@@ -214,10 +214,6 @@ describe('ResizableTableColumns', function () {
   });
 
   describe('.createHandlerReferences()', function () {
-    it('Create "windowResizeHandlerRef"', function () {
-      assert.isTrue(typeof rtc.windowResizeHandlerRef === 'function');
-    });
-
     it('Create "onPointerDownRef"', function () {
       assert.isTrue(typeof rtc.onPointerDownRef === 'function');
     });
@@ -228,6 +224,12 @@ describe('ResizableTableColumns', function () {
 
     it('Create "onPointerUpRef"', function () {
       assert.isTrue(typeof rtc.onPointerUpRef === 'function');
+    });
+  });
+
+  describe('.registerWindowResizeHandler()', function () {
+    it('Should be true "registerWindowResizeHandler"', function () {
+      assert.isTrue(ResizableTableColumns.windowResizeHandlerRegistered);
     });
   });
 

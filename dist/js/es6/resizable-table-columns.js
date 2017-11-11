@@ -23,9 +23,8 @@ var ResizableTableColumns = (function () {
         this.table[ResizableConstants.dataPropertyname] = this;
     }
     ResizableTableColumns.prototype.init = function () {
-        var _this = this;
-        this.createHandlerReferences();
         this.validateMarkup();
+        this.createHandlerReferences();
         this.wrapTable();
         this.asignTableHeaders();
         this.storeOriginalWidths();
@@ -34,23 +33,12 @@ var ResizableTableColumns = (function () {
         this.restoreColumnWidths();
         this.checkTableWidth();
         this.syncHandleWidths();
-        var win = this.ownerDocument.defaultView;
-        ResizableConstants.events.windowResize
-            .forEach(function (evt, idx) {
-            win.addEventListener(evt, _this.windowResizeHandlerRef, false);
-        });
+        this.registerWindowResizeHandler();
     };
     ResizableTableColumns.prototype.dispose = function () {
-        var _this = this;
-        var win = this.ownerDocument.defaultView;
-        ResizableConstants.events.windowResize
-            .forEach(function (evt, idx) {
-            win.removeEventListener(evt, _this.windowResizeHandlerRef, false);
-        });
         this.destroyDragHandles();
         this.restoreOriginalWidths();
         this.unwrapTable();
-        this.windowResizeHandlerRef = null;
         this.onPointerDownRef = null;
         this.onPointerMoveRef = null;
         this.onPointerUpRef = null;
@@ -524,12 +512,6 @@ var ResizableTableColumns = (function () {
     };
     ResizableTableColumns.prototype.createHandlerReferences = function () {
         var _this = this;
-        if (!this.windowResizeHandlerRef) {
-            this.windowResizeHandlerRef = function () {
-                _this.checkTableWidth();
-                _this.syncHandleWidths();
-            };
-        }
         if (!this.onPointerDownRef) {
             this.onPointerDownRef = function (evt) {
                 _this.handlePointerDown(evt);
@@ -544,6 +526,32 @@ var ResizableTableColumns = (function () {
             this.onPointerUpRef = function (evt) {
                 _this.handlePointerUp(evt);
             };
+        }
+    };
+    ResizableTableColumns.prototype.registerWindowResizeHandler = function () {
+        var win = this.ownerDocument.defaultView;
+        if (ResizableTableColumns.windowResizeHandlerRegistered)
+            return;
+        ResizableTableColumns.windowResizeHandlerRegistered = true;
+        ResizableConstants.events.windowResize
+            .forEach(function (evt, idx) {
+            win.addEventListener(evt, ResizableTableColumns.onWindowResize, false);
+        });
+    };
+    ResizableTableColumns.prototype.handleWindowResize = function () {
+        this.checkTableWidth();
+        this.syncHandleWidths();
+    };
+    ResizableTableColumns.onWindowResize = function (event) {
+        var target = event.target;
+        if (target == null)
+            return;
+        var tables = target.document.querySelectorAll("." + ResizableConstants.classes.table);
+        for (var index = 0; index < tables.length; index++) {
+            var table = tables[index];
+            if (typeof table[ResizableConstants.dataPropertyname] !== 'object')
+                continue;
+            table[ResizableConstants.dataPropertyname].handleWindowResize();
         }
     };
     ResizableTableColumns.generateColumnId = function (el) {
@@ -574,6 +582,7 @@ var ResizableTableColumns = (function () {
         return ResizableTableColumns.instancesCount++;
     };
     ResizableTableColumns.instancesCount = 0;
+    ResizableTableColumns.windowResizeHandlerRegistered = false;
     return ResizableTableColumns;
 }());
 export default ResizableTableColumns;
