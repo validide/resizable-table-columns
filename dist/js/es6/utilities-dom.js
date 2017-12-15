@@ -145,7 +145,12 @@ var UtilitiesDOM = (function () {
     };
     UtilitiesDOM.getPointerX = function (event) {
         if (event.type.indexOf('touch') === 0) {
-            return (event.touches[0] || event.changedTouches[0]).pageX;
+            if (event.touches && event.touches.length) {
+                return event.touches[0].pageX;
+            }
+            if (event.changedTouches && event.changedTouches.length) {
+                return event.changedTouches[0].pageX;
+            }
         }
         return event.pageX;
     };

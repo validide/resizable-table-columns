@@ -369,9 +369,9 @@ class ResizableTableColumns {
   }
 
   handlePointerDown(event: Event): void {
-    this.handlePointerUp(event);
+    this.handlePointerUp();
 
-    const target = event.target as HTMLElement;
+    const target = event ? event.target as HTMLElement : null;
     if (target == null)
       return;
 
@@ -429,7 +429,7 @@ class ResizableTableColumns {
   }
 
   handlePointerMove(event: Event): void {
-    if (!this.eventData)
+    if (!this.eventData || !event)
       return;
 
     const difference = UtilitiesDOM.getPointerX(event) - this.eventData.pointer.x;
@@ -457,14 +457,14 @@ class ResizableTableColumns {
     this.table.dispatchEvent(eventToDispatch);
   }
 
-  handlePointerUp(event: Event): void {
+  handlePointerUp(): void {
     this.detachHandlers();
 
     if (!this.eventData)
       return;
 
     if (this.eventData.pointer.isDoubleClick) {
-      this.handleDoubleClick(event)
+      this.handleDoubleClick()
     }
 
     UtilitiesDOM.removeClass(this.table, ResizableConstants.classes.tableResizing);
@@ -491,7 +491,7 @@ class ResizableTableColumns {
     this.eventData = null;
   }
 
-  handleDoubleClick(event: Event): void {
+  handleDoubleClick(): void {
     if (!this.eventData || !this.eventData.column)
       return;
 
@@ -640,7 +640,7 @@ class ResizableTableColumns {
 
     if (!this.onPointerUpRef) {
       this.onPointerUpRef = (evt) => {
-        this.handlePointerUp(evt);
+        this.handlePointerUp();
       };
     }
   }
@@ -663,7 +663,7 @@ class ResizableTableColumns {
   }
 
   static onWindowResize(event: Event): void {
-    const target = event.target as Window;
+    const target = event ? event.target as Window : null;
     if (target == null)
       return;
 

@@ -201,7 +201,12 @@ var UtilitiesDOM = (function () {
     };
     UtilitiesDOM.getPointerX = function (event) {
         if (event.type.indexOf('touch') === 0) {
-            return (event.touches[0] || event.changedTouches[0]).pageX;
+            if (event.touches && event.touches.length) {
+                return event.touches[0].pageX;
+            }
+            if (event.changedTouches && event.changedTouches.length) {
+                return event.changedTouches[0].pageX;
+            }
         }
         return event.pageX;
     };
@@ -581,8 +586,8 @@ var ResizableTableColumns = (function () {
         });
     };
     ResizableTableColumns.prototype.handlePointerDown = function (event) {
-        this.handlePointerUp(event);
-        var target = event.target;
+        this.handlePointerUp();
+        var target = event ? event.target : null;
         if (target == null)
             return;
         if (target.nodeName !== 'DIV' || !UtilitiesDOM.hasClass(target, ResizableConstants.classes.handle))
@@ -630,7 +635,7 @@ var ResizableTableColumns = (function () {
         event.preventDefault();
     };
     ResizableTableColumns.prototype.handlePointerMove = function (event) {
-        if (!this.eventData)
+        if (!this.eventData || !event)
             return;
         var difference = UtilitiesDOM.getPointerX(event) - this.eventData.pointer.x;
         if (difference === 0) {
@@ -654,12 +659,12 @@ var ResizableTableColumns = (function () {
         });
         this.table.dispatchEvent(eventToDispatch);
     };
-    ResizableTableColumns.prototype.handlePointerUp = function (event) {
+    ResizableTableColumns.prototype.handlePointerUp = function () {
         this.detachHandlers();
         if (!this.eventData)
             return;
         if (this.eventData.pointer.isDoubleClick) {
-            this.handleDoubleClick(event);
+            this.handleDoubleClick();
         }
         UtilitiesDOM.removeClass(this.table, ResizableConstants.classes.tableResizing);
         UtilitiesDOM.removeClass(this.wrapper, ResizableConstants.classes.tableResizing);
@@ -681,7 +686,7 @@ var ResizableTableColumns = (function () {
         this.table.dispatchEvent(eventToDispatch);
         this.eventData = null;
     };
-    ResizableTableColumns.prototype.handleDoubleClick = function (event) {
+    ResizableTableColumns.prototype.handleDoubleClick = function () {
         if (!this.eventData || !this.eventData.column)
             return;
         var column = this.eventData.column;
@@ -809,7 +814,7 @@ var ResizableTableColumns = (function () {
         }
         if (!this.onPointerUpRef) {
             this.onPointerUpRef = function (evt) {
-                _this.handlePointerUp(evt);
+                _this.handlePointerUp();
             };
         }
     };
@@ -828,7 +833,7 @@ var ResizableTableColumns = (function () {
         this.syncHandleWidths();
     };
     ResizableTableColumns.onWindowResize = function (event) {
-        var target = event.target;
+        var target = event ? event.target : null;
         if (target == null)
             return;
         var tables = target.document.querySelectorAll("." + ResizableConstants.classes.table);

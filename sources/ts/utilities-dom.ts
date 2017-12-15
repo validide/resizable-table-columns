@@ -184,10 +184,16 @@ export default class UtilitiesDOM {
     return null;
   }
 
-  static getPointerX(event): number {
+  static getPointerX(event): number | null {
     //TODO: Browser test this
     if (event.type.indexOf('touch') === 0) {
-      return (event.touches[0] || event.changedTouches[0]).pageX;
+      if (event.touches && event.touches.length) {
+        return event.touches[0].pageX;
+      }
+
+      if (event.changedTouches && event.changedTouches.length) {
+        return event.changedTouches[0].pageX
+      }
     }
     return event.pageX;
   }
