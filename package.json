@@ -35,22 +35,22 @@
   },
   "homepage": "https://github.com/validide/resizable-table-columns#readme",
   "devDependencies": {
-    "@types/chai": "^4.0.4",
-    "@types/jsdom": "^11.0.2",
-    "@types/mocha": "^2.2.43",
-    "autoprefixer": "^7.1.2",
-    "babel-preset-env": "^1.6.0",
+    "@types/chai": "^4.1.4",
+    "@types/jsdom": "^11.0.5",
+    "@types/mocha": "^2.2.48",
+    "autoprefixer": "^7.2.6",
+    "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
-    "concurrently": "^3.5.0",
+    "concurrently": "^3.5.1",
     "glob": "^7.1.2",
-    "jsdom": "^11.3.0",
+    "jsdom": "^11.11.0",
     "minifier": "^0.8.1",
-    "mocha": "^4.0.1",
-    "node-sass": "^4.5.3",
+    "mocha": "^4.1.0",
+    "node-sass": "^4.9.0",
     "postcss-cli": "^4.1.1",
     "rimraf": "latest",
-    "rollup": "^0.50.0",
-    "typescript": "^2.5.3"
+    "rollup": "^0.50.1",
+    "typescript": "^2.9.2"
   }
 }
