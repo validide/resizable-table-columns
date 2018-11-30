@@ -1,16 +1,29 @@
-const minifier = require("minifier");
-const options = {};
-const pathsToMinify = [
-  "./dist/css",
-  "./dist/js/bundle"
-];
+const _fs = require('fs');
+const _path = require('path');
+const _glob = require('glob');
+const _uglifycss = require('uglifycss');
+const _uglifyJS = require("uglify-js");
 
-minifier.on("error", function(err) {
-	console.error(err);
-});
 
-for(let i=0; i< pathsToMinify.length; i++) {
-  minifier.minify(pathsToMinify[i]);
+function writeMinifiedFileSync(path, content, encding) {
+  const file = _path.parse(path);
+  const minifiedFilePath = _path.join(file.dir, `${file.name}.min${file.ext}`);
+  //console.log(minifiedFilePath);
+  _fs.writeFileSync(minifiedFilePath, content, encding);
 }
 
-console.log("Done minfying!");
+
+_glob
+  .sync('./dist/css/**/*.css', [])
+  .forEach(f => {
+    writeMinifiedFileSync(f, _uglifycss.processFiles([f], {}), 'utf8');
+    console.log(`Minified "${f}"`);
+  });
+
+
+_glob
+  .sync('./dist/js/bundle/**/*.js', [])
+  .forEach(f => {
+    writeMinifiedFileSync(f, _uglifyJS.minify(_fs.readFileSync(f, 'utf8'), {}).code, 'utf8');
+    console.log(`Minified "${f}"`);
+  });
