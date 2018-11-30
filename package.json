@@ -1,6 +1,6 @@
 {
   "name": "resizable-table-columns",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple Javascript resizable table columns",
   "main": "index.js",
   "scripts": {
