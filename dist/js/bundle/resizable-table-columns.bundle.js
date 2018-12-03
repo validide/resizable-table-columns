@@ -568,10 +568,7 @@ var ResizableTableColumns = (function () {
                 var height = UtilitiesDOM.getInnerHeight(_this.options.resizeFromBody ? _this.table : _this.table.tHead);
                 if (idx < headers.length) {
                     var th = headers[idx];
-                    var computedStyles = getComputedStyle(th);
                     var left = UtilitiesDOM.getOuterWidth(th);
-                    left -= Utilities.parseStyleDimension(computedStyles.paddingLeft, false);
-                    left -= Utilities.parseStyleDimension(computedStyles.paddingRight, false);
                     left += UtilitiesDOM.getOffset(th).left;
                     left -= UtilitiesDOM.getOffset(_this.dragHandlesContainer).left;
                     el.style.left = left + "px";

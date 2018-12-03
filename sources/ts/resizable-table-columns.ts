@@ -349,10 +349,7 @@ class ResizableTableColumns {
 
         if (idx < headers.length) {
           const th = headers[idx];
-          const computedStyles = getComputedStyle(th);
           let left = UtilitiesDOM.getOuterWidth(th);
-          left -= <number>Utilities.parseStyleDimension(computedStyles.paddingLeft, false);
-          left -= <number>Utilities.parseStyleDimension(computedStyles.paddingRight, false);
           left += UtilitiesDOM.getOffset(th).left;
           left -= UtilitiesDOM.getOffset(this.dragHandlesContainer).left;
           el.style.left = `${left}px`;
