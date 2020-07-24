@@ -1,7 +1,7 @@
-var ResizableConstants = (function () {
+var ResizableConstants = /** @class */ (function () {
     function ResizableConstants() {
     }
-    ResizableConstants.dataPropertyname = 'rtc_data_object';
+    ResizableConstants.dataPropertyname = 'validide_rtc_data_object';
     ResizableConstants.classes = {
         table: 'rtc-table',
         wrapper: 'rtc-wrapper',
@@ -30,3 +30,4 @@ var ResizableConstants = (function () {
     return ResizableConstants;
 }());
 export default ResizableConstants;
+//# sourceMappingURL=resizable-constants.js.map

@@ -3,10 +3,10 @@
 /// <reference path="../node_modules/@types/jsdom/index.d.ts" />
 
 import { assert } from 'chai';
-import { JSDOM } from '../node_modules/jsdom/lib/api';
-import ResizableConstants from '../dist/js/es6/resizable-constants';
-import ResizableOptions from '../dist/js/es6/resizable-options';
-import ResizableTableColumns from '../dist/js/es6/resizable-table-columns';
+import { JSDOM } from 'jsdom';
+import ResizableConstants from '../sources/ts/resizable-constants';
+import ResizableOptions from '../sources/ts/resizable-options';
+import ResizableTableColumns from '../sources/ts/resizable-table-columns';
 
 describe('ResizableTableColumns', function () {
   describe('.dispose', function () {
@@ -49,11 +49,11 @@ describe('ResizableTableColumns', function () {
       const el = DOM.window.document.getElementById('valid-table');
       assert.isNotNull(el, 'Table element should be found in dom');
 
-      const rtc = new ResizableTableColumns(el, null);
+      const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       rtc.dispose();
 
       assert.isObject(rtc);
-      assert.isTrue(typeof el[ResizableConstants.dataPropertyname] === 'undefined');
+      assert.isTrue(typeof (el as any)[ResizableConstants.dataPropertyname] === 'undefined');
     });
   });
 });

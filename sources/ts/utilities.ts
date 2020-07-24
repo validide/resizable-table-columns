@@ -1,3 +1,7 @@
+export interface IIndexedCollection<T> {
+  [name: string]: T;
+}
+
 export default class Utilities {
   static regexEscapeRegex: RegExp = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;
   static kebabCaseRegex: RegExp = /(\-\w)/g;
@@ -33,7 +37,7 @@ export default class Utilities {
     return str;
   }
 
-  static parseStyleDimension(dimension: string | number, returnOriginal: boolean): number | string {
+  static parseStyleDimension(dimension: string | number | undefined, returnOriginal: boolean): number | string | undefined {
     if (typeof dimension === 'string') {
       if (dimension.length) {
         const toParse = dimension

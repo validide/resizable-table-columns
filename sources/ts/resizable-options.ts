@@ -9,7 +9,7 @@ export default class ResizableOptions {
   doubleClickDelay: number;
   store: any;
 
-  constructor(options: null | object, element: null | HTMLElement) {
+  constructor(options: null | object = null, element: null | HTMLElement = null) {
     this.resizeFromBody = true;
     this.minWidth = 40;
     this.maxWidth = null;
@@ -23,18 +23,18 @@ export default class ResizableOptions {
   }
 
 
-  overrideValues(options: null | object): void {
+  overrideValues(options: null | object = null): void {
     if (!options)
       return;
 
     for (let prop in options) {
       if (this.hasOwnProperty(prop)) {
-        this[prop] = options[prop];
+        (this as any)[prop] = (options as any)[prop];
       }
     }
   }
 
-  overrideValuesFromElement(element: null | HTMLElement): void {
+  overrideValuesFromElement(element: null | HTMLElement = null): void {
     if (!element)
       return;
 

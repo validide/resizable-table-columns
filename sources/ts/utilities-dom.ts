@@ -1,4 +1,4 @@
-import Utilities from './utilities'
+import Utilities, { IIndexedCollection } from './utilities'
 
 export default class UtilitiesDOM {
   static addClass(el: HTMLElement, className: string) {
@@ -24,15 +24,15 @@ export default class UtilitiesDOM {
       return !!el.className.match(new RegExp('(\\s|^)' + Utilities.escapeRegExp(className) + '(\\s|$)'))
   }
 
-  static getDataAttributesValues(el: HTMLElement): object {
+  static getDataAttributesValues(el: HTMLElement): object | null {
     if (!el)
       return null;
 
-    const returnValue: object = {};
+    const returnValue: IIndexedCollection<any> = {};
     if (el.dataset) {
       for (let prop in el.dataset) {
         if (el.dataset.hasOwnProperty(prop)) {
-          returnValue[prop] = Utilities.parseStringToType(el.dataset[prop]);
+          returnValue[prop] = Utilities.parseStringToType(el.dataset[prop] || '');
         }
       }
     }
@@ -50,7 +50,7 @@ export default class UtilitiesDOM {
   }
 
   static getMinCssWidth(el: HTMLElement): number | null {
-    const computedStyle = el.ownerDocument.defaultView.getComputedStyle(el).minWidth;
+    const computedStyle = el.ownerDocument.defaultView?.getComputedStyle(el).minWidth;
     const minWidth = Utilities.parseStyleDimension(computedStyle, true);
     if (typeof minWidth === 'number' && !isNaN(minWidth))
       return minWidth;
@@ -59,7 +59,7 @@ export default class UtilitiesDOM {
   }
 
   static getMaxCssWidth(el: HTMLElement): number | null {
-    const computedStyle = el.ownerDocument.defaultView.getComputedStyle(el).maxWidth;
+    const computedStyle = el.ownerDocument.defaultView?.getComputedStyle(el).maxWidth;
     const maxWidth = Utilities.parseStyleDimension(computedStyle, true);
     if (typeof maxWidth === 'number' && !isNaN(maxWidth))
       return maxWidth;
@@ -73,9 +73,9 @@ export default class UtilitiesDOM {
     if (!includeMargin)
       return width;
 
-    const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-    const marginTop = <number>Utilities.parseStyleDimension(computedStyles.marginTop, false);
-    const marginBottom = <number>Utilities.parseStyleDimension(computedStyles.marginBottom, false);
+    const computedStyles = el.ownerDocument.defaultView?.getComputedStyle(el);
+    const marginTop = <number>Utilities.parseStyleDimension(computedStyles?.marginTop, false);
+    const marginBottom = <number>Utilities.parseStyleDimension(computedStyles?.marginBottom, false);
     return width + marginTop + marginBottom;
   }
 
@@ -83,9 +83,9 @@ export default class UtilitiesDOM {
     //TODO: Browser test this
     const width = UtilitiesDOM.getOuterWidth(el);
 
-    const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-    const borderLeft = <number>Utilities.parseStyleDimension(computedStyles.borderLeft, false);
-    const borderRight = <number>Utilities.parseStyleDimension(computedStyles.borderRight, false);
+    const computedStyles = el.ownerDocument.defaultView?.getComputedStyle(el);
+    const borderLeft = <number>Utilities.parseStyleDimension(computedStyles?.borderLeft, false);
+    const borderRight = <number>Utilities.parseStyleDimension(computedStyles?.borderRight, false);
 
     return width - borderLeft - borderRight;
   }
@@ -94,11 +94,16 @@ export default class UtilitiesDOM {
     //TODO: Browser test this
     const width = UtilitiesDOM.getOuterWidth(el);
 
-    const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-    const paddingLeft = <number>Utilities.parseStyleDimension(computedStyles.paddingLeft, false);
-    const paddingRight = <number>Utilities.parseStyleDimension(computedStyles.paddingRight, false);
-    const borderLeft = <number>Utilities.parseStyleDimension(computedStyles.borderLeft, false);
-    const borderRight = <number>Utilities.parseStyleDimension(computedStyles.borderRight, false);
+    const computedStyles = el.ownerDocument.defaultView?.getComputedStyle(el);
+    const isBorderBox = computedStyles?.boxSizing === 'border-box';
+    if (isBorderBox)
+      return width;
+
+    const paddingLeft = <number>Utilities.parseStyleDimension(computedStyles?.paddingLeft, false);
+    const paddingRight = <number>Utilities.parseStyleDimension(computedStyles?.paddingRight, false);
+    const borderLeft = <number>Utilities.parseStyleDimension(computedStyles?.borderLeft, false);
+    const borderRight = <number>Utilities.parseStyleDimension(computedStyles?.borderRight, false);
+
 
     return width - paddingLeft - paddingRight - borderLeft - borderRight;
   }
@@ -109,9 +114,9 @@ export default class UtilitiesDOM {
     if (!includeMargin)
       return height;
 
-    const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-    const marginTop = <number>Utilities.parseStyleDimension(computedStyles.marginTop, false);
-    const marginBottom = <number>Utilities.parseStyleDimension(computedStyles.marginBottom, false);
+    const computedStyles = el.ownerDocument.defaultView?.getComputedStyle(el);
+    const marginTop = <number>Utilities.parseStyleDimension(computedStyles?.marginTop, false);
+    const marginBottom = <number>Utilities.parseStyleDimension(computedStyles?.marginBottom, false);
     return height + marginTop + marginBottom;
   }
 
@@ -119,9 +124,9 @@ export default class UtilitiesDOM {
     //TODO: Browser test this
     const height = UtilitiesDOM.getOuterHeight(el);
 
-    const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-    const borderTop = <number>Utilities.parseStyleDimension(computedStyles.borderTop, false);
-    const borderBottom = <number>Utilities.parseStyleDimension(computedStyles.borderBottom, false);
+    const computedStyles = el.ownerDocument.defaultView?.getComputedStyle(el);
+    const borderTop = <number>Utilities.parseStyleDimension(computedStyles?.borderTop, false);
+    const borderBottom = <number>Utilities.parseStyleDimension(computedStyles?.borderBottom, false);
 
     return height - borderTop - borderBottom;
   }
@@ -130,18 +135,18 @@ export default class UtilitiesDOM {
     //TODO: Browser test this
     const height = UtilitiesDOM.getOuterHeight(el);
 
-    const computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-    const paddingTop = <number>Utilities.parseStyleDimension(computedStyles.paddingTop, false);
-    const paddingBottom = <number>Utilities.parseStyleDimension(computedStyles.paddingBottom, false);
-    const borderTop = <number>Utilities.parseStyleDimension(computedStyles.borderTop, false);
-    const borderBottom = <number>Utilities.parseStyleDimension(computedStyles.borderBottom, false);
+    const computedStyles = el.ownerDocument.defaultView?.getComputedStyle(el);
+    const paddingTop = <number>Utilities.parseStyleDimension(computedStyles?.paddingTop, false);
+    const paddingBottom = <number>Utilities.parseStyleDimension(computedStyles?.paddingBottom, false);
+    const borderTop = <number>Utilities.parseStyleDimension(computedStyles?.borderTop, false);
+    const borderBottom = <number>Utilities.parseStyleDimension(computedStyles?.borderBottom, false);
 
     return height - paddingTop - paddingBottom - borderTop - borderBottom;
   }
 
   static getOffset(el: HTMLElement): { top: number, left: number } {
     if (!el)
-      return null;
+      return { top: 0, left: 0 };
 
     const rect = el.getBoundingClientRect();
 
@@ -152,17 +157,17 @@ export default class UtilitiesDOM {
   }
 
   static matches(el: Element, selector: string): boolean {
-    let matchesFn;
+    let matchesFn: any = undefined;
     // find vendor prefix
     const matchNames = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
     for (let index = 0; index < matchNames.length; index++) {
-      if (typeof el.ownerDocument.body[matchNames[index]] === 'function') {
+      if (typeof (el.ownerDocument.body as any)[matchNames[index]] === 'function') {
         matchesFn = matchNames[index];
         break;
       }
     }
 
-    return el[matchesFn](selector);
+    return matchesFn ? (el as any)[matchesFn](selector) : false;
   }
 
   static closest(el: Element, selector: string): Element | null {
@@ -178,24 +183,25 @@ export default class UtilitiesDOM {
       if (UtilitiesDOM.matches(<Element>element, selector)) {
         return <Element>element;
       }
-      element = element.parentNode;
+      element = element.parentNode as Node;
     }
 
     return null;
   }
 
-  static getPointerX(event): number | null {
+  static getPointerX(event: Event): number | null {
     //TODO: Browser test this
     if (event.type.indexOf('touch') === 0) {
-      if (event.touches && event.touches.length) {
-        return event.touches[0].pageX;
+      const tEvent = event as TouchEvent;
+      if (tEvent.touches && tEvent.touches.length) {
+        return tEvent.touches[0].pageX;
       }
 
-      if (event.changedTouches && event.changedTouches.length) {
-        return event.changedTouches[0].pageX
+      if (tEvent.changedTouches && tEvent.changedTouches.length) {
+        return tEvent.changedTouches[0].pageX
       }
     }
-    return event.pageX;
+    return (event as MouseEvent).pageX;
   }
 
   static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number {
@@ -203,12 +209,12 @@ export default class UtilitiesDOM {
     if (!contentElement || !measurementElement)
       return 0;
 
-    var text = contentElement.textContent.trim().replace(/\s/g, '&nbsp;') + '&nbsp;'; //add extra space to ensure we are not elipsing anything
+    var text = contentElement.textContent?.trim().replace(/\s/g, '&nbsp;') + '&nbsp;'; //add extra space to ensure we are not elipsing anything
 
-    const styles = contentElement.ownerDocument.defaultView.getComputedStyle(contentElement);
-    ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border']
+    const styles = contentElement.ownerDocument.defaultView?.getComputedStyle(contentElement);
+    ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border', 'boxSizing']
       .forEach((prop) => {
-        measurementElement.style[prop] = styles[prop];
+        (measurementElement.style as any)[prop] = (styles as any)[prop];
       });
 
     measurementElement.innerHTML = text;

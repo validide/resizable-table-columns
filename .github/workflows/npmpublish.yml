@@ -1,0 +1,71 @@
+name: Node.js Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
+      - run: npm test
+
+  publish-pacakges:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      # checkout the repo
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm run build
+
+      # extract tag name
+      - id: branch_name
+        name: Get branch name
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      # update version
+      - id: update_version
+        name: Update version
+        run: |
+          echo $SOURCE_NAME
+          echo $SOURCE_BRANCH
+          echo $SOURCE_TAG
+          npm --no-git-tag-version version $SOURCE_TAG
+        env:
+          SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+          SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+
+      # publish to NPMJS
+      - uses: actions/setup-node@v1
+        with:
+          registry-url: https://registry.npmjs.org/
+          scope: '@validide'
+      - run: |
+          npm config set @validide:registry https://registry.npmjs.org/
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      # publish to GitHub Pacakge Registry
+      - uses: actions/setup-node@v1
+        with:
+          registry-url: https://npm.pkg.github.com/
+          scope: '@validide'
+      - run: |
+          npm config set @validide:registry https://npm.pkg.github.com/
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

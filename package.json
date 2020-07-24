@@ -1,8 +1,9 @@
 {
-  "name": "resizable-table-columns",
-  "version": "0.0.3",
+  "name": "@validide/resizable-table-columns",
+  "version": "0.0.1",
   "description": "Simple Javascript resizable table columns",
-  "main": "index.js",
+  "main": "dist/bundle/index.js",
+  "module": "dist/js/index.js",
   "scripts": {
     "clean-dist": "node ./scripts/clean-dist.js",
     "minify-files": "node ./scripts/minify-files.js",
@@ -16,8 +17,9 @@
     "post-css": "postcss --no-map --use autoprefixer --autoprefixer.browsers \"Chrome >= 45, Firefox >= 38, Edge >= 12, Explorer >= 10, iOS >= 9, Safari >= 9, Android >= 4.4, Opera >= 30\" --replace ./dist/css/*.css",
     "post-process-dist": "npm run post-css && npm run minify-files",
     "rollup-files": "rollup --config ./rollup.config.js",
-    "test": "node ./node_modules/mocha/bin/mocha \"./tests/**/*.js\" --opts \"./tests/_mocha.opts\"",
-    "build-dist": "npm run build-dev && npm test && npm run rollup-files && npm run post-process-dist"
+    "prebuild": "npm run clean-dist",
+    "build": "npm run scss-base && tsc --module es2015 --target ES2015 --declaration --outFile ./dist/js/index.es2015.js --emitDeclarationOnly && tsc --module es2015 --target ES5 && rollup --config ./rollup.config.js && npm run post-process-dist",
+    "test": "nyc mocha"
   },
   "repository": {
     "type": "git",
@@ -34,24 +36,31 @@
     "url": "https://github.com/validide/resizable-table-columns/issues"
   },
   "homepage": "https://github.com/validide/resizable-table-columns#readme",
+  "files": [
+    "dist",
+    "sources"
+  ],
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "1.0.1",
     "@types/chai": "4.2.11",
-    "@types/jsdom": "16.2.0",
-    "@types/mocha": "7.0.2",
-    "autoprefixer": "9.7.5",
+    "@types/jsdom": "16.2.3",
+    "@types/mocha": "8.0.0",
+    "autoprefixer": "9.8.5",
     "babel-preset-env": "1.7.0",
     "babel-register": "6.26.0",
     "chai": "4.2.0",
-    "concurrently": "5.1.0",
+    "concurrently": "5.2.0",
     "glob": "7.1.6",
-    "jsdom": "16.2.2",
-    "mocha": "7.1.1",
-    "node-sass": "4.13.1",
-    "postcss-cli": "7.1.0",
+    "jsdom": "16.3.0",
+    "mocha": "8.0.1",
+    "node-sass": "4.14.1",
+    "postcss-cli": "7.1.1",
+    "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "rollup": "2.3.3",
-    "typescript": "3.8.3",
-    "uglify-js": "3.8.1",
+    "rollup": "2.22.2",
+    "ts-node": "8.10.2",
+    "typescript": "3.9.7",
+    "uglify-js": "3.10.0",
     "uglifycss": "0.0.29"
   }
 }

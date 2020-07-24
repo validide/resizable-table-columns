@@ -1,0 +1,14 @@
+# https://mochajs.org/#command-line-usage
+# https://github.com/mochajs/mocha/tree/master/example/config
+
+extension:
+  - ts
+recursive: true
+require:
+  - ts-node/register # replace with ts-node/register/transpile-only if you have custom types
+  - source-map-support/register
+bail: false
+color: true
+full-trace: false
+reporter: spec
+spec: tests/**/*.ts

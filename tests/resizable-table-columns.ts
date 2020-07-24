@@ -3,11 +3,11 @@
 /// <reference path="../node_modules/@types/jsdom/index.d.ts" />
 
 import { assert } from 'chai';
-import { JSDOM } from '../node_modules/jsdom/lib/api';
-import ResizableConstants from '../dist/js/es6/resizable-constants';
-import ResizableOptions from '../dist/js/es6/resizable-options';
-import ResizableTableColumns from '../dist/js/es6/resizable-table-columns';
-import UtilitiesDOM from '../dist/js/es6/utilities-dom';
+import { JSDOM } from 'jsdom';
+import ResizableConstants from '../sources/ts/resizable-constants';
+import ResizableOptions from '../sources/ts/resizable-options';
+import ResizableTableColumns from '../sources/ts/resizable-table-columns';
+import UtilitiesDOM from '../sources/ts/utilities-dom';
 
 describe('ResizableTableColumns', function () {
   const DOM = new JSDOM(`<!DOCTYPE html>
@@ -85,22 +85,22 @@ describe('ResizableTableColumns', function () {
   </tbody>
 </table>`;
 
-  const el = DOM.window.document.getElementById('valid-table');
+  const el = DOM.window.document.getElementById('valid-table') as HTMLTableElement;
   const rtc = new ResizableTableColumns(el, null);
 
   describe('Constructor calls', function () {
 
-    let container, el, rtc;
+    let container: HTMLElement, el: HTMLTableElement, rtc: ResizableTableColumns;
     before(function() {
       container = DOM.window.document.createElement('div');
       container.innerHTML = dynamicTable;
 
       DOM.window.document.body.appendChild(container);
-      el = container.querySelector('table');
-      rtc = new ResizableTableColumns(el, {
-        minWidth: 130,
-        maxWidth: 170
-      });
+      const overriders = new ResizableOptions();
+      overriders.minWidth = 130;
+      overriders.maxWidth = 170;
+      el = container.querySelector('table') as HTMLTableElement;
+      rtc = new ResizableTableColumns(el,  overriders);
     });
 
     after(function() {
@@ -109,7 +109,7 @@ describe('ResizableTableColumns', function () {
     });
 
     it('Should ".wrapTable()"', function () {
-      const wrapper = el.parentNode;
+      const wrapper = el.parentNode as HTMLElement;
       assert.isNotNull(wrapper, 'Table wrapper is missing.');
       assert.equal(wrapper.nodeName, 'DIV', 'Table wrapper is not a DIV.');
       assert.isTrue(UtilitiesDOM.hasClass(wrapper, 'rtc-wrapper'), 'Table wrapper does not have the required class.');
@@ -146,7 +146,7 @@ describe('ResizableTableColumns', function () {
     });
 
     it('Should ".createDragHandles()"', function () {
-      const dragWrapper = el.parentNode.childNodes[0];
+      const dragWrapper = el.parentNode?.childNodes[0] as HTMLElement;
       assert.isNotNull(dragWrapper, 'Drag wrapper is missing.');
       assert.equal(dragWrapper.nodeName, 'DIV', 'Drag wrapper is not a DIV.');
       assert.isTrue(UtilitiesDOM.hasClass(dragWrapper, 'rtc-handle-container'), 'Drag wrapper does not have the required class.');
@@ -155,19 +155,19 @@ describe('ResizableTableColumns', function () {
       assert.equal(dragWrapper.childNodes.length, resizableHeaders.length);
 
       for (let index = 0; index < dragWrapper.childNodes.length; index++) {
-        assert.isTrue(UtilitiesDOM.hasClass(rtc.childNodes[index], 'rtc-handle'));
+        assert.isTrue(UtilitiesDOM.hasClass((dragWrapper.childNodes as any)[index], 'rtc-handle'));
       }
     });
   });
 
   describe('Dispose calls', function () {
-    let container, el, rtc;
+    let container: HTMLElement, el: HTMLTableElement, rtc: ResizableTableColumns;
     before(function() {
       container = DOM.window.document.createElement('div');
       container.innerHTML = dynamicTable;
 
       DOM.window.document.body.appendChild(container);
-      el = container.querySelector('table');
+      el = container.querySelector('table') as HTMLTableElement;
       rtc = new ResizableTableColumns(el, null);
       rtc.dispose();
     });
@@ -183,7 +183,7 @@ describe('ResizableTableColumns', function () {
 
     it('Should ".restoreOriginalWidths()"', function () {
       for (let index = 1; index <= 9; index++) {
-        const th = DOM.window.document.getElementById(`th${index}`);
+        const th = DOM.window.document.getElementById(`th${index}`) as HTMLElement;
         assert.equal(th.style.width,  (100 + ((index) * 10)) + 'px' );
       }
       assert.equal(el.style.width, '7000px', 'Original table width was not restored.');

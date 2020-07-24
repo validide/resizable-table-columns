@@ -1,6 +1,8 @@
 import UtilitiesDOM from './utilities-dom';
-var ResizableOptions = (function () {
+var ResizableOptions = /** @class */ (function () {
     function ResizableOptions(options, element) {
+        if (options === void 0) { options = null; }
+        if (element === void 0) { element = null; }
         this.resizeFromBody = true;
         this.minWidth = 40;
         this.maxWidth = null;
@@ -12,6 +14,7 @@ var ResizableOptions = (function () {
         this.overrideValuesFromElement(element);
     }
     ResizableOptions.prototype.overrideValues = function (options) {
+        if (options === void 0) { options = null; }
         if (!options)
             return;
         for (var prop in options) {
@@ -21,6 +24,7 @@ var ResizableOptions = (function () {
         }
     };
     ResizableOptions.prototype.overrideValuesFromElement = function (element) {
+        if (element === void 0) { element = null; }
         if (!element)
             return;
         var elementOptions = UtilitiesDOM.getDataAttributesValues(element);
@@ -29,3 +33,4 @@ var ResizableOptions = (function () {
     return ResizableOptions;
 }());
 export default ResizableOptions;
+//# sourceMappingURL=resizable-options.js.map

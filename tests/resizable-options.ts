@@ -3,8 +3,8 @@
 /// <reference path="../node_modules/@types/jsdom/index.d.ts" />
 
 import { assert } from 'chai';
-import { JSDOM } from '../node_modules/jsdom/lib/api';
-import ResizableOptions from '../dist/js/es6/resizable-options';
+import { JSDOM } from 'jsdom';
+import ResizableOptions from '../sources/ts/resizable-options';
 
 describe('ResizableOptions', function() {
   const DOM = new JSDOM(`<!DOCTYPE html>

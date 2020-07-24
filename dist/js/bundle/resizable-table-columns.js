@@ -1,7 +1,10 @@
-var ResizableTableColumns = (function () {
-    'use strict';
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = global || self, global.validide_resizableTableColumns = factory());
+}(this, (function () { 'use strict';
 
-    var Utilities = (function () {
+    var Utilities = /** @class */ (function () {
         function Utilities() {
         }
         Utilities.escapeRegExp = function (str) {
@@ -55,7 +58,7 @@ var ResizableTableColumns = (function () {
         return Utilities;
     }());
 
-    var UtilitiesDOM = (function () {
+    var UtilitiesDOM = /** @class */ (function () {
         function UtilitiesDOM() {
         }
         UtilitiesDOM.addClass = function (el, className) {
@@ -85,7 +88,7 @@ var ResizableTableColumns = (function () {
             if (el.dataset) {
                 for (var prop in el.dataset) {
                     if (el.dataset.hasOwnProperty(prop)) {
-                        returnValue[prop] = Utilities.parseStringToType(el.dataset[prop]);
+                        returnValue[prop] = Utilities.parseStringToType(el.dataset[prop] || '');
                     }
                 }
             }
@@ -100,74 +103,91 @@ var ResizableTableColumns = (function () {
             return returnValue;
         };
         UtilitiesDOM.getMinCssWidth = function (el) {
-            var computedStyle = el.ownerDocument.defaultView.getComputedStyle(el).minWidth;
+            var _a;
+            var computedStyle = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el).minWidth;
             var minWidth = Utilities.parseStyleDimension(computedStyle, true);
             if (typeof minWidth === 'number' && !isNaN(minWidth))
                 return minWidth;
             return null;
         };
         UtilitiesDOM.getMaxCssWidth = function (el) {
-            var computedStyle = el.ownerDocument.defaultView.getComputedStyle(el).maxWidth;
+            var _a;
+            var computedStyle = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el).maxWidth;
             var maxWidth = Utilities.parseStyleDimension(computedStyle, true);
             if (typeof maxWidth === 'number' && !isNaN(maxWidth))
                 return maxWidth;
             return null;
         };
         UtilitiesDOM.getOuterWidth = function (el, includeMargin) {
+            var _a;
             if (includeMargin === void 0) { includeMargin = false; }
+            //TODO: Browser test this
             var width = el.offsetWidth;
             if (!includeMargin)
                 return width;
-            var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-            var marginTop = Utilities.parseStyleDimension(computedStyles.marginTop, false);
-            var marginBottom = Utilities.parseStyleDimension(computedStyles.marginBottom, false);
+            var computedStyles = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el);
+            var marginTop = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.marginTop, false);
+            var marginBottom = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.marginBottom, false);
             return width + marginTop + marginBottom;
         };
         UtilitiesDOM.getInnerWidth = function (el) {
+            var _a;
+            //TODO: Browser test this
             var width = UtilitiesDOM.getOuterWidth(el);
-            var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-            var borderLeft = Utilities.parseStyleDimension(computedStyles.borderLeft, false);
-            var borderRight = Utilities.parseStyleDimension(computedStyles.borderRight, false);
+            var computedStyles = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el);
+            var borderLeft = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderLeft, false);
+            var borderRight = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderRight, false);
             return width - borderLeft - borderRight;
         };
         UtilitiesDOM.getWidth = function (el) {
+            var _a;
+            //TODO: Browser test this
             var width = UtilitiesDOM.getOuterWidth(el);
-            var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-            var paddingLeft = Utilities.parseStyleDimension(computedStyles.paddingLeft, false);
-            var paddingRight = Utilities.parseStyleDimension(computedStyles.paddingRight, false);
-            var borderLeft = Utilities.parseStyleDimension(computedStyles.borderLeft, false);
-            var borderRight = Utilities.parseStyleDimension(computedStyles.borderRight, false);
+            var computedStyles = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el);
+            var isBorderBox = (computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.boxSizing) === 'border-box';
+            if (isBorderBox)
+                return width;
+            var paddingLeft = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.paddingLeft, false);
+            var paddingRight = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.paddingRight, false);
+            var borderLeft = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderLeft, false);
+            var borderRight = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderRight, false);
             return width - paddingLeft - paddingRight - borderLeft - borderRight;
         };
         UtilitiesDOM.getOuterHeight = function (el, includeMargin) {
+            var _a;
             if (includeMargin === void 0) { includeMargin = false; }
+            //TODO: Browser test this
             var height = el.offsetHeight;
             if (!includeMargin)
                 return height;
-            var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-            var marginTop = Utilities.parseStyleDimension(computedStyles.marginTop, false);
-            var marginBottom = Utilities.parseStyleDimension(computedStyles.marginBottom, false);
+            var computedStyles = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el);
+            var marginTop = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.marginTop, false);
+            var marginBottom = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.marginBottom, false);
             return height + marginTop + marginBottom;
         };
         UtilitiesDOM.getInnerHeight = function (el) {
+            var _a;
+            //TODO: Browser test this
             var height = UtilitiesDOM.getOuterHeight(el);
-            var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-            var borderTop = Utilities.parseStyleDimension(computedStyles.borderTop, false);
-            var borderBottom = Utilities.parseStyleDimension(computedStyles.borderBottom, false);
+            var computedStyles = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el);
+            var borderTop = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderTop, false);
+            var borderBottom = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderBottom, false);
             return height - borderTop - borderBottom;
         };
         UtilitiesDOM.getHeight = function (el) {
+            var _a;
+            //TODO: Browser test this
             var height = UtilitiesDOM.getOuterHeight(el);
-            var computedStyles = el.ownerDocument.defaultView.getComputedStyle(el);
-            var paddingTop = Utilities.parseStyleDimension(computedStyles.paddingTop, false);
-            var paddingBottom = Utilities.parseStyleDimension(computedStyles.paddingBottom, false);
-            var borderTop = Utilities.parseStyleDimension(computedStyles.borderTop, false);
-            var borderBottom = Utilities.parseStyleDimension(computedStyles.borderBottom, false);
+            var computedStyles = (_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el);
+            var paddingTop = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.paddingTop, false);
+            var paddingBottom = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.paddingBottom, false);
+            var borderTop = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderTop, false);
+            var borderBottom = Utilities.parseStyleDimension(computedStyles === null || computedStyles === void 0 ? void 0 : computedStyles.borderBottom, false);
             return height - paddingTop - paddingBottom - borderTop - borderBottom;
         };
         UtilitiesDOM.getOffset = function (el) {
             if (!el)
-                return null;
+                return { top: 0, left: 0 };
             var rect = el.getBoundingClientRect();
             return {
                 top: rect.top + el.ownerDocument.body.scrollTop,
@@ -175,7 +195,8 @@ var ResizableTableColumns = (function () {
             };
         };
         UtilitiesDOM.matches = function (el, selector) {
-            var matchesFn;
+            var matchesFn = undefined;
+            // find vendor prefix
             var matchNames = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
             for (var index = 0; index < matchNames.length; index++) {
                 if (typeof el.ownerDocument.body[matchNames[index]] === 'function') {
@@ -183,7 +204,7 @@ var ResizableTableColumns = (function () {
                     break;
                 }
             }
-            return el[matchesFn](selector);
+            return matchesFn ? el[matchesFn](selector) : false;
         };
         UtilitiesDOM.closest = function (el, selector) {
             if (!el)
@@ -200,22 +221,26 @@ var ResizableTableColumns = (function () {
             return null;
         };
         UtilitiesDOM.getPointerX = function (event) {
+            //TODO: Browser test this
             if (event.type.indexOf('touch') === 0) {
-                if (event.touches && event.touches.length) {
-                    return event.touches[0].pageX;
+                var tEvent = event;
+                if (tEvent.touches && tEvent.touches.length) {
+                    return tEvent.touches[0].pageX;
                 }
-                if (event.changedTouches && event.changedTouches.length) {
-                    return event.changedTouches[0].pageX;
+                if (tEvent.changedTouches && tEvent.changedTouches.length) {
+                    return tEvent.changedTouches[0].pageX;
                 }
             }
             return event.pageX;
         };
         UtilitiesDOM.getTextWidth = function (contentElement, measurementElement) {
+            var _a, _b;
+            //TODO: Browser test this
             if (!contentElement || !measurementElement)
                 return 0;
-            var text = contentElement.textContent.trim().replace(/\s/g, '&nbsp;') + '&nbsp;';
-            var styles = contentElement.ownerDocument.defaultView.getComputedStyle(contentElement);
-            ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border']
+            var text = ((_a = contentElement.textContent) === null || _a === void 0 ? void 0 : _a.trim().replace(/\s/g, '&nbsp;')) + '&nbsp;'; //add extra space to ensure we are not elipsing anything
+            var styles = (_b = contentElement.ownerDocument.defaultView) === null || _b === void 0 ? void 0 : _b.getComputedStyle(contentElement);
+            ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border', 'boxSizing']
                 .forEach(function (prop) {
                 measurementElement.style[prop] = styles[prop];
             });
@@ -225,8 +250,10 @@ var ResizableTableColumns = (function () {
         return UtilitiesDOM;
     }());
 
-    var ResizableOptions = (function () {
+    var ResizableOptions = /** @class */ (function () {
         function ResizableOptions(options, element) {
+            if (options === void 0) { options = null; }
+            if (element === void 0) { element = null; }
             this.resizeFromBody = true;
             this.minWidth = 40;
             this.maxWidth = null;
@@ -238,6 +265,7 @@ var ResizableTableColumns = (function () {
             this.overrideValuesFromElement(element);
         }
         ResizableOptions.prototype.overrideValues = function (options) {
+            if (options === void 0) { options = null; }
             if (!options)
                 return;
             for (var prop in options) {
@@ -247,6 +275,7 @@ var ResizableTableColumns = (function () {
             }
         };
         ResizableOptions.prototype.overrideValuesFromElement = function (element) {
+            if (element === void 0) { element = null; }
             if (!element)
                 return;
             var elementOptions = UtilitiesDOM.getDataAttributesValues(element);
@@ -255,10 +284,35 @@ var ResizableTableColumns = (function () {
         return ResizableOptions;
     }());
 
-    var ResizableConstants = (function () {
+    var WidthsData = /** @class */ (function () {
+        function WidthsData() {
+            this.column = 0;
+            this.table = 0;
+        }
+        return WidthsData;
+    }());
+    var PointerData = /** @class */ (function () {
+        function PointerData() {
+            this.x = null;
+            this.isDoubleClick = false;
+        }
+        return PointerData;
+    }());
+    var ResizableEventData = /** @class */ (function () {
+        function ResizableEventData(column, dragHandler) {
+            this.pointer = new PointerData();
+            this.originalWidths = new WidthsData();
+            this.newWidths = new WidthsData();
+            this.column = column;
+            this.dragHandler = dragHandler;
+        }
+        return ResizableEventData;
+    }());
+
+    var ResizableConstants = /** @class */ (function () {
         function ResizableConstants() {
         }
-        ResizableConstants.dataPropertyname = 'rtc_data_object';
+        ResizableConstants.dataPropertyname = 'validide_rtc_data_object';
         ResizableConstants.classes = {
             table: 'rtc-table',
             wrapper: 'rtc-wrapper',
@@ -287,13 +341,7 @@ var ResizableTableColumns = (function () {
         return ResizableConstants;
     }());
 
-    var ResizableEventData = (function () {
-        function ResizableEventData() {
-        }
-        return ResizableEventData;
-    }());
-
-    var ResizableTableColumns = (function () {
+    var ResizableTableColumns = /** @class */ (function () {
         function ResizableTableColumns(table, options) {
             if (typeof table !== 'object' || table === null || table.toString() !== '[object HTMLTableElement]')
                 throw 'Invalid argument: "table".\nResizableTableColumns requires that the table element is a not null HTMLTableElement object!';
@@ -337,7 +385,7 @@ var ResizableTableColumns = (function () {
         ResizableTableColumns.prototype.validateMarkup = function () {
             var theadCount = 0;
             var tbodyCount = 0;
-            var thead;
+            var thead = null;
             for (var index = 0; index < this.table.childNodes.length; index++) {
                 var element = this.table.childNodes[index];
                 if (element.nodeName === 'THEAD') {
@@ -348,7 +396,7 @@ var ResizableTableColumns = (function () {
                     tbodyCount++;
                 }
             }
-            if (theadCount !== 1)
+            if (thead === null || theadCount !== 1)
                 throw "Markup validation: thead count.\nResizableTableColumns requires that the table element has one(1) table head element. Current count: " + theadCount;
             if (tbodyCount !== 1)
                 throw "Markup validation: tbody count.\nResizableTableColumns requires that the table element has one(1) table body element. Current count: " + tbodyCount;
@@ -363,7 +411,7 @@ var ResizableTableColumns = (function () {
                     }
                 }
             }
-            if (theadRowCount < 1)
+            if (firstRow === null || theadRowCount < 1)
                 throw "Markup validation: thead row count.\nResizableTableColumns requires that the table head element has at least one(1) table row element. Current count: " + theadRowCount;
             var headerCellsCount = 0;
             var invalidHeaderCellsCount = 0;
@@ -411,6 +459,8 @@ var ResizableTableColumns = (function () {
                     break;
                 }
             }
+            if (!tableHeader)
+                return;
             for (var index = 0; index < tableHeader.childNodes.length; index++) {
                 var element = tableHeader.childNodes[index];
                 if (element.nodeName === 'TR') {
@@ -418,6 +468,8 @@ var ResizableTableColumns = (function () {
                     break;
                 }
             }
+            if (!firstTableRow)
+                return;
             for (var index = 0; index < firstTableRow.childNodes.length; index++) {
                 var element = firstTableRow.childNodes[index];
                 if (element.nodeName === 'TH') {
@@ -455,39 +507,44 @@ var ResizableTableColumns = (function () {
             var minWidth = this.options.obeyCssMinWidth
                 ? UtilitiesDOM.getMinCssWidth(el)
                 : -Infinity;
-            result = Math.max(result, minWidth, this.options.minWidth || -Infinity);
+            result = Math.max(result, minWidth || 0, this.options.minWidth || -Infinity);
             var maxWidth = this.options.obeyCssMaxWidth
                 ? UtilitiesDOM.getMaxCssWidth(el)
                 : +Infinity;
-            result = Math.min(result, maxWidth, this.options.maxWidth || +Infinity);
+            result = Math.min(result, maxWidth || 0, this.options.maxWidth || +Infinity);
             return result;
         };
         ResizableTableColumns.prototype.createDragHandles = function () {
             var _this = this;
+            var _a;
             if (this.dragHandlesContainer != null)
                 throw 'Drag handlers allready created. Call <destroyDragHandles> if you wish to recreate them';
             this.dragHandlesContainer = this.ownerDocument.createElement('div');
-            this.wrapper.insertBefore(this.dragHandlesContainer, this.table);
+            (_a = this.wrapper) === null || _a === void 0 ? void 0 : _a.insertBefore(this.dragHandlesContainer, this.table);
             UtilitiesDOM.addClass(this.dragHandlesContainer, ResizableConstants.classes.handleContainer);
             this.getResizableHeaders()
                 .forEach(function (el, idx) {
+                var _a;
                 var handler = _this.ownerDocument.createElement('div');
                 UtilitiesDOM.addClass(handler, ResizableConstants.classes.handle);
-                _this.dragHandlesContainer.appendChild(handler);
+                (_a = _this.dragHandlesContainer) === null || _a === void 0 ? void 0 : _a.appendChild(handler);
             });
             ResizableConstants.events.pointerDown
                 .forEach(function (evt, evtIdx) {
-                _this.dragHandlesContainer.addEventListener(evt, _this.onPointerDownRef, false);
+                var _a;
+                (_a = _this.dragHandlesContainer) === null || _a === void 0 ? void 0 : _a.addEventListener(evt, _this.onPointerDownRef, false);
             });
         };
         ResizableTableColumns.prototype.destroyDragHandles = function () {
             var _this = this;
+            var _a, _b;
             if (this.dragHandlesContainer !== null) {
                 ResizableConstants.events.pointerDown
                     .forEach(function (evt, evtIdx) {
-                    _this.dragHandlesContainer.removeEventListener(evt, _this.onPointerDownRef, false);
+                    var _a;
+                    (_a = _this.dragHandlesContainer) === null || _a === void 0 ? void 0 : _a.removeEventListener(evt, _this.onPointerDownRef, false);
                 });
-                this.dragHandlesContainer.parentElement.removeChild(this.dragHandlesContainer);
+                (_b = (_a = this.dragHandlesContainer) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.removeChild(this.dragHandlesContainer);
             }
         };
         ResizableTableColumns.prototype.getDragHandlers = function () {
@@ -520,6 +577,7 @@ var ResizableTableColumns = (function () {
         };
         ResizableTableColumns.prototype.checkTableWidth = function () {
             var wrappperWidth = UtilitiesDOM.getWidth(this.wrapper);
+            //might bee needed to exclude margins/borders/paddings
             var tableWidth = UtilitiesDOM.getOuterWidth(this.table, true);
             var difference = wrappperWidth - tableWidth;
             if (difference > 0) {
@@ -529,6 +587,7 @@ var ResizableTableColumns = (function () {
                 var widths_1 = [];
                 this.tableHeaders
                     .forEach(function (el, idx) {
+                    //might bee needed to include margins/borders/paddings
                     var width = ResizableTableColumns.getWidth(el);
                     widths_1.push(width);
                     totalWidth_1 += width;
@@ -544,7 +603,7 @@ var ResizableTableColumns = (function () {
                         var newWidth = currentWidth + ((currentWidth / resizableWidth_1) * difference);
                         var leftToAdd = totalWidth_1 + difference - addedWidth;
                         newWidth = Math.min(newWidth, leftToAdd);
-                        newWidth = Math.max(newWidth, 0);
+                        newWidth = Math.max(newWidth, 0); // Do not add a negative width
                         var constrainedWidth = this.constrainWidth(el, newWidth);
                         ResizableTableColumns.setWidth(el, constrainedWidth);
                         addedWidth += newWidth;
@@ -565,7 +624,7 @@ var ResizableTableColumns = (function () {
             var headers = this.getResizableHeaders();
             this.getDragHandlers()
                 .forEach(function (el, idx) {
-                var height = UtilitiesDOM.getInnerHeight(_this.options.resizeFromBody ? _this.table : _this.table.tHead);
+                var height = UtilitiesDOM.getInnerHeight((_this.options.resizeFromBody ? _this.table : _this.table.tHead));
                 if (idx < headers.length) {
                     var th = headers[idx];
                     var left = UtilitiesDOM.getOuterWidth(th);
@@ -590,7 +649,7 @@ var ResizableTableColumns = (function () {
             if (target.nodeName !== 'DIV' || !UtilitiesDOM.hasClass(target, ResizableConstants.classes.handle))
                 return;
             if (typeof event.button === 'number' && event.button !== 0)
-                return;
+                return; // this is not a left click
             var dragHandler = target;
             var gripIndex = this.getDragHandlers().indexOf(dragHandler);
             var resizableHeaders = this.getResizableHeaders();
@@ -601,9 +660,7 @@ var ResizableTableColumns = (function () {
             var column = resizableHeaders[gripIndex];
             var columnWidth = ResizableTableColumns.getWidth(column);
             var tableWidth = ResizableTableColumns.getWidth(this.table);
-            var eventData = new ResizableEventData();
-            eventData.column = column;
-            eventData.dragHandler = dragHandler;
+            var eventData = new ResizableEventData(column, dragHandler);
             eventData.pointer = {
                 x: UtilitiesDOM.getPointerX(event),
                 isDoubleClick: isDoubleClick
@@ -612,7 +669,7 @@ var ResizableTableColumns = (function () {
                 column: columnWidth,
                 table: tableWidth
             };
-            this.detachHandlers();
+            this.detachHandlers(); //make sure we do not have extra handlers
             this.attachHandlers();
             UtilitiesDOM.addClass(this.table, ResizableConstants.classes.tableResizing);
             UtilitiesDOM.addClass(this.wrapper, ResizableConstants.classes.tableResizing);
@@ -634,7 +691,7 @@ var ResizableTableColumns = (function () {
         ResizableTableColumns.prototype.handlePointerMove = function (event) {
             if (!this.eventData || !event)
                 return;
-            var difference = UtilitiesDOM.getPointerX(event) - this.eventData.pointer.x;
+            var difference = (UtilitiesDOM.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
             if (difference === 0) {
                 return;
             }
@@ -822,7 +879,7 @@ var ResizableTableColumns = (function () {
             ResizableTableColumns.windowResizeHandlerRegistered = true;
             ResizableConstants.events.windowResize
                 .forEach(function (evt, idx) {
-                win.addEventListener(evt, ResizableTableColumns.onWindowResize, false);
+                win === null || win === void 0 ? void 0 : win.addEventListener(evt, ResizableTableColumns.onWindowResize, false);
             });
         };
         ResizableTableColumns.prototype.handleWindowResize = function () {
@@ -875,4 +932,5 @@ var ResizableTableColumns = (function () {
 
     return ResizableTableColumns;
 
-}());
+})));
+//# sourceMappingURL=resizable-table-columns.js.map

@@ -1,4 +1,4 @@
-var Utilities = (function () {
+var Utilities = /** @class */ (function () {
     function Utilities() {
     }
     Utilities.escapeRegExp = function (str) {
@@ -52,3 +52,4 @@ var Utilities = (function () {
     return Utilities;
 }());
 export default Utilities;
+//# sourceMappingURL=utilities.js.map

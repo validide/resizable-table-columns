@@ -12,6 +12,7 @@
   border-collapse: collapse;
   white-space: nowrap;
   margin: 0;
+  width: auto;
 }
 
 .rtc-wrapper table.rtc-table thead, .rtc-wrapper table.rtc-table tbody, .rtc-wrapper table.rtc-table tfoot {

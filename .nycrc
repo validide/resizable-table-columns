@@ -1,0 +1,28 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "all": true,
+  "extension": [
+    ".ts",
+    ".tsx"
+  ],
+  "exclude": [
+    "**/*.d.ts",
+    "tests/**/*.*",
+    "dist/**/*.*",
+    "scripts/**/*.*",
+    "coverage/**/*.*",
+    ".build/**/*.*",
+    "docs/**/*.*",
+    "rollup.config.js"
+  ],
+  "reporter": [
+    "text",
+    "lcov",
+    "html"
+  ],
+  "branches": 5,
+  "lines": 5,
+  "functions": 5,
+  "statements": 5,
+  "check-coverage": true
+}
