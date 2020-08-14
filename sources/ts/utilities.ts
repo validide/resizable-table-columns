@@ -2,7 +2,7 @@ export interface IIndexedCollection<T> {
   [name: string]: T;
 }
 
-export default class Utilities {
+export class Utilities {
   static regexEscapeRegex: RegExp = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;
   static kebabCaseRegex: RegExp = /(\-\w)/g;
   static trueRegex: RegExp = /^true$/i;

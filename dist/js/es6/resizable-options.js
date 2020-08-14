@@ -1,4 +1,4 @@
-import UtilitiesDOM from './utilities-dom';
+import { UtilitiesDOM } from "./utilities-dom";
 var ResizableOptions = /** @class */ (function () {
     function ResizableOptions(options, element) {
         if (options === void 0) { options = null; }
@@ -32,5 +32,5 @@ var ResizableOptions = /** @class */ (function () {
     };
     return ResizableOptions;
 }());
-export default ResizableOptions;
+export { ResizableOptions };
 //# sourceMappingURL=resizable-options.js.map

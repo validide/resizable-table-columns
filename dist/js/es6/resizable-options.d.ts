@@ -1,4 +1,4 @@
-export default class ResizableOptions {
+export declare class ResizableOptions {
     resizeFromBody: boolean;
     minWidth: null | number;
     maxWidth: null | number;

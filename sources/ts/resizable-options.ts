@@ -1,6 +1,6 @@
-import UtilitiesDOM from './utilities-dom'
+import { UtilitiesDOM } from "./utilities-dom";
 
-export default class ResizableOptions {
+export class ResizableOptions {
   resizeFromBody: boolean;
   minWidth: null | number;
   maxWidth: null | number;

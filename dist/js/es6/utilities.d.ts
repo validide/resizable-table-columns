@@ -1,7 +1,7 @@
 export interface IIndexedCollection<T> {
     [name: string]: T;
 }
-export default class Utilities {
+export declare class Utilities {
     static regexEscapeRegex: RegExp;
     static kebabCaseRegex: RegExp;
     static trueRegex: RegExp;

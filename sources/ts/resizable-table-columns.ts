@@ -1,10 +1,10 @@
-import ResizableOptions from './resizable-options'
-import Utilities, { IIndexedCollection } from './utilities'
-import UtilitiesDOM from './utilities-dom'
+import { ResizableOptions } from './resizable-options'
+import { Utilities, IIndexedCollection } from './utilities'
+import { UtilitiesDOM } from './utilities-dom'
 import { ResizableEventData } from './resizable-event-data';
-import ResizableConstants from './resizable-constants';
+import { ResizableConstants } from './resizable-constants';
 
-class ResizableTableColumns {
+export class ResizableTableColumns {
   static instancesCount: number = 0;
   static windowResizeHandlerRegistered: boolean = false;
 
@@ -395,17 +395,23 @@ class ResizableTableColumns {
     const isDoubleClick = (millisecondsNow - this.lastPointerDown) < this.options.doubleClickDelay;
     const column = resizableHeaders[gripIndex];
     const columnWidth = ResizableTableColumns.getWidth(column);
+    const computedColumnWidth = ResizableTableColumns.getComputedWidth(column);
     const tableWidth = ResizableTableColumns.getWidth(this.table);
+    const computedTableWidth = ResizableTableColumns.getComputedWidth(this.table);
 
+    const widths = {
+      column: columnWidth,
+      table: tableWidth
+    };
     const eventData: ResizableEventData = new ResizableEventData(column, dragHandler);
     eventData.pointer = {
       x: UtilitiesDOM.getPointerX(event),
       isDoubleClick: isDoubleClick
     };
-    eventData.originalWidths = {
-      column: columnWidth,
-      table: tableWidth
-    };
+    eventData.originalWidths = widths;
+    eventData.newWidths = widths;
+    eventData.columnRatio = columnWidth / computedColumnWidth;
+    eventData.tableRatio = tableWidth / computedTableWidth;
 
     this.detachHandlers(); //make sure we do not have extra handlers
     this.attachHandlers();
@@ -423,7 +429,9 @@ class ResizableTableColumns {
         column: column,
         columnWidth: columnWidth,
         table: this.table,
-        tableWidth: tableWidth
+        tableWidth: tableWidth,
+        columnRatio: this.eventData.columnRatio,
+        tableRatio: this.eventData.tableRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -439,8 +447,14 @@ class ResizableTableColumns {
       return;
     }
 
-    const tableWidth = this.eventData.originalWidths.table + difference;
-    const columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
+    this.eventData.columnRatio = this.eventData.newWidths.column / ResizableTableColumns.getComputedWidth(this.eventData.column);
+    this.eventData.tableRatio = this.eventData.newWidths.table / ResizableTableColumns.getComputedWidth(this.table);
+
+    const tableWidth = (this.eventData.originalWidths.table + difference) * this.eventData.tableRatio;
+    const columnWidth = this.constrainWidth(
+      this.eventData.column,
+      (this.eventData.originalWidths.column + difference) * this.eventData.columnRatio
+    );
     ResizableTableColumns.setWidth(this.table, tableWidth);
     ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
 
@@ -448,12 +462,15 @@ class ResizableTableColumns {
       column: columnWidth,
       table: tableWidth
     };
+
     var eventToDispatch = new CustomEvent(ResizableConstants.events.eventResize, {
       detail: {
         column: this.eventData.column,
         columnWidth: columnWidth,
         table: this.table,
-        tableWidth: tableWidth
+        tableWidth: tableWidth,
+        columnRatio: this.eventData.columnRatio,
+        tableRatio: this.eventData.tableRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -562,14 +579,16 @@ class ResizableTableColumns {
 
     this.eventData.newWidths = {
       column: columnWidth,
-      table: tableWidth
+      table: tableWidth,
     };
     var eventToDispatch = new CustomEvent(ResizableConstants.events.eventResize, {
       detail: {
         column: this.eventData.column,
         columnWidth: columnWidth,
         table: this.table,
-        tableWidth: tableWidth
+        tableWidth: tableWidth,
+        columnRatio: this.eventData.columnRatio,
+        tableRatio: this.eventData.tableRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -702,6 +721,10 @@ class ResizableTableColumns {
     if (el.style.width === '')
       return UtilitiesDOM.getWidth(el);
 
+    return ResizableTableColumns.getComputedWidth(el);
+  }
+
+  static getComputedWidth(el: HTMLElement): number {
     return <number>Utilities.parseStyleDimension(el.style.width, false);
   }
 
@@ -715,5 +738,3 @@ class ResizableTableColumns {
     return ResizableTableColumns.instancesCount++;
   }
 }
-
-export default ResizableTableColumns;

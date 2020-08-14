@@ -1,6 +1,6 @@
-import Utilities, { IIndexedCollection } from './utilities'
+import {Utilities, IIndexedCollection } from './utilities'
 
-export default class UtilitiesDOM {
+export class UtilitiesDOM {
   static addClass(el: HTMLElement, className: string) {
     if (el.classList)
       el.classList.add(className)

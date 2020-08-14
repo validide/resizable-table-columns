@@ -1,4 +1,4 @@
-import Utilities from './utilities';
+import { Utilities } from './utilities';
 var UtilitiesDOM = /** @class */ (function () {
     function UtilitiesDOM() {
     }
@@ -190,5 +190,5 @@ var UtilitiesDOM = /** @class */ (function () {
     };
     return UtilitiesDOM;
 }());
-export default UtilitiesDOM;
+export { UtilitiesDOM };
 //# sourceMappingURL=utilities-dom.js.map

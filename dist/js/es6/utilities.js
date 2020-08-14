@@ -51,5 +51,5 @@ var Utilities = /** @class */ (function () {
     Utilities.notEmptyOrWhiteSpace = /\S/;
     return Utilities;
 }());
-export default Utilities;
+export { Utilities };
 //# sourceMappingURL=utilities.js.map

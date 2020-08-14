@@ -29,5 +29,5 @@ var ResizableConstants = /** @class */ (function () {
     };
     return ResizableConstants;
 }());
-export default ResizableConstants;
+export { ResizableConstants };
 //# sourceMappingURL=resizable-constants.js.map

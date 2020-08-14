@@ -4,9 +4,9 @@
 
 import { assert } from 'chai';
 import { JSDOM } from 'jsdom';
-import ResizableConstants from '../sources/ts/resizable-constants';
-import ResizableOptions from '../sources/ts/resizable-options';
-import ResizableTableColumns from '../sources/ts/resizable-table-columns';
+import { ResizableConstants } from '../sources/ts/resizable-constants';
+import { ResizableOptions } from '../sources/ts/resizable-options';
+import { ResizableTableColumns } from '../sources/ts/resizable-table-columns';
 
 describe('ResizableTableColumns', function () {
   describe('constructor', function () {
@@ -463,8 +463,8 @@ describe('ResizableTableColumns', function () {
       const id3 = rtc.id;
       rtc.dispose();
 
-      assert.equal(id2, id1 +1);
-      assert.equal(id3, id2 +1);
+      assert.equal(id2, id1 + 1);
+      assert.equal(id3, id2 + 1);
     });
 
   });

@@ -4,9 +4,9 @@
 
 import { assert } from 'chai';
 import { JSDOM } from 'jsdom';
-import ResizableConstants from '../sources/ts/resizable-constants';
-import ResizableOptions from '../sources/ts/resizable-options';
-import ResizableTableColumns from '../sources/ts/resizable-table-columns';
+import { ResizableConstants } from '../sources/ts/resizable-constants';
+import { ResizableOptions } from '../sources/ts/resizable-options';
+import { ResizableTableColumns } from '../sources/ts/resizable-table-columns';
 
 describe('ResizableTableColumns', function () {
   describe('.dispose', function () {

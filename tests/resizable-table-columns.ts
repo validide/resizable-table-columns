@@ -4,10 +4,10 @@
 
 import { assert } from 'chai';
 import { JSDOM } from 'jsdom';
-import ResizableConstants from '../sources/ts/resizable-constants';
-import ResizableOptions from '../sources/ts/resizable-options';
-import ResizableTableColumns from '../sources/ts/resizable-table-columns';
-import UtilitiesDOM from '../sources/ts/utilities-dom';
+import { ResizableConstants } from '../sources/ts/resizable-constants';
+import { ResizableOptions } from '../sources/ts/resizable-options';
+import { ResizableTableColumns } from '../sources/ts/resizable-table-columns';
+import { UtilitiesDOM } from '../sources/ts/utilities-dom';
 
 describe('ResizableTableColumns', function () {
   const DOM = new JSDOM(`<!DOCTYPE html>
@@ -91,7 +91,7 @@ describe('ResizableTableColumns', function () {
   describe('Constructor calls', function () {
 
     let container: HTMLElement, el: HTMLTableElement, rtc: ResizableTableColumns;
-    before(function() {
+    before(function () {
       container = DOM.window.document.createElement('div');
       container.innerHTML = dynamicTable;
 
@@ -100,10 +100,10 @@ describe('ResizableTableColumns', function () {
       overriders.minWidth = 130;
       overriders.maxWidth = 170;
       el = container.querySelector('table') as HTMLTableElement;
-      rtc = new ResizableTableColumns(el,  overriders);
+      rtc = new ResizableTableColumns(el, overriders);
     });
 
-    after(function() {
+    after(function () {
       rtc.dispose();
       DOM.window.document.body.removeChild(container);
     });
@@ -133,7 +133,7 @@ describe('ResizableTableColumns', function () {
       for (let index = 0; index < rtc.tableHeaders.length; index++) {
         const th = rtc.tableHeaders[index];
         assert.equal(typeof rtc.originalWidths[`___.${index}`], 'string', `"originalWidths[___.${index}] is not string.`);
-        assert.equal(rtc.originalWidths[`___.${index}`],  (100 + ((index + 1) * 10)) + 'px' );
+        assert.equal(rtc.originalWidths[`___.${index}`], (100 + ((index + 1) * 10)) + 'px');
       }
     });
 
@@ -141,7 +141,7 @@ describe('ResizableTableColumns', function () {
       for (let index = 0; index < rtc.tableHeaders.length; index++) {
         const th = rtc.tableHeaders[index];
         let width = rtc.constrainWidth(th, UtilitiesDOM.getWidth(th));
-        assert.equal(th.style.width,  (width.toFixed(2)) + 'px', `Column index ${index}`);
+        assert.equal(th.style.width, (width.toFixed(2)) + 'px', `Column index ${index}`);
       }
     });
 
@@ -162,7 +162,7 @@ describe('ResizableTableColumns', function () {
 
   describe('Dispose calls', function () {
     let container: HTMLElement, el: HTMLTableElement, rtc: ResizableTableColumns;
-    before(function() {
+    before(function () {
       container = DOM.window.document.createElement('div');
       container.innerHTML = dynamicTable;
 
@@ -172,7 +172,7 @@ describe('ResizableTableColumns', function () {
       rtc.dispose();
     });
 
-    after(function() {
+    after(function () {
       DOM.window.document.body.removeChild(container);
     });
 
@@ -184,7 +184,7 @@ describe('ResizableTableColumns', function () {
     it('Should ".restoreOriginalWidths()"', function () {
       for (let index = 1; index <= 9; index++) {
         const th = DOM.window.document.getElementById(`th${index}`) as HTMLElement;
-        assert.equal(th.style.width,  (100 + ((index) * 10)) + 'px' );
+        assert.equal(th.style.width, (100 + ((index) * 10)) + 'px');
       }
       assert.equal(el.style.width, '7000px', 'Original table width was not restored.');
     });

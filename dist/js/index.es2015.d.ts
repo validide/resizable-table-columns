@@ -24,7 +24,7 @@ declare module "resizable-constants" {
         eventResize: string;
         eventResizeStop: string;
     }
-    export default class ResizableConstants {
+    export class ResizableConstants {
         static dataPropertyname: string;
         static classes: IClassesConstants;
         static attibutes: IAttributesConstants;
@@ -47,6 +47,8 @@ declare module "resizable-event-data" {
         pointer: PointerData;
         originalWidths: WidthsData;
         newWidths: WidthsData;
+        columnRatio: number;
+        tableRatio: number;
         constructor(column: HTMLTableCellElement, dragHandler: HTMLDivElement);
     }
 }
@@ -54,7 +56,7 @@ declare module "utilities" {
     export interface IIndexedCollection<T> {
         [name: string]: T;
     }
-    export default class Utilities {
+    export class Utilities {
         static regexEscapeRegex: RegExp;
         static kebabCaseRegex: RegExp;
         static trueRegex: RegExp;
@@ -68,7 +70,7 @@ declare module "utilities" {
     }
 }
 declare module "utilities-dom" {
-    export default class UtilitiesDOM {
+    export class UtilitiesDOM {
         static addClass(el: HTMLElement, className: string): void;
         static removeClass(el: HTMLElement, className: string): void;
         static hasClass(el: HTMLElement, className: string): boolean;
@@ -92,7 +94,7 @@ declare module "utilities-dom" {
     }
 }
 declare module "resizable-options" {
-    export default class ResizableOptions {
+    export class ResizableOptions {
         resizeFromBody: boolean;
         minWidth: null | number;
         maxWidth: null | number;
@@ -106,9 +108,9 @@ declare module "resizable-options" {
     }
 }
 declare module "resizable-table-columns" {
-    import ResizableOptions from "resizable-options";
+    import { ResizableOptions } from "resizable-options";
     import { ResizableEventData } from "resizable-event-data";
-    class ResizableTableColumns {
+    export class ResizableTableColumns {
         static instancesCount: number;
         static windowResizeHandlerRegistered: boolean;
         table: HTMLTableElement;
@@ -159,8 +161,8 @@ declare module "resizable-table-columns" {
         static generateColumnId(el: HTMLElement): string;
         static generateTableId(table: HTMLTableElement): string;
         static getWidth(el: HTMLElement): number;
+        static getComputedWidth(el: HTMLElement): number;
         static setWidth(element: HTMLElement, width: number): void;
         static getInstanceId(): number;
     }
-    export default ResizableTableColumns;
 }

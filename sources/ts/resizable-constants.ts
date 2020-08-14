@@ -27,7 +27,7 @@ interface IEvents {
   eventResizeStop: string;
 }
 
-export default class ResizableConstants {
+export class ResizableConstants {
   static dataPropertyname: string = 'validide_rtc_data_object';
   static classes: IClassesConstants = {
     table: 'rtc-table',

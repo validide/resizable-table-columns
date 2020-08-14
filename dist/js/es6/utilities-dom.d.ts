@@ -1,4 +1,4 @@
-export default class UtilitiesDOM {
+export declare class UtilitiesDOM {
     static addClass(el: HTMLElement, className: string): void;
     static removeClass(el: HTMLElement, className: string): void;
     static hasClass(el: HTMLElement, className: string): boolean;

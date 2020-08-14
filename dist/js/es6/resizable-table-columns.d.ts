@@ -1,6 +1,6 @@
-import ResizableOptions from './resizable-options';
+import { ResizableOptions } from './resizable-options';
 import { ResizableEventData } from './resizable-event-data';
-declare class ResizableTableColumns {
+export declare class ResizableTableColumns {
     static instancesCount: number;
     static windowResizeHandlerRegistered: boolean;
     table: HTMLTableElement;
@@ -51,7 +51,7 @@ declare class ResizableTableColumns {
     static generateColumnId(el: HTMLElement): string;
     static generateTableId(table: HTMLTableElement): string;
     static getWidth(el: HTMLElement): number;
+    static getComputedWidth(el: HTMLElement): number;
     static setWidth(element: HTMLElement, width: number): void;
     static getInstanceId(): number;
 }
-export default ResizableTableColumns;
