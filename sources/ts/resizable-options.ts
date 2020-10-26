@@ -1,4 +1,4 @@
-import { UtilitiesDOM } from "./utilities-dom";
+import { UtilitiesDOM } from './utilities-dom';
 
 export class ResizableOptions {
   resizeFromBody: boolean;

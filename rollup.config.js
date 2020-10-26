@@ -1,6 +1,6 @@
 export default [
   {
-    input: './dist/js/es6/resizable-table-columns.js',
+    input: './dist/js/es6/index.js',
     context: 'window',
     output: {
       format: 'umd',

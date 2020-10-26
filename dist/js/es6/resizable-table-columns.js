@@ -1,8 +1,8 @@
+import { ResizableConstants } from './resizable-constants';
+import { ResizableEventData } from './resizable-event-data';
 import { ResizableOptions } from './resizable-options';
 import { Utilities } from './utilities';
 import { UtilitiesDOM } from './utilities-dom';
-import { ResizableEventData } from './resizable-event-data';
-import { ResizableConstants } from './resizable-constants';
 var ResizableTableColumns = /** @class */ (function () {
     function ResizableTableColumns(table, options) {
         if (typeof table !== 'object' || table === null || table.toString() !== '[object HTMLTableElement]')
@@ -367,8 +367,8 @@ var ResizableTableColumns = /** @class */ (function () {
         }
         this.eventData.columnRatio = this.eventData.newWidths.column / ResizableTableColumns.getComputedWidth(this.eventData.column);
         this.eventData.tableRatio = this.eventData.newWidths.table / ResizableTableColumns.getComputedWidth(this.table);
-        var tableWidth = (this.eventData.originalWidths.table + difference) * this.eventData.tableRatio;
-        var columnWidth = this.constrainWidth(this.eventData.column, (this.eventData.originalWidths.column + difference) * this.eventData.columnRatio);
+        var tableWidth = (this.eventData.originalWidths.table + difference * this.eventData.tableRatio * 0.9);
+        var columnWidth = this.constrainWidth(this.eventData.column, (this.eventData.originalWidths.column + difference * this.eventData.columnRatio * 0.9));
         ResizableTableColumns.setWidth(this.table, tableWidth);
         ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
         this.eventData.newWidths = {

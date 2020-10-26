@@ -1,8 +1,8 @@
-import { ResizableOptions } from './resizable-options'
-import { Utilities, IIndexedCollection } from './utilities'
-import { UtilitiesDOM } from './utilities-dom'
-import { ResizableEventData } from './resizable-event-data';
 import { ResizableConstants } from './resizable-constants';
+import { ResizableEventData } from './resizable-event-data';
+import { ResizableOptions } from './resizable-options';
+import { IIndexedCollection, Utilities } from './utilities';
+import { UtilitiesDOM } from './utilities-dom';
 
 export class ResizableTableColumns {
   static instancesCount: number = 0;
