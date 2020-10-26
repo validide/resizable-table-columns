@@ -4,6 +4,65 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.validide_resizableTableColumns = {}));
 }(this, (function (exports) { 'use strict';
 
+    var ResizableConstants = /** @class */ (function () {
+        function ResizableConstants() {
+        }
+        ResizableConstants.dataPropertyname = 'validide_rtc_data_object';
+        ResizableConstants.classes = {
+            table: 'rtc-table',
+            wrapper: 'rtc-wrapper',
+            handleContainer: 'rtc-handle-container',
+            handle: 'rtc-handle',
+            tableResizing: 'rtc-table-resizing',
+            columnResizing: 'rtc-column-resizing',
+        };
+        ResizableConstants.attibutes = {
+            dataResizable: 'data-rtc-resizable',
+            dataResizableTable: 'data-rtc-resizable-table'
+        };
+        ResizableConstants.data = {
+            resizable: 'rtcResizable',
+            resizableTable: 'rtcResizableTable'
+        };
+        ResizableConstants.events = {
+            pointerDown: ['mousedown', 'touchstart'],
+            pointerMove: ['mousemove', 'touchmove'],
+            pointerUp: ['mouseup', 'touchend'],
+            windowResize: ['resize'],
+            eventResizeStart: 'eventResizeStart.rtc',
+            eventResize: 'eventResize.rtc',
+            eventResizeStop: 'eventResizeStop.rtc'
+        };
+        return ResizableConstants;
+    }());
+
+    var WidthsData = /** @class */ (function () {
+        function WidthsData() {
+            this.column = 0;
+            this.table = 0;
+        }
+        return WidthsData;
+    }());
+    var PointerData = /** @class */ (function () {
+        function PointerData() {
+            this.x = null;
+            this.isDoubleClick = false;
+        }
+        return PointerData;
+    }());
+    var ResizableEventData = /** @class */ (function () {
+        function ResizableEventData(column, dragHandler) {
+            this.pointer = new PointerData();
+            this.originalWidths = new WidthsData();
+            this.newWidths = new WidthsData();
+            this.columnRatio = 0;
+            this.tableRatio = 0;
+            this.column = column;
+            this.dragHandler = dragHandler;
+        }
+        return ResizableEventData;
+    }());
+
     var Utilities = /** @class */ (function () {
         function Utilities() {
         }
@@ -282,65 +341,6 @@
             this.overrideValues(elementOptions);
         };
         return ResizableOptions;
-    }());
-
-    var WidthsData = /** @class */ (function () {
-        function WidthsData() {
-            this.column = 0;
-            this.table = 0;
-        }
-        return WidthsData;
-    }());
-    var PointerData = /** @class */ (function () {
-        function PointerData() {
-            this.x = null;
-            this.isDoubleClick = false;
-        }
-        return PointerData;
-    }());
-    var ResizableEventData = /** @class */ (function () {
-        function ResizableEventData(column, dragHandler) {
-            this.pointer = new PointerData();
-            this.originalWidths = new WidthsData();
-            this.newWidths = new WidthsData();
-            this.columnRatio = 0;
-            this.tableRatio = 0;
-            this.column = column;
-            this.dragHandler = dragHandler;
-        }
-        return ResizableEventData;
-    }());
-
-    var ResizableConstants = /** @class */ (function () {
-        function ResizableConstants() {
-        }
-        ResizableConstants.dataPropertyname = 'validide_rtc_data_object';
-        ResizableConstants.classes = {
-            table: 'rtc-table',
-            wrapper: 'rtc-wrapper',
-            handleContainer: 'rtc-handle-container',
-            handle: 'rtc-handle',
-            tableResizing: 'rtc-table-resizing',
-            columnResizing: 'rtc-column-resizing',
-        };
-        ResizableConstants.attibutes = {
-            dataResizable: 'data-rtc-resizable',
-            dataResizableTable: 'data-rtc-resizable-table'
-        };
-        ResizableConstants.data = {
-            resizable: 'rtcResizable',
-            resizableTable: 'rtcResizableTable'
-        };
-        ResizableConstants.events = {
-            pointerDown: ['mousedown', 'touchstart'],
-            pointerMove: ['mousemove', 'touchmove'],
-            pointerUp: ['mouseup', 'touchend'],
-            windowResize: ['resize'],
-            eventResizeStart: 'eventResizeStart.rtc',
-            eventResize: 'eventResize.rtc',
-            eventResizeStop: 'eventResizeStop.rtc'
-        };
-        return ResizableConstants;
     }());
 
     var ResizableTableColumns = /** @class */ (function () {
@@ -707,8 +707,8 @@
             }
             this.eventData.columnRatio = this.eventData.newWidths.column / ResizableTableColumns.getComputedWidth(this.eventData.column);
             this.eventData.tableRatio = this.eventData.newWidths.table / ResizableTableColumns.getComputedWidth(this.table);
-            var tableWidth = (this.eventData.originalWidths.table + difference) * this.eventData.tableRatio;
-            var columnWidth = this.constrainWidth(this.eventData.column, (this.eventData.originalWidths.column + difference) * this.eventData.columnRatio);
+            var tableWidth = (this.eventData.originalWidths.table + difference * this.eventData.tableRatio * 0.9);
+            var columnWidth = this.constrainWidth(this.eventData.column, (this.eventData.originalWidths.column + difference * this.eventData.columnRatio * 0.9));
             ResizableTableColumns.setWidth(this.table, tableWidth);
             ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
             this.eventData.newWidths = {
@@ -949,9 +949,16 @@
         return ResizableTableColumns;
     }());
 
+    exports.PointerData = PointerData;
+    exports.ResizableConstants = ResizableConstants;
+    exports.ResizableEventData = ResizableEventData;
+    exports.ResizableOptions = ResizableOptions;
     exports.ResizableTableColumns = ResizableTableColumns;
+    exports.Utilities = Utilities;
+    exports.UtilitiesDOM = UtilitiesDOM;
+    exports.WidthsData = WidthsData;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=resizable-table-columns.js.map
+//# sourceMappingURL=index.js.map

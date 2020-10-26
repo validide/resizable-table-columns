@@ -1,4 +1,4 @@
-interface IClassesConstants {
+export interface IClassesConstants {
   table: string;
   wrapper: string;
   handleContainer: string;
@@ -7,17 +7,17 @@ interface IClassesConstants {
   columnResizing: string;
 }
 
-interface IAttributesConstants {
+export interface IAttributesConstants {
   dataResizable: string;
   dataResizableTable: string;
 }
 
-interface IDataConstants {
+export interface IDataConstants {
   resizable: string;
   resizableTable: string;
 }
 
-interface IEvents {
+export interface IEvents {
   pointerDown: Array<string>;
   pointerMove: Array<string>;
   pointerUp: Array<string>;

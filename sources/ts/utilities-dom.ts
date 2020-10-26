@@ -1,4 +1,4 @@
-import {Utilities, IIndexedCollection } from './utilities'
+import { IIndexedCollection, Utilities } from './utilities'
 
 export class UtilitiesDOM {
   static addClass(el: HTMLElement, className: string) {

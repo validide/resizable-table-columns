@@ -1,5 +1,5 @@
-import { ResizableOptions } from './resizable-options';
 import { ResizableEventData } from './resizable-event-data';
+import { ResizableOptions } from './resizable-options';
 export declare class ResizableTableColumns {
     static instancesCount: number;
     static windowResizeHandlerRegistered: boolean;

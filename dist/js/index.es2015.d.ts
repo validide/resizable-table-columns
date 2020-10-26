@@ -1,5 +1,5 @@
 declare module "resizable-constants" {
-    interface IClassesConstants {
+    export interface IClassesConstants {
         table: string;
         wrapper: string;
         handleContainer: string;
@@ -7,15 +7,15 @@ declare module "resizable-constants" {
         tableResizing: string;
         columnResizing: string;
     }
-    interface IAttributesConstants {
+    export interface IAttributesConstants {
         dataResizable: string;
         dataResizableTable: string;
     }
-    interface IDataConstants {
+    export interface IDataConstants {
         resizable: string;
         resizableTable: string;
     }
-    interface IEvents {
+    export interface IEvents {
         pointerDown: Array<string>;
         pointerMove: Array<string>;
         pointerUp: Array<string>;
@@ -108,8 +108,8 @@ declare module "resizable-options" {
     }
 }
 declare module "resizable-table-columns" {
-    import { ResizableOptions } from "resizable-options";
     import { ResizableEventData } from "resizable-event-data";
+    import { ResizableOptions } from "resizable-options";
     export class ResizableTableColumns {
         static instancesCount: number;
         static windowResizeHandlerRegistered: boolean;
@@ -165,4 +165,12 @@ declare module "resizable-table-columns" {
         static setWidth(element: HTMLElement, width: number): void;
         static getInstanceId(): number;
     }
+}
+declare module "index" {
+    export * from "resizable-constants";
+    export * from "resizable-event-data";
+    export * from "resizable-options";
+    export * from "resizable-table-columns";
+    export * from "utilities-dom";
+    export * from "utilities";
 }
