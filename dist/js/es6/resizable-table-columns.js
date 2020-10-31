@@ -26,7 +26,7 @@ var ResizableTableColumns = /** @class */ (function () {
         this.validateMarkup();
         this.createHandlerReferences();
         this.wrapTable();
-        this.asignTableHeaders();
+        this.assignTableHeaders();
         this.storeOriginalWidths();
         this.setHeaderWidths();
         this.createDragHandles();
@@ -111,7 +111,7 @@ var ResizableTableColumns = /** @class */ (function () {
         tableOriginalParent.removeChild(this.wrapper);
         this.wrapper = null;
     };
-    ResizableTableColumns.prototype.asignTableHeaders = function () {
+    ResizableTableColumns.prototype.assignTableHeaders = function () {
         var tableHeader;
         var firstTableRow;
         for (var index = 0; index < this.table.childNodes.length; index++) {
@@ -321,9 +321,7 @@ var ResizableTableColumns = /** @class */ (function () {
         var isDoubleClick = (millisecondsNow - this.lastPointerDown) < this.options.doubleClickDelay;
         var column = resizableHeaders[gripIndex];
         var columnWidth = ResizableTableColumns.getWidth(column);
-        var computedColumnWidth = ResizableTableColumns.getComputedWidth(column);
         var tableWidth = ResizableTableColumns.getWidth(this.table);
-        var computedTableWidth = ResizableTableColumns.getComputedWidth(this.table);
         var widths = {
             column: columnWidth,
             table: tableWidth
@@ -335,8 +333,7 @@ var ResizableTableColumns = /** @class */ (function () {
         };
         eventData.originalWidths = widths;
         eventData.newWidths = widths;
-        eventData.columnRatio = columnWidth / computedColumnWidth;
-        eventData.tableRatio = tableWidth / computedTableWidth;
+        eventData.widthRatio = ResizableTableColumns.getWidthRatio(column);
         this.detachHandlers(); //make sure we do not have extra handlers
         this.attachHandlers();
         UtilitiesDOM.addClass(this.table, ResizableConstants.classes.tableResizing);
@@ -351,8 +348,7 @@ var ResizableTableColumns = /** @class */ (function () {
                 columnWidth: columnWidth,
                 table: this.table,
                 tableWidth: tableWidth,
-                columnRatio: this.eventData.columnRatio,
-                tableRatio: this.eventData.tableRatio
+                widthRatio: this.eventData.widthRatio
             }
         });
         this.table.dispatchEvent(eventToDispatch);
@@ -365,12 +361,12 @@ var ResizableTableColumns = /** @class */ (function () {
         if (difference === 0) {
             return;
         }
-        this.eventData.columnRatio = this.eventData.newWidths.column / ResizableTableColumns.getComputedWidth(this.eventData.column);
-        this.eventData.tableRatio = this.eventData.newWidths.table / ResizableTableColumns.getComputedWidth(this.table);
-        var tableWidth = (this.eventData.originalWidths.table + difference * this.eventData.tableRatio * 0.9);
-        var columnWidth = this.constrainWidth(this.eventData.column, (this.eventData.originalWidths.column + difference * this.eventData.columnRatio * 0.9));
+        difference = difference * this.eventData.widthRatio;
+        var tableWidth = this.eventData.originalWidths.table + difference;
+        var columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
         ResizableTableColumns.setWidth(this.table, tableWidth);
         ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
+        this.eventData.widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
         this.eventData.newWidths = {
             column: columnWidth,
             table: tableWidth
@@ -381,8 +377,7 @@ var ResizableTableColumns = /** @class */ (function () {
                 columnWidth: columnWidth,
                 table: this.table,
                 tableWidth: tableWidth,
-                columnRatio: this.eventData.columnRatio,
-                tableRatio: this.eventData.tableRatio
+                widthRatio: this.eventData.widthRatio
             }
         });
         this.table.dispatchEvent(eventToDispatch);
@@ -408,7 +403,8 @@ var ResizableTableColumns = /** @class */ (function () {
                 column: this.eventData.column,
                 columnWidth: widths.column,
                 table: this.table,
-                tableWidth: widths.table
+                tableWidth: widths.table,
+                widthRatio: this.eventData.widthRatio
             }
         });
         this.table.dispatchEvent(eventToDispatch);
@@ -479,8 +475,7 @@ var ResizableTableColumns = /** @class */ (function () {
                 columnWidth: columnWidth,
                 table: this.table,
                 tableWidth: tableWidth,
-                columnRatio: this.eventData.columnRatio,
-                tableRatio: this.eventData.tableRatio
+                widthRatio: this.eventData.widthRatio
             }
         });
         this.table.dispatchEvent(eventToDispatch);
@@ -533,19 +528,19 @@ var ResizableTableColumns = /** @class */ (function () {
     ResizableTableColumns.prototype.createHandlerReferences = function () {
         var _this = this;
         if (!this.onPointerDownRef) {
-            this.onPointerDownRef = function (evt) {
+            this.onPointerDownRef = ResizableTableColumns.debounce(function (evt) {
                 _this.handlePointerDown(evt);
-            };
+            }, 100, true);
         }
         if (!this.onPointerMoveRef) {
-            this.onPointerMoveRef = function (evt) {
+            this.onPointerMoveRef = ResizableTableColumns.debounce(function (evt) {
                 _this.handlePointerMove(evt);
-            };
+            }, 1, false);
         }
         if (!this.onPointerUpRef) {
-            this.onPointerUpRef = function (evt) {
+            this.onPointerUpRef = ResizableTableColumns.debounce(function (evt) {
                 _this.handlePointerUp();
-            };
+            }, 100, true);
         }
     };
     ResizableTableColumns.prototype.registerWindowResizeHandler = function () {
@@ -591,10 +586,17 @@ var ResizableTableColumns = /** @class */ (function () {
     ResizableTableColumns.getWidth = function (el) {
         if (el.style.width === '')
             return UtilitiesDOM.getWidth(el);
-        return ResizableTableColumns.getComputedWidth(el);
+        return Utilities.parseStyleDimension(el.style.width, false);
     };
     ResizableTableColumns.getComputedWidth = function (el) {
-        return Utilities.parseStyleDimension(el.style.width, false);
+        var _a;
+        return Utilities.parseStyleDimension((_a = el.ownerDocument.defaultView) === null || _a === void 0 ? void 0 : _a.getComputedStyle(el).width, false);
+    };
+    ResizableTableColumns.getWidthRatio = function (el) {
+        var width = ResizableTableColumns.getWidth(el);
+        var computedWidth = ResizableTableColumns.getComputedWidth(el);
+        var ratio = width / computedWidth;
+        return ratio + Math.log10(100 * (1 - ratio)) / 100;
     };
     ResizableTableColumns.setWidth = function (element, width) {
         var strWidth = width.toFixed(2);
@@ -606,6 +608,30 @@ var ResizableTableColumns = /** @class */ (function () {
     };
     ResizableTableColumns.instancesCount = 0;
     ResizableTableColumns.windowResizeHandlerRegistered = false;
+    ResizableTableColumns.debounce = function (func, wait, immediate) {
+        var timeout = null;
+        var debounced = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            var later = function () {
+                timeout = null;
+                if (!immediate) {
+                    func.apply(void 0, args);
+                }
+            };
+            var callNow = immediate && !timeout;
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(later, wait);
+            if (callNow) {
+                func.apply(void 0, args);
+            }
+        };
+        return debounced;
+    };
     return ResizableTableColumns;
 }());
 export { ResizableTableColumns };
