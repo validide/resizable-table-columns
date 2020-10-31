@@ -24,7 +24,7 @@ export declare class ResizableTableColumns {
     validateMarkup(): void;
     wrapTable(): void;
     unwrapTable(): void;
-    asignTableHeaders(): void;
+    assignTableHeaders(): void;
     storeOriginalWidths(): void;
     restoreOriginalWidths(): void;
     setHeaderWidths(): void;
@@ -52,6 +52,8 @@ export declare class ResizableTableColumns {
     static generateTableId(table: HTMLTableElement): string;
     static getWidth(el: HTMLElement): number;
     static getComputedWidth(el: HTMLElement): number;
+    static getWidthRatio(el: HTMLElement): number;
     static setWidth(element: HTMLElement, width: number): void;
     static getInstanceId(): number;
+    static debounce: <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => (...args: Parameters<F>) => ReturnType<F>;
 }

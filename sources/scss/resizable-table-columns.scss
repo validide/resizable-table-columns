@@ -57,13 +57,13 @@ $handleMargin: 3px;
     .rtc-handle {
       position: absolute;
       width: 2 * $handleMargin + $handleWidth;
-      margin-left: -1 * ($handleMargin + $handleWidth/2);
+      margin-left: -1.1 * ($handleMargin + $handleWidth/2);
       z-index: 2;
       cursor: $cursorResize;
 
       &:last-of-type {
         width: $handleMargin + $handleWidth;
-        margin-left: -1 * ($handleMargin + $handleWidth);
+        margin-left: -1.1 * ($handleMargin + $handleWidth);
       }
     }
   }

@@ -52,7 +52,7 @@ export class ResizableTableColumns {
     this.validateMarkup();
     this.createHandlerReferences();
     this.wrapTable();
-    this.asignTableHeaders();
+    this.assignTableHeaders();
     this.storeOriginalWidths();
     this.setHeaderWidths();
     this.createDragHandles();
@@ -150,7 +150,7 @@ export class ResizableTableColumns {
     this.wrapper = null;
   }
 
-  asignTableHeaders() {
+  assignTableHeaders() {
     let tableHeader;
     let firstTableRow;
     for (let index = 0; index < this.table.childNodes.length; index++) {
@@ -395,9 +395,7 @@ export class ResizableTableColumns {
     const isDoubleClick = (millisecondsNow - this.lastPointerDown) < this.options.doubleClickDelay;
     const column = resizableHeaders[gripIndex];
     const columnWidth = ResizableTableColumns.getWidth(column);
-    const computedColumnWidth = ResizableTableColumns.getComputedWidth(column);
     const tableWidth = ResizableTableColumns.getWidth(this.table);
-    const computedTableWidth = ResizableTableColumns.getComputedWidth(this.table);
 
     const widths = {
       column: columnWidth,
@@ -410,8 +408,7 @@ export class ResizableTableColumns {
     };
     eventData.originalWidths = widths;
     eventData.newWidths = widths;
-    eventData.columnRatio = columnWidth / computedColumnWidth;
-    eventData.tableRatio = tableWidth / computedTableWidth;
+    eventData.widthRatio = ResizableTableColumns.getWidthRatio(column);
 
     this.detachHandlers(); //make sure we do not have extra handlers
     this.attachHandlers();
@@ -430,8 +427,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        columnRatio: this.eventData.columnRatio,
-        tableRatio: this.eventData.tableRatio
+        widthRatio: this.eventData.widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -442,22 +438,22 @@ export class ResizableTableColumns {
     if (!this.eventData || !event)
       return;
 
-    const difference = (UtilitiesDOM.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
+    let difference = (UtilitiesDOM.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
     if (difference === 0) {
       return;
     }
 
-    this.eventData.columnRatio = this.eventData.newWidths.column / ResizableTableColumns.getComputedWidth(this.eventData.column);
-    this.eventData.tableRatio = this.eventData.newWidths.table / ResizableTableColumns.getComputedWidth(this.table);
+    difference = difference * this.eventData.widthRatio;
 
-    const tableWidth = (this.eventData.originalWidths.table + difference) * this.eventData.tableRatio;
+    const tableWidth = this.eventData.originalWidths.table + difference;
     const columnWidth = this.constrainWidth(
       this.eventData.column,
-      (this.eventData.originalWidths.column + difference) * this.eventData.columnRatio
+      this.eventData.originalWidths.column + difference
     );
     ResizableTableColumns.setWidth(this.table, tableWidth);
     ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
 
+    this.eventData.widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
     this.eventData.newWidths = {
       column: columnWidth,
       table: tableWidth
@@ -469,8 +465,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        columnRatio: this.eventData.columnRatio,
-        tableRatio: this.eventData.tableRatio
+        widthRatio: this.eventData.widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -502,7 +497,8 @@ export class ResizableTableColumns {
         column: this.eventData.column,
         columnWidth: widths.column,
         table: this.table,
-        tableWidth: widths.table
+        tableWidth: widths.table,
+        widthRatio: this.eventData.widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -587,8 +583,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        columnRatio: this.eventData.columnRatio,
-        tableRatio: this.eventData.tableRatio
+        widthRatio: this.eventData.widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -649,21 +644,33 @@ export class ResizableTableColumns {
 
   createHandlerReferences() {
     if (!this.onPointerDownRef) {
-      this.onPointerDownRef = (evt: Event) => {
-        this.handlePointerDown(evt);
-      };
+      this.onPointerDownRef = ResizableTableColumns.debounce(
+        (evt: Event) => {
+          this.handlePointerDown(evt);
+        },
+        100,
+        true
+      );
     }
 
     if (!this.onPointerMoveRef) {
-      this.onPointerMoveRef = (evt: Event) => {
-        this.handlePointerMove(evt);
-      };
+      this.onPointerMoveRef = ResizableTableColumns.debounce(
+        (evt: Event) => {
+          this.handlePointerMove(evt);
+        },
+        1,
+        false
+      );
     }
 
     if (!this.onPointerUpRef) {
-      this.onPointerUpRef = (evt: Event) => {
-        this.handlePointerUp();
-      };
+      this.onPointerUpRef = ResizableTableColumns.debounce(
+        (evt: Event) => {
+          this.handlePointerUp();
+        },
+        100,
+        true
+      );
     }
   }
 
@@ -721,11 +728,19 @@ export class ResizableTableColumns {
     if (el.style.width === '')
       return UtilitiesDOM.getWidth(el);
 
-    return ResizableTableColumns.getComputedWidth(el);
+    return <number>Utilities.parseStyleDimension(el.style.width, false);
   }
 
   static getComputedWidth(el: HTMLElement): number {
-    return <number>Utilities.parseStyleDimension(el.style.width, false);
+    return <number>Utilities.parseStyleDimension(el.ownerDocument.defaultView?.getComputedStyle(el).width, false);
+  }
+
+  static getWidthRatio(el: HTMLElement): number {
+    const width = ResizableTableColumns.getWidth(el);
+    const computedWidth = ResizableTableColumns.getComputedWidth(el);
+    const ratio = width / computedWidth;
+
+    return ratio + Math.log10(100 * (1 - ratio)) / 100;
   }
 
   static setWidth(element: HTMLElement, width: number) {
@@ -736,5 +751,27 @@ export class ResizableTableColumns {
 
   static getInstanceId(): number {
     return ResizableTableColumns.instancesCount++;
+  }
+
+  static debounce = <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const debounced = (...args: Parameters<F>) => {
+      const later = () => {
+        timeout = null;
+        if (!immediate) {
+          func(...args);
+        }
+      };
+
+      const callNow = immediate && !timeout;
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      timeout = setTimeout(later, wait);
+      if (callNow) {
+        func(...args);
+      }
+    };
+    return debounced as (...args: Parameters<F>) => ReturnType<F>;
   }
 }
