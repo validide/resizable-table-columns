@@ -53,7 +53,7 @@ describe('ResizableTableColumns', function () {
       rtc.dispose();
 
       assert.isObject(rtc);
-      assert.isTrue(typeof (el as any)[ResizableConstants.dataPropertyname] === 'undefined');
+      assert.isTrue(typeof (el as any)[ResizableConstants.dataPropertyName] === 'undefined');
     });
   });
 });

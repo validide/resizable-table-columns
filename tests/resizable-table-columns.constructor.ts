@@ -228,8 +228,8 @@ describe('ResizableTableColumns', function () {
       const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
 
       assert.isObject(rtc);
-      assert.isObject((el as any)[ResizableConstants.dataPropertyname]);
-      assert.deepEqual(rtc, (el as any)[ResizableConstants.dataPropertyname]);
+      assert.isObject((el as any)[ResizableConstants.dataPropertyName]);
+      assert.deepEqual(rtc, (el as any)[ResizableConstants.dataPropertyName]);
     });
 
     it('Should fail to construct - undefined table ', function () {
@@ -273,14 +273,14 @@ describe('ResizableTableColumns', function () {
       const el = DOM.window.document.createElement('table');
 
       try {
-        (el as any)[ResizableConstants.dataPropertyname] = {};
+        (el as any)[ResizableConstants.dataPropertyName] = {};
         const rtc = new ResizableTableColumns(el, null);
       } catch (error) {
         theError = error;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf(`Existing "${ResizableConstants.dataPropertyname}" property.`) == 0);
+      assert.isTrue(theError.indexOf(`Existing "${ResizableConstants.dataPropertyName}" property.`) == 0);
     });
 
     it('Should fail to construct - missing head and body', function () {
@@ -447,8 +447,8 @@ describe('ResizableTableColumns', function () {
       const el = DOM.window.document.getElementById('valid-table');
       assert.isNotNull(el, 'Table element should be found in dom');
 
-      if (typeof (el as any)[ResizableConstants.dataPropertyname] !== 'undefined') {
-        (el as any)[ResizableConstants.dataPropertyname].dispose();
+      if (typeof (el as any)[ResizableConstants.dataPropertyName] !== 'undefined') {
+        (el as any)[ResizableConstants.dataPropertyName].dispose();
       }
 
       let rtc = new ResizableTableColumns(el as HTMLTableElement, null);
