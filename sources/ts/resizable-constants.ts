@@ -28,7 +28,7 @@ export interface IEvents {
 }
 
 export class ResizableConstants {
-  static dataPropertyname: string = 'validide_rtc_data_object';
+  static dataPropertyName: string = 'validide_rtc_data_object';
   static classes: IClassesConstants = {
     table: 'rtc-table',
     wrapper: 'rtc-wrapper',
@@ -37,7 +37,7 @@ export class ResizableConstants {
     tableResizing:'rtc-table-resizing',
     columnResizing:'rtc-column-resizing',
   };
-  static attibutes: IAttributesConstants = {
+  static attributes: IAttributesConstants = {
     dataResizable: 'data-rtc-resizable',
     dataResizableTable: 'data-rtc-resizable-table'
   };
