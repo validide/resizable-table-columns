@@ -20,7 +20,8 @@
             padding: 5px 20px 5px 10px;
         } */
 
-        article { max-width: 900px; }
+        /* article { max-width: 900px; } */
+        article { width: 4000px; }
     </style>
 </head>
 
@@ -336,7 +337,7 @@
 
                 var options = {
                     store: store,
-                    maxInitialWidth: 100
+                    maxInitialWidthHint: 400
                 };
                 if (table.querySelectorAll('thead > tr').length > 1) {
                     options.resizeFromBody = false;

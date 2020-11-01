@@ -7,8 +7,8 @@ var ResizableTableColumns = /** @class */ (function () {
     function ResizableTableColumns(table, options) {
         if (typeof table !== 'object' || table === null || table.toString() !== '[object HTMLTableElement]')
             throw 'Invalid argument: "table".\nResizableTableColumns requires that the table element is a not null HTMLTableElement object!';
-        if (typeof table[ResizableConstants.dataPropertyname] !== 'undefined')
-            throw "Existing \"" + ResizableConstants.dataPropertyname + "\" property.\nTable elemet already has a '" + ResizableConstants.dataPropertyname + "' attached object!";
+        if (typeof table[ResizableConstants.dataPropertyName] !== 'undefined')
+            throw "Existing \"" + ResizableConstants.dataPropertyName + "\" property.\nTable element already has a '" + ResizableConstants.dataPropertyName + "' attached object!";
         this.id = ResizableTableColumns.getInstanceId();
         this.table = table;
         this.options = new ResizableOptions(options, table);
@@ -20,7 +20,7 @@ var ResizableTableColumns = /** @class */ (function () {
         this.eventData = null;
         this.lastPointerDown = 0;
         this.init();
-        this.table[ResizableConstants.dataPropertyname] = this;
+        this.table[ResizableConstants.dataPropertyName] = this;
     }
     ResizableTableColumns.prototype.init = function () {
         this.validateMarkup();
@@ -42,7 +42,7 @@ var ResizableTableColumns = /** @class */ (function () {
         this.onPointerDownRef = null;
         this.onPointerMoveRef = null;
         this.onPointerUpRef = null;
-        this.table[ResizableConstants.dataPropertyname] = void (0);
+        this.table[ResizableConstants.dataPropertyName] = void (0);
     };
     ResizableTableColumns.prototype.validateMarkup = function () {
         var theadCount = 0;
@@ -161,10 +161,10 @@ var ResizableTableColumns = /** @class */ (function () {
             .forEach(function (el, idx) {
             var width = UtilitiesDOM.getWidth(el);
             var constrainedWidth = _this.constrainWidth(el, width);
-            if (typeof _this.options.maxInitialWidth === 'number') {
-                constrainedWidth = Math.min(constrainedWidth, _this.options.maxInitialWidth);
+            if (typeof _this.options.maxInitialWidthHint === 'number') {
+                constrainedWidth = Math.min(constrainedWidth, _this.options.maxInitialWidthHint);
             }
-            ResizableTableColumns.setWidth(el, constrainedWidth);
+            _this.setCellWidth(el, constrainedWidth, true);
         });
     };
     ResizableTableColumns.prototype.constrainWidth = function (el, width) {
@@ -183,7 +183,7 @@ var ResizableTableColumns = /** @class */ (function () {
         var _this = this;
         var _a;
         if (this.dragHandlesContainer != null)
-            throw 'Drag handlers allready created. Call <destroyDragHandles> if you wish to recreate them';
+            throw 'Drag handlers already created. Call <destroyDragHandles> if you wish to recreate them';
         this.dragHandlesContainer = this.ownerDocument.createElement('div');
         (_a = this.wrapper) === null || _a === void 0 ? void 0 : _a.insertBefore(this.dragHandlesContainer, this.table);
         UtilitiesDOM.addClass(this.dragHandlesContainer, ResizableConstants.classes.handleContainer);
@@ -241,10 +241,10 @@ var ResizableTableColumns = /** @class */ (function () {
         }
     };
     ResizableTableColumns.prototype.checkTableWidth = function () {
-        var wrappperWidth = UtilitiesDOM.getWidth(this.wrapper);
+        var wrapperWidth = UtilitiesDOM.getWidth(this.wrapper);
         //might bee needed to exclude margins/borders/paddings
         var tableWidth = UtilitiesDOM.getOuterWidth(this.table, true);
-        var difference = wrappperWidth - tableWidth;
+        var difference = wrapperWidth - tableWidth;
         if (difference > 0) {
             var totalWidth_1 = 0;
             var resizableWidth_1 = 0;
@@ -256,28 +256,35 @@ var ResizableTableColumns = /** @class */ (function () {
                 var width = ResizableTableColumns.getWidth(el);
                 widths_1.push(width);
                 totalWidth_1 += width;
-                if (el.hasAttribute(ResizableConstants.attibutes.dataResizable)) {
+                if (el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
                     resizableWidth_1 += width;
                 }
             });
-            ResizableTableColumns.setWidth(this.table, wrappperWidth);
+            var leftToAdd = 0;
+            var lastResizableCell = null;
             for (var index = 0; index < this.tableHeaders.length; index++) {
                 var el = this.tableHeaders[index];
                 var currentWidth = widths_1.shift();
-                if (el.hasAttribute(ResizableConstants.attibutes.dataResizable)) {
+                if (el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
+                    lastResizableCell = el;
                     var newWidth = currentWidth + ((currentWidth / resizableWidth_1) * difference);
-                    var leftToAdd = totalWidth_1 + difference - addedWidth;
+                    leftToAdd = totalWidth_1 + difference - addedWidth;
                     newWidth = Math.min(newWidth, leftToAdd);
                     newWidth = Math.max(newWidth, 0); // Do not add a negative width
-                    var constrainedWidth = this.constrainWidth(el, newWidth);
-                    ResizableTableColumns.setWidth(el, constrainedWidth);
-                    addedWidth += newWidth;
+                    var setWidth = this.setCellWidth(el, newWidth, false);
+                    addedWidth += setWidth;
                 }
                 else {
                     addedWidth += currentWidth;
                 }
                 if (addedWidth >= totalWidth_1)
                     break;
+            }
+            leftToAdd = totalWidth_1 - addedWidth;
+            if (leftToAdd > 0) {
+                var lastCell = lastResizableCell || this.tableHeaders[this.tableHeaders.length - 1];
+                var lastCellWidth = ResizableTableColumns.getWidth(lastCell);
+                this.setCellWidth(lastCell, lastCellWidth, true);
             }
         }
     };
@@ -303,7 +310,7 @@ var ResizableTableColumns = /** @class */ (function () {
     ResizableTableColumns.prototype.getResizableHeaders = function () {
         return this.tableHeaders
             .filter(function (el, idx) {
-            return el.hasAttribute(ResizableConstants.attibutes.dataResizable);
+            return el.hasAttribute(ResizableConstants.attributes.dataResizable);
         });
     };
     ResizableTableColumns.prototype.handlePointerDown = function (event) {
@@ -336,7 +343,6 @@ var ResizableTableColumns = /** @class */ (function () {
         };
         eventData.originalWidths = widths;
         eventData.newWidths = widths;
-        var widthRatio = ResizableTableColumns.getWidthRatio(column);
         this.detachHandlers(); //make sure we do not have extra handlers
         this.attachHandlers();
         UtilitiesDOM.addClass(this.table, ResizableConstants.classes.tableResizing);
@@ -351,7 +357,7 @@ var ResizableTableColumns = /** @class */ (function () {
                 columnWidth: columnWidth,
                 table: this.table,
                 tableWidth: tableWidth,
-                widthRatio: widthRatio
+                widthRatio: ResizableTableColumns.getWidthRatio(column)
             }
         });
         this.table.dispatchEvent(eventToDispatch);
@@ -422,7 +428,7 @@ var ResizableTableColumns = /** @class */ (function () {
         var indicesToSkip = [];
         this.tableHeaders
             .forEach(function (el, idx) {
-            if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable)) {
+            if (!el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
                 indicesToSkip.push(idx);
             }
         });
@@ -460,10 +466,12 @@ var ResizableTableColumns = /** @class */ (function () {
             }
         }
         this.ownerDocument.body.removeChild(span);
-        var difference = maxWidth - UtilitiesDOM.getWidth(column);
+        var difference = maxWidth - ResizableTableColumns.getComputedWidth(column);
         if (difference === 0) {
             return;
         }
+        var widthRatio = ResizableTableColumns.getWidthRatio(column);
+        difference = difference * widthRatio;
         var tableWidth = this.eventData.originalWidths.table + difference;
         var columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
         ResizableTableColumns.setWidth(this.table, tableWidth);
@@ -482,6 +490,8 @@ var ResizableTableColumns = /** @class */ (function () {
             }
         });
         this.table.dispatchEvent(eventToDispatch);
+        this.checkTableWidth();
+        this.syncHandleWidths();
     };
     ResizableTableColumns.prototype.attachHandlers = function () {
         var _this = this;
@@ -560,6 +570,19 @@ var ResizableTableColumns = /** @class */ (function () {
         this.checkTableWidth();
         this.syncHandleWidths();
     };
+    ResizableTableColumns.prototype.setCellWidth = function (cell, suggestedWidth, skipConstrainCheck) {
+        var widthRatio = ResizableTableColumns.getWidthRatio(cell);
+        var originalCellWidth = ResizableTableColumns.getWidth(cell);
+        var difference = suggestedWidth - originalCellWidth;
+        difference = difference * widthRatio;
+        var tableWidth = ResizableTableColumns.getWidth(this.table) + difference;
+        var columnWidth = skipConstrainCheck
+            ? originalCellWidth + difference
+            : this.constrainWidth(cell, originalCellWidth + difference);
+        ResizableTableColumns.setWidth(this.table, tableWidth);
+        ResizableTableColumns.setWidth(cell, columnWidth);
+        return columnWidth;
+    };
     ResizableTableColumns.onWindowResize = function (event) {
         var target = event ? event.target : null;
         if (target == null)
@@ -567,19 +590,19 @@ var ResizableTableColumns = /** @class */ (function () {
         var tables = target.document.querySelectorAll("." + ResizableConstants.classes.table);
         for (var index = 0; index < tables.length; index++) {
             var table = tables[index];
-            if (typeof table[ResizableConstants.dataPropertyname] !== 'object')
+            if (typeof table[ResizableConstants.dataPropertyName] !== 'object')
                 continue;
-            table[ResizableConstants.dataPropertyname].handleWindowResize();
+            table[ResizableConstants.dataPropertyName].handleWindowResize();
         }
     };
     ResizableTableColumns.generateColumnId = function (el) {
-        var columnId = (el.getAttribute(ResizableConstants.attibutes.dataResizable) || '')
+        var columnId = (el.getAttribute(ResizableConstants.attributes.dataResizable) || '')
             .trim()
             .replace(/\./g, '_');
         return columnId;
     };
     ResizableTableColumns.generateTableId = function (table) {
-        var tableId = (table.getAttribute(ResizableConstants.attibutes.dataResizableTable) || '')
+        var tableId = (table.getAttribute(ResizableConstants.attributes.dataResizableTable) || '')
             .trim()
             .replace(/\./g, '_');
         return tableId.length
@@ -599,7 +622,11 @@ var ResizableTableColumns = /** @class */ (function () {
         var width = ResizableTableColumns.getWidth(el);
         var computedWidth = ResizableTableColumns.getComputedWidth(el);
         var ratio = width / computedWidth;
-        return ratio + Math.log10(100 * Math.max(0, (1 - ratio))) / 100;
+        return ResizableTableColumns.round(Math.min(1, ratio), 2);
+    };
+    ResizableTableColumns.round = function (value, places) {
+        var multiplier = Math.pow(10, places);
+        return (Math.round(value * multiplier) / multiplier);
     };
     ResizableTableColumns.setWidth = function (element, width) {
         var strWidth = width.toFixed(2);

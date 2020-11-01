@@ -1,7 +1,7 @@
 var ResizableConstants = /** @class */ (function () {
     function ResizableConstants() {
     }
-    ResizableConstants.dataPropertyname = 'validide_rtc_data_object';
+    ResizableConstants.dataPropertyName = 'validide_rtc_data_object';
     ResizableConstants.classes = {
         table: 'rtc-table',
         wrapper: 'rtc-wrapper',
@@ -10,7 +10,7 @@ var ResizableConstants = /** @class */ (function () {
         tableResizing: 'rtc-table-resizing',
         columnResizing: 'rtc-column-resizing',
     };
-    ResizableConstants.attibutes = {
+    ResizableConstants.attributes = {
         dataResizable: 'data-rtc-resizable',
         dataResizableTable: 'data-rtc-resizable-table'
     };

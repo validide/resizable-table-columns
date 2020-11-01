@@ -1,5 +1,5 @@
 # Simple JavaScript resizable table columns
-Insipired by **[jquery-resizable-columns](https://github.com/dobtco/jquery-resizable-columns)**
+Inspired by **[jquery-resizable-columns](https://github.com/dobtco/jquery-resizable-columns)**
 ## This is still a work in progress
 
 ## Usage
@@ -21,25 +21,28 @@ new ResizableTableColumns(tableElement, {
 ```js
 var  options = {
   // boolean - The resize handle will span the entire height of the table
-  resizeFromBody: true;
+  resizeFromBody: true,
 
   // null or number - The minimum width any column in the table should have
-  minWidth: 40;
+  minWidth: 40,
 
   // null or number - The maximum width any column in the table should have
-  maxWidth: null;
+  maxWidth: null,
 
   // boolean - Should the minimum width take into account CSS rules?
-  obeyCssMinWidth: false;
+  obeyCssMinWidth: false,
 
   // boolean - Should the maximum width take into account CSS rules?
-  obeyCssMaxWidth: false;
+  obeyCssMaxWidth: false,
 
   // number - The maximum number off milliseconds between to pointer down events to consider the action a 'double click'
-  doubleClickDelay: 500;
+  doubleClickDelay: 500,
 
-  //data store provider (ex: https://github.com/marcuswestin/store.js)
-  store: null;
+  // data store provider (ex: https://github.com/marcuswestin/store.js)
+  store: null,
+
+  // null or number - The suggestion for how wide (in pixels) a cell might be in case the content is really wide.
+  maxInitialWidthHint: null
 }
 ```
 

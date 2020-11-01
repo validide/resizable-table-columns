@@ -24,9 +24,9 @@ export interface IEvents {
     eventResizeStop: string;
 }
 export declare class ResizableConstants {
-    static dataPropertyname: string;
+    static dataPropertyName: string;
     static classes: IClassesConstants;
-    static attibutes: IAttributesConstants;
+    static attributes: IAttributesConstants;
     static data: IDataConstants;
     static events: IEvents;
 }

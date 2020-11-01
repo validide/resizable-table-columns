@@ -9,7 +9,7 @@ var ResizableOptions = /** @class */ (function () {
         this.obeyCssMinWidth = false;
         this.obeyCssMaxWidth = false;
         this.doubleClickDelay = 500;
-        this.maxInitialWidth = null;
+        this.maxInitialWidthHint = null;
         this.store = null;
         this.overrideValues(options);
         this.overrideValuesFromElement(element);
