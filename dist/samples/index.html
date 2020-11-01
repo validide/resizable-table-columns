@@ -321,7 +321,10 @@
                     continue;
                 }
 
-                var options = { store: store };
+                var options = {
+                    store: store,
+                    maxInitialWidth: 100
+                };
                 if (table.querySelectorAll('thead > tr').length > 1) {
                     options.resizeFromBody = false;
                 }

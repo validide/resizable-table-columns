@@ -205,6 +205,9 @@ export class ResizableTableColumns {
       .forEach((el, idx) => {
         const width = UtilitiesDOM.getWidth(el);
         let constrainedWidth = this.constrainWidth(el, width);
+        if (typeof this.options.maxInitialWidth === 'number') {
+          constrainedWidth = Math.min(constrainedWidth, this.options.maxInitialWidth);
+        }
         ResizableTableColumns.setWidth(el, constrainedWidth);
       });
   }
@@ -408,7 +411,7 @@ export class ResizableTableColumns {
     };
     eventData.originalWidths = widths;
     eventData.newWidths = widths;
-    eventData.widthRatio = ResizableTableColumns.getWidthRatio(column);
+    const widthRatio = ResizableTableColumns.getWidthRatio(column);
 
     this.detachHandlers(); //make sure we do not have extra handlers
     this.attachHandlers();
@@ -427,7 +430,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -443,7 +446,8 @@ export class ResizableTableColumns {
       return;
     }
 
-    difference = difference * this.eventData.widthRatio;
+    const widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
+    difference = difference * widthRatio;
 
     const tableWidth = this.eventData.originalWidths.table + difference;
     const columnWidth = this.constrainWidth(
@@ -453,7 +457,6 @@ export class ResizableTableColumns {
     ResizableTableColumns.setWidth(this.table, tableWidth);
     ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
 
-    this.eventData.widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
     this.eventData.newWidths = {
       column: columnWidth,
       table: tableWidth
@@ -465,7 +468,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -498,7 +501,7 @@ export class ResizableTableColumns {
         columnWidth: widths.column,
         table: this.table,
         tableWidth: widths.table,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -514,11 +517,11 @@ export class ResizableTableColumns {
     const colIndex = this.tableHeaders.indexOf(column);
 
     let maxWidth = 0;
-    let indecesToSkip: number[] = [];
+    let indicesToSkip: number[] = [];
     this.tableHeaders
       .forEach((el, idx) => {
         if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable)) {
-          indecesToSkip.push(idx);
+          indicesToSkip.push(idx);
         }
       });
 
@@ -549,7 +552,7 @@ export class ResizableTableColumns {
           }
         }
 
-        if (indecesToSkip.indexOf(cellIndex) === -1
+        if (indicesToSkip.indexOf(cellIndex) === -1
           && colSpan === 1
           && currentIndex === colIndex) {
           maxWidth = Math.max(maxWidth, UtilitiesDOM.getTextWidth(<HTMLElement>cell, span))
@@ -583,7 +586,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -658,7 +661,7 @@ export class ResizableTableColumns {
         (evt: Event) => {
           this.handlePointerMove(evt);
         },
-        1,
+        5,
         false
       );
     }
@@ -740,7 +743,7 @@ export class ResizableTableColumns {
     const computedWidth = ResizableTableColumns.getComputedWidth(el);
     const ratio = width / computedWidth;
 
-    return ratio + Math.log10(100 * (1 - ratio)) / 100;
+    return ratio + Math.log10(100 * Math.max(0, (1 - ratio))) / 100;
   }
 
   static setWidth(element: HTMLElement, width: number) {

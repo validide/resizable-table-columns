@@ -12,6 +12,5 @@ export declare class ResizableEventData {
     pointer: PointerData;
     originalWidths: WidthsData;
     newWidths: WidthsData;
-    widthRatio: number;
     constructor(column: HTMLTableCellElement, dragHandler: HTMLDivElement);
 }

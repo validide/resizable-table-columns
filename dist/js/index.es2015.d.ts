@@ -47,7 +47,6 @@ declare module "resizable-event-data" {
         pointer: PointerData;
         originalWidths: WidthsData;
         newWidths: WidthsData;
-        widthRatio: number;
         constructor(column: HTMLTableCellElement, dragHandler: HTMLDivElement);
     }
 }
@@ -97,6 +96,7 @@ declare module "resizable-options" {
         resizeFromBody: boolean;
         minWidth: null | number;
         maxWidth: null | number;
+        maxInitialWidth: null | number;
         obeyCssMinWidth: boolean;
         obeyCssMaxWidth: boolean;
         doubleClickDelay: number;

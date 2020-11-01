@@ -55,7 +55,6 @@
             this.pointer = new PointerData();
             this.originalWidths = new WidthsData();
             this.newWidths = new WidthsData();
-            this.widthRatio = 1;
             this.column = column;
             this.dragHandler = dragHandler;
         }
@@ -318,6 +317,7 @@
             this.obeyCssMinWidth = false;
             this.obeyCssMaxWidth = false;
             this.doubleClickDelay = 500;
+            this.maxInitialWidth = null;
             this.store = null;
             this.overrideValues(options);
             this.overrideValuesFromElement(element);
@@ -500,6 +500,9 @@
                 .forEach(function (el, idx) {
                 var width = UtilitiesDOM.getWidth(el);
                 var constrainedWidth = _this.constrainWidth(el, width);
+                if (typeof _this.options.maxInitialWidth === 'number') {
+                    constrainedWidth = Math.min(constrainedWidth, _this.options.maxInitialWidth);
+                }
                 ResizableTableColumns.setWidth(el, constrainedWidth);
             });
         };
@@ -672,7 +675,7 @@
             };
             eventData.originalWidths = widths;
             eventData.newWidths = widths;
-            eventData.widthRatio = ResizableTableColumns.getWidthRatio(column);
+            var widthRatio = ResizableTableColumns.getWidthRatio(column);
             this.detachHandlers(); //make sure we do not have extra handlers
             this.attachHandlers();
             UtilitiesDOM.addClass(this.table, ResizableConstants.classes.tableResizing);
@@ -687,7 +690,7 @@
                     columnWidth: columnWidth,
                     table: this.table,
                     tableWidth: tableWidth,
-                    widthRatio: this.eventData.widthRatio
+                    widthRatio: widthRatio
                 }
             });
             this.table.dispatchEvent(eventToDispatch);
@@ -700,12 +703,12 @@
             if (difference === 0) {
                 return;
             }
-            difference = difference * this.eventData.widthRatio;
+            var widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
+            difference = difference * widthRatio;
             var tableWidth = this.eventData.originalWidths.table + difference;
             var columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
             ResizableTableColumns.setWidth(this.table, tableWidth);
             ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
-            this.eventData.widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
             this.eventData.newWidths = {
                 column: columnWidth,
                 table: tableWidth
@@ -716,7 +719,7 @@
                     columnWidth: columnWidth,
                     table: this.table,
                     tableWidth: tableWidth,
-                    widthRatio: this.eventData.widthRatio
+                    widthRatio: widthRatio
                 }
             });
             this.table.dispatchEvent(eventToDispatch);
@@ -743,7 +746,7 @@
                     columnWidth: widths.column,
                     table: this.table,
                     tableWidth: widths.table,
-                    widthRatio: this.eventData.widthRatio
+                    widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
                 }
             });
             this.table.dispatchEvent(eventToDispatch);
@@ -755,11 +758,11 @@
             var column = this.eventData.column;
             var colIndex = this.tableHeaders.indexOf(column);
             var maxWidth = 0;
-            var indecesToSkip = [];
+            var indicesToSkip = [];
             this.tableHeaders
                 .forEach(function (el, idx) {
                 if (!el.hasAttribute(ResizableConstants.attibutes.dataResizable)) {
-                    indecesToSkip.push(idx);
+                    indicesToSkip.push(idx);
                 }
             });
             var span = this.ownerDocument.createElement('span');
@@ -786,7 +789,7 @@
                             colSpan = 1;
                         }
                     }
-                    if (indecesToSkip.indexOf(cellIndex) === -1
+                    if (indicesToSkip.indexOf(cellIndex) === -1
                         && colSpan === 1
                         && currentIndex === colIndex) {
                         maxWidth = Math.max(maxWidth, UtilitiesDOM.getTextWidth(cell, span));
@@ -814,7 +817,7 @@
                     columnWidth: columnWidth,
                     table: this.table,
                     tableWidth: tableWidth,
-                    widthRatio: this.eventData.widthRatio
+                    widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
                 }
             });
             this.table.dispatchEvent(eventToDispatch);
@@ -874,7 +877,7 @@
             if (!this.onPointerMoveRef) {
                 this.onPointerMoveRef = ResizableTableColumns.debounce(function (evt) {
                     _this.handlePointerMove(evt);
-                }, 1, false);
+                }, 5, false);
             }
             if (!this.onPointerUpRef) {
                 this.onPointerUpRef = ResizableTableColumns.debounce(function (evt) {
@@ -935,7 +938,7 @@
             var width = ResizableTableColumns.getWidth(el);
             var computedWidth = ResizableTableColumns.getComputedWidth(el);
             var ratio = width / computedWidth;
-            return ratio + Math.log10(100 * (1 - ratio)) / 100;
+            return ratio + Math.log10(100 * Math.max(0, (1 - ratio))) / 100;
         };
         ResizableTableColumns.setWidth = function (element, width) {
             var strWidth = width.toFixed(2);
