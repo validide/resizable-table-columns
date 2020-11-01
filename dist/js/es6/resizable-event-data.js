@@ -19,7 +19,6 @@ var ResizableEventData = /** @class */ (function () {
         this.pointer = new PointerData();
         this.originalWidths = new WidthsData();
         this.newWidths = new WidthsData();
-        this.widthRatio = 1;
         this.column = column;
         this.dragHandler = dragHandler;
     }

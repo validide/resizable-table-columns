@@ -20,6 +20,7 @@
             padding: 5px 20px 5px 10px;
         } */
 
+        /* article { max-width: 900px; } */
         article { width: 4000px; }
     </style>
 </head>
@@ -35,13 +36,14 @@
                     <tr>
                         <th>No.</th>
                         <th data-rtc-resizable="name">Name</th>
-                        <th data-rtc-resizable="country">Counrty</th>
+                        <th data-rtc-resizable="country">Country</th>
                         <th data-rtc-resizable="region">Region</th>
                         <th>City</th>
                         <th data-rtc-resizable="street">Street</th>
                         <th data-rtc-resizable="post-code">Post Code</th>
                         <th data-rtc-resizable="last-update">Last updated</th>
                         <th data-rtc-resizable="uuid">UUID</th>
+                        <th data-rtc-resizable="remarks">Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,6 +57,7 @@
                         <td>41754</td>
                         <td>2017-11-15T16:52:00-08:00</td>
                         <td>E212DAC2-220E-9589-D96A-3B58242E9817</td>
+                        <td>Some very long remarks to test if this will cause the cell to initially be a lot longer than we would like it to be.</td>
                     </tr>
                     <tr>
                         <td>2</td>
@@ -66,6 +69,7 @@
                         <td>5426</td>
                         <td>2017-02-14T22:58:55-08:00</td>
                         <td>5DD78B29-5B58-F2D9-3D36-8FB80C3121A7</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>3</td>
@@ -77,6 +81,7 @@
                         <td>4901</td>
                         <td>2018-05-21T06:02:19-07:00</td>
                         <td>43416183-B9A7-9E24-3FBD-42093FB3B9F4</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>4</td>
@@ -88,6 +93,7 @@
                         <td>11401</td>
                         <td>2018-04-26T19:07:30-07:00</td>
                         <td>16A49C04-4CD6-DAB7-B6F6-9F441487D0CD</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>5</td>
@@ -99,6 +105,7 @@
                         <td>C1W 2W0</td>
                         <td>2017-08-30T22:53:40-07:00</td>
                         <td>650F3DCA-D979-6629-0CB1-643E1D289239</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>6</td>
@@ -110,6 +117,7 @@
                         <td>40664</td>
                         <td>2018-07-03T03:12:45-07:00</td>
                         <td>7A4609A1-E4D6-3327-7329-4ACB8950F9A2</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>7</td>
@@ -121,6 +129,7 @@
                         <td>381870</td>
                         <td>2018-07-15T17:01:24-07:00</td>
                         <td>03D5BF83-F1EA-05E1-2B76-37A1996A4007</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>8</td>
@@ -132,6 +141,7 @@
                         <td>47947</td>
                         <td>2017-07-24T02:04:07-07:00</td>
                         <td>64FF2C19-E62B-FCB0-91C0-E6493EDBEB72</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>9</td>
@@ -143,6 +153,7 @@
                         <td>3539</td>
                         <td>2018-05-17T20:59:41-07:00</td>
                         <td>D08BC557-A7BB-CE2D-652D-CCE2DBC79DA1</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>10</td>
@@ -154,6 +165,7 @@
                         <td>JS5Z 4UZ</td>
                         <td>2016-10-03T23:00:32-07:00</td>
                         <td>F854BE7E-C117-7B9A-F3D5-9EAD294315D0</td>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
@@ -183,7 +195,7 @@
                     <tr>
                         <th>No.</th>
                         <th>Name</th>
-                        <th>Counrty</th>
+                        <th>Country</th>
                         <th>Region</th>
                         <th>City</th>
                         <th>Street</th>
@@ -323,7 +335,10 @@
                     continue;
                 }
 
-                var options = { store: store };
+                var options = {
+                    store: store,
+                    maxInitialWidthHint: 400
+                };
                 if (table.querySelectorAll('thead > tr').length > 1) {
                     options.resizeFromBody = false;
                 }

@@ -47,12 +47,14 @@ export declare class ResizableTableColumns {
     createHandlerReferences(): void;
     registerWindowResizeHandler(): void;
     handleWindowResize(): void;
+    setCellWidth(cell: HTMLTableCellElement, suggestedWidth: number, skipConstrainCheck: boolean): number;
     static onWindowResize(event: Event): void;
     static generateColumnId(el: HTMLElement): string;
     static generateTableId(table: HTMLTableElement): string;
     static getWidth(el: HTMLElement): number;
     static getComputedWidth(el: HTMLElement): number;
     static getWidthRatio(el: HTMLElement): number;
+    static round(value: number, places: number): number;
     static setWidth(element: HTMLElement, width: number): void;
     static getInstanceId(): number;
     static debounce: <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => (...args: Parameters<F>) => ReturnType<F>;

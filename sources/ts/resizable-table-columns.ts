@@ -205,7 +205,10 @@ export class ResizableTableColumns {
       .forEach((el, idx) => {
         const width = UtilitiesDOM.getWidth(el);
         let constrainedWidth = this.constrainWidth(el, width);
-        ResizableTableColumns.setWidth(el, constrainedWidth);
+        if (typeof this.options.maxInitialWidthHint === 'number') {
+          constrainedWidth = Math.min(constrainedWidth, this.options.maxInitialWidthHint);
+        }
+        this.setCellWidth(el, constrainedWidth, true);
       });
   }
 
@@ -317,23 +320,22 @@ export class ResizableTableColumns {
           }
         });
 
-      ResizableTableColumns.setWidth(this.table, wrapperWidth);
-
-
+      let leftToAdd = 0;
+      let lastResizableCell: HTMLTableCellElement | null = null;
       for (let index = 0; index < this.tableHeaders.length; index++) {
         const el = this.tableHeaders[index];
         const currentWidth = widths.shift() as number;
 
         if (el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
+          lastResizableCell = el;
           let newWidth = currentWidth + ((currentWidth / resizableWidth) * difference);
-          let leftToAdd = totalWidth + difference - addedWidth;
+          leftToAdd = totalWidth + difference - addedWidth;
 
           newWidth = Math.min(newWidth, leftToAdd);
           newWidth = Math.max(newWidth, 0); // Do not add a negative width
-          const constrainedWidth = this.constrainWidth(el, newWidth)
-          ResizableTableColumns.setWidth(el, constrainedWidth);
+          const setWidth = this.setCellWidth(el, newWidth, false)
 
-          addedWidth += newWidth;
+          addedWidth += setWidth;
         } else {
           addedWidth += currentWidth;
         }
@@ -341,6 +343,14 @@ export class ResizableTableColumns {
         if (addedWidth >= totalWidth)
           break;
       }
+
+      leftToAdd = totalWidth - addedWidth;
+      if(leftToAdd > 0) {
+        const lastCell = lastResizableCell || this.tableHeaders[this.tableHeaders.length -1];
+        const lastCellWidth = ResizableTableColumns.getWidth(lastCell);
+        this.setCellWidth(lastCell, lastCellWidth, true);
+      }
+
     }
   }
 
@@ -408,7 +418,6 @@ export class ResizableTableColumns {
     };
     eventData.originalWidths = widths;
     eventData.newWidths = widths;
-    eventData.widthRatio = ResizableTableColumns.getWidthRatio(column);
 
     this.detachHandlers(); //make sure we do not have extra handlers
     this.attachHandlers();
@@ -427,7 +436,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: ResizableTableColumns.getWidthRatio(column)
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -443,7 +452,8 @@ export class ResizableTableColumns {
       return;
     }
 
-    difference = difference * this.eventData.widthRatio;
+    const widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
+    difference = difference * widthRatio;
 
     const tableWidth = this.eventData.originalWidths.table + difference;
     const columnWidth = this.constrainWidth(
@@ -453,7 +463,6 @@ export class ResizableTableColumns {
     ResizableTableColumns.setWidth(this.table, tableWidth);
     ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
 
-    this.eventData.widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
     this.eventData.newWidths = {
       column: columnWidth,
       table: tableWidth
@@ -465,7 +474,7 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: widthRatio
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -498,7 +507,7 @@ export class ResizableTableColumns {
         columnWidth: widths.column,
         table: this.table,
         tableWidth: widths.table,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -563,10 +572,13 @@ export class ResizableTableColumns {
 
     this.ownerDocument.body.removeChild(span);
 
-    const difference = maxWidth - UtilitiesDOM.getWidth(column);
+    let difference = maxWidth - ResizableTableColumns.getComputedWidth(column);
     if (difference === 0) {
       return;
     }
+
+    const widthRatio = ResizableTableColumns.getWidthRatio(column);
+    difference = difference * widthRatio;
 
     const tableWidth = this.eventData.originalWidths.table + difference;
     const columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
@@ -583,10 +595,13 @@ export class ResizableTableColumns {
         columnWidth: columnWidth,
         table: this.table,
         tableWidth: tableWidth,
-        widthRatio: this.eventData.widthRatio
+        widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
       }
     });
     this.table.dispatchEvent(eventToDispatch);
+
+    this.checkTableWidth();
+    this.syncHandleWidths();
   }
 
   attachHandlers(): void {
@@ -658,7 +673,7 @@ export class ResizableTableColumns {
         (evt: Event) => {
           this.handlePointerMove(evt);
         },
-        1,
+        5,
         false
       );
     }
@@ -689,6 +704,22 @@ export class ResizableTableColumns {
   handleWindowResize(): void {
     this.checkTableWidth();
     this.syncHandleWidths();
+  }
+
+  setCellWidth(cell: HTMLTableCellElement, suggestedWidth: number, skipConstrainCheck: boolean): number {
+    const widthRatio = ResizableTableColumns.getWidthRatio(cell);
+    const originalCellWidth = ResizableTableColumns.getWidth(cell);
+    let difference = suggestedWidth - originalCellWidth;
+    difference = difference * widthRatio;
+
+    const tableWidth = ResizableTableColumns.getWidth(this.table) + difference;
+    const columnWidth = skipConstrainCheck
+      ? originalCellWidth + difference
+      : this.constrainWidth(cell, originalCellWidth + difference);
+    ResizableTableColumns.setWidth(this.table, tableWidth);
+    ResizableTableColumns.setWidth(cell, columnWidth);
+
+    return columnWidth;
   }
 
   static onWindowResize(event: Event): void {
@@ -739,9 +770,13 @@ export class ResizableTableColumns {
     const width = ResizableTableColumns.getWidth(el);
     const computedWidth = ResizableTableColumns.getComputedWidth(el);
     const ratio = width / computedWidth;
-
-    return ratio + Math.log10(100 * (1 - ratio)) / 100;
+    return ResizableTableColumns.round(Math.min(1, ratio), 2);
   }
+
+  static round(value: number, places: number): number {
+    const multiplier = Math.pow(10, places);
+    return (Math.round(value * multiplier) / multiplier);
+}
 
   static setWidth(element: HTMLElement, width: number) {
     let strWidth = width.toFixed(2);

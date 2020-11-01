@@ -25,9 +25,9 @@ declare module "resizable-constants" {
         eventResizeStop: string;
     }
     export class ResizableConstants {
-        static dataPropertyname: string;
+        static dataPropertyName: string;
         static classes: IClassesConstants;
-        static attibutes: IAttributesConstants;
+        static attributes: IAttributesConstants;
         static data: IDataConstants;
         static events: IEvents;
     }
@@ -47,7 +47,6 @@ declare module "resizable-event-data" {
         pointer: PointerData;
         originalWidths: WidthsData;
         newWidths: WidthsData;
-        widthRatio: number;
         constructor(column: HTMLTableCellElement, dragHandler: HTMLDivElement);
     }
 }
@@ -97,6 +96,7 @@ declare module "resizable-options" {
         resizeFromBody: boolean;
         minWidth: null | number;
         maxWidth: null | number;
+        maxInitialWidthHint: null | number;
         obeyCssMinWidth: boolean;
         obeyCssMaxWidth: boolean;
         doubleClickDelay: number;
@@ -156,12 +156,14 @@ declare module "resizable-table-columns" {
         createHandlerReferences(): void;
         registerWindowResizeHandler(): void;
         handleWindowResize(): void;
+        setCellWidth(cell: HTMLTableCellElement, suggestedWidth: number, skipConstrainCheck: boolean): number;
         static onWindowResize(event: Event): void;
         static generateColumnId(el: HTMLElement): string;
         static generateTableId(table: HTMLTableElement): string;
         static getWidth(el: HTMLElement): number;
         static getComputedWidth(el: HTMLElement): number;
         static getWidthRatio(el: HTMLElement): number;
+        static round(value: number, places: number): number;
         static setWidth(element: HTMLElement, width: number): void;
         static getInstanceId(): number;
         static debounce: <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => (...args: Parameters<F>) => ReturnType<F>;
