@@ -49,7 +49,7 @@ var  options = {
 ## Supported Browsers
 IE 10 and above
 
-**[Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)**
-
-**[Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)**
+## Demos
+* [Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)
+* [Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)
 
