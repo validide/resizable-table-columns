@@ -13,4 +13,4 @@ for(let i=0; i< pathsToClean.length; i++) {
   }
 }
 
-console.log("Done cleaning!");
+// console.log("Done cleaning!");
