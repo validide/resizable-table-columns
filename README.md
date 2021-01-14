@@ -6,7 +6,6 @@ Inspired by **[jquery-resizable-columns](https://github.com/dobtco/jquery-resiza
 
 
 ## Usage
-
 ### Basic
 
 ```js
@@ -53,6 +52,6 @@ var  options = {
 IE 10 and above
 
 ## Demos
-* [Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)
-* [Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)
+  * [Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)
 
+  * [Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)

@@ -3,7 +3,7 @@ $handleWidth: 2.5px;
 $handleMargin: 2px;
 
 .rtc-hidden {
-  display: none!important;
+  display: none !important;
 }
 
 .rtc-wrapper {
@@ -17,10 +17,14 @@ $handleMargin: 2px;
     margin: 0;
     width: auto;
 
-    thead, tbody, tfoot {
+    thead,
+    tbody,
+    tfoot {
       margin: 0;
+
       tr {
         margin: 0;
+
         th,
         td {
           margin: 0;
@@ -34,7 +38,9 @@ $handleMargin: 2px;
     &.rtc-table-resizing {
       cursor: $cursorResize;
 
-      thead, thead > th, thead > th > a {
+      thead,
+      thead > th,
+      thead > th > a {
         cursor: $cursorResize;
       }
     }
@@ -44,7 +50,7 @@ $handleMargin: 2px;
       border: none;
       margin: 0;
       padding: 0;
-      height: 0!important;
+      height: 0 !important;
     }
   }
 
