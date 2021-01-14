@@ -4,7 +4,6 @@ Inspired by **[jquery-resizable-columns](https://github.com/dobtco/jquery-resiza
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f963825a192e4c9a8fd148212fec5c13)](https://www.codacy.com/gh/validide/resizable-table-columns/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=validide/resizable-table-columns&amp;utm_campaign=Badge_Grade)
 [![npm version](https://img.shields.io/npm/v/@validide/resizable-table-columns)](https://www.npmjs.com/package/@validide/resizable-table-columns)
 
-
 ## Usage
 ### Basic
 
@@ -52,6 +51,5 @@ var  options = {
 IE 10 and above
 
 ## Demos
-  * [Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)
-
-  * [Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)
+*  [Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)
+*  [Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)
