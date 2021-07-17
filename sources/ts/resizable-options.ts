@@ -5,8 +5,6 @@ export class ResizableOptions {
   minWidth: null | number;
   maxWidth: null | number;
   maxInitialWidthHint: null | number;
-  obeyCssMinWidth: boolean;
-  obeyCssMaxWidth: boolean;
   doubleClickDelay: number;
   store: any;
 
@@ -14,8 +12,6 @@ export class ResizableOptions {
     this.resizeFromBody = true;
     this.minWidth = 40;
     this.maxWidth = null;
-    this.obeyCssMinWidth = false;
-    this.obeyCssMaxWidth = false;
     this.doubleClickDelay = 500;
     this.maxInitialWidthHint = null;
     this.store = null;

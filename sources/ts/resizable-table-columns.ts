@@ -1,12 +1,19 @@
 import { ResizableConstants } from './resizable-constants';
 import { ResizableEventData } from './resizable-event-data';
 import { ResizableOptions } from './resizable-options';
-import { IIndexedCollection, Utilities } from './utilities';
-import { UtilitiesDOM } from './utilities-dom';
+
+interface IHeaderDetails<T> {
+  el: HTMLElement,
+  detail: T;
+}
+
+interface IIndexedCollection<T> {
+  [name: string]: T;
+}
 
 export class ResizableTableColumns {
   static instancesCount: number = 0;
-  static windowResizeHandlerRegistered: boolean = false;
+  static windowResizeHandlerRef: null | ((event: Event) => void) = null;
 
   table: HTMLTableElement;
   options: ResizableOptions;
@@ -16,7 +23,7 @@ export class ResizableTableColumns {
   ownerDocument: Document;
   tableHeaders: HTMLTableHeaderCellElement[];
   dragHandlesContainer: HTMLDivElement | null;
-  originalWidths: { [id: string]: string; };
+  originalWidths: IHeaderDetails<string>[];
   eventData: ResizableEventData | null;
   lastPointerDown: number;
   onPointerDownRef: any;
@@ -39,7 +46,7 @@ export class ResizableTableColumns {
     this.ownerDocument = table.ownerDocument;
     this.tableHeaders = [];
     this.dragHandlesContainer = null;
-    this.originalWidths = {};
+    this.originalWidths = [];
     this.eventData = null;
     this.lastPointerDown = 0;
 
@@ -131,16 +138,17 @@ export class ResizableTableColumns {
       return;
 
     this.wrapper = this.ownerDocument.createElement('div');
+    this.wrapper.classList.add(ResizableConstants.classes.wrapper);
+
     const tableOriginalParent = this.table.parentNode as Node;
     tableOriginalParent.insertBefore(this.wrapper, this.table);
     tableOriginalParent.removeChild(this.table);
     this.wrapper.appendChild(this.table);
-    UtilitiesDOM.addClass(this.wrapper, ResizableConstants.classes.wrapper);
-    UtilitiesDOM.addClass(this.table, ResizableConstants.classes.table);
+    this.table.classList.add(ResizableConstants.classes.table);
   }
 
   unwrapTable() {
-    UtilitiesDOM.removeClass(this.table, ResizableConstants.classes.table);
+    this.table.classList.remove(ResizableConstants.classes.table);
     if (!this.wrapper)
       return;
 
@@ -186,46 +194,41 @@ export class ResizableTableColumns {
 
   storeOriginalWidths() {
     this.tableHeaders
-      .forEach((el, idx) => {
-        this.originalWidths[`___.${idx}`] = el.style.width;
+      .forEach(el => {
+        this.originalWidths.push({
+          el: el,
+          detail: el.style.width
+        });
       });
-    this.originalWidths[`___.table`] = this.table.style.width;
+    this.originalWidths.push({
+      el: this.table,
+      detail: this.table.style.width
+    });
   }
 
   restoreOriginalWidths() {
-    this.tableHeaders
-      .forEach((el, idx) => {
-        el.style.width = this.originalWidths[`___.${idx}`];
+    this.originalWidths
+      .forEach(itm => {
+        itm.el.style.width = itm.detail;
       });
-    this.table.style.width = this.originalWidths[`___.table`];
   }
 
   setHeaderWidths() {
     this.tableHeaders
-      .forEach((el, idx) => {
-        const width = UtilitiesDOM.getWidth(el);
+      .forEach(el => {
+        const width = el.offsetWidth;
         let constrainedWidth = this.constrainWidth(el, width);
         if (typeof this.options.maxInitialWidthHint === 'number') {
           constrainedWidth = Math.min(constrainedWidth, this.options.maxInitialWidthHint);
         }
-        this.setCellWidth(el, constrainedWidth, true);
+        this.updateWidth(el, constrainedWidth, true, false);
       });
   }
 
   constrainWidth(el: HTMLElement, width: number): number {
     let result: number = width;
-    const minWidth = this.options.obeyCssMinWidth
-      ? UtilitiesDOM.getMinCssWidth(el)
-      : -Infinity;
-
-    result = Math.max(result, minWidth || 0, this.options.minWidth || -Infinity);
-
-    const maxWidth = this.options.obeyCssMaxWidth
-      ? UtilitiesDOM.getMaxCssWidth(el)
-      : +Infinity;
-
-    result = Math.min(result, maxWidth || 0, this.options.maxWidth || +Infinity);
-
+    result = Math.max(result, this.options.minWidth || -Infinity);
+    result = Math.min(result, this.options.maxWidth || +Infinity);
     return result;
   }
 
@@ -236,12 +239,12 @@ export class ResizableTableColumns {
 
     this.dragHandlesContainer = this.ownerDocument.createElement('div');
     this.wrapper?.insertBefore(this.dragHandlesContainer, this.table);
-    UtilitiesDOM.addClass(this.dragHandlesContainer, ResizableConstants.classes.handleContainer);
+    this.dragHandlesContainer.classList.add(ResizableConstants.classes.handleContainer);
 
     this.getResizableHeaders()
-      .forEach((el, idx) => {
+      .forEach(() => {
         const handler = this.ownerDocument.createElement('div');
-        UtilitiesDOM.addClass(handler, ResizableConstants.classes.handle);
+        handler.classList.add(ResizableConstants.classes.handle);
         this.dragHandlesContainer?.appendChild(handler);
       });
 
@@ -284,7 +287,7 @@ export class ResizableTableColumns {
       return;
 
     this.getResizableHeaders()
-      .forEach((el, idx) => {
+      .forEach(el => {
         const width = data.columns[ResizableTableColumns.generateColumnId(el)]
         if (typeof width !== 'undefined') {
           ResizableTableColumns.setWidth(el, width);
@@ -297,78 +300,68 @@ export class ResizableTableColumns {
   }
 
   checkTableWidth() {
-    let wrapperWidth = UtilitiesDOM.getWidth(this.wrapper as HTMLElement);
-
-    //might bee needed to exclude margins/borders/paddings
-    let tableWidth = UtilitiesDOM.getOuterWidth(this.table, true);
+    let wrapperWidth = (this.wrapper as HTMLElement).clientWidth;
+    let tableWidth = this.table.offsetWidth;
     let difference = wrapperWidth - tableWidth;
-    if (difference > 0) {
+    if (difference <= 0)
+      return;
 
-      let totalWidth = 0;
-      let resizableWidth = 0;
-      let addedWidth = 0;
-      let widths: number[] = [];
+    let resizableWidth = 0;
+    let addedWidth = 0;
+    let headersDetails: IHeaderDetails<number>[] = [];
 
-      this.tableHeaders
-        .forEach((el, idx) => {
-          //might bee needed to include margins/borders/paddings
-          const width = ResizableTableColumns.getWidth(el);
-          widths.push(width);
-          totalWidth += width;
-          if (el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
-            resizableWidth += width;
-          }
-        });
-
-      let leftToAdd = 0;
-      let lastResizableCell: HTMLTableCellElement | null = null;
-      for (let index = 0; index < this.tableHeaders.length; index++) {
-        const el = this.tableHeaders[index];
-        const currentWidth = widths.shift() as number;
-
+    this.tableHeaders
+      .forEach((el, idx) => {
         if (el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
-          lastResizableCell = el;
-          let newWidth = currentWidth + ((currentWidth / resizableWidth) * difference);
-          leftToAdd = totalWidth + difference - addedWidth;
-
-          newWidth = Math.min(newWidth, leftToAdd);
-          newWidth = Math.max(newWidth, 0); // Do not add a negative width
-          const setWidth = this.setCellWidth(el, newWidth, false)
-
-          addedWidth += setWidth;
-        } else {
-          addedWidth += currentWidth;
+          const detail: IHeaderDetails<number> = {
+            el: el,
+            detail: el.offsetWidth
+          };
+          headersDetails.push(detail);
+          resizableWidth += detail.detail;
         }
+      });
 
-        if (addedWidth >= totalWidth)
-          break;
-      }
+    let leftToAdd = 0;
+    let lastResizableCell: HTMLElement | null = null;
+    let currentDetail: IHeaderDetails<number> | undefined;
+    while ((currentDetail = headersDetails.shift() as IHeaderDetails<number>)) {
+      leftToAdd = difference - addedWidth;
 
-      leftToAdd = totalWidth - addedWidth;
-      if(leftToAdd > 0) {
-        const lastCell = lastResizableCell || this.tableHeaders[this.tableHeaders.length -1];
-        const lastCellWidth = ResizableTableColumns.getWidth(lastCell);
-        this.setCellWidth(lastCell, lastCellWidth, true);
-      }
+      lastResizableCell = currentDetail.el;
+      let extraWidth = Math.floor((currentDetail.detail / resizableWidth) * difference);
+      extraWidth = Math.min(extraWidth, leftToAdd);
+      const newWidth = this.updateWidth(currentDetail.el, currentDetail.detail + extraWidth, false, true);
+      addedWidth += (newWidth - currentDetail.detail);
 
+      if (addedWidth >= difference)
+        break;
     }
+
+    leftToAdd = difference - addedWidth;
+    if (leftToAdd > 0) {
+      const lastCell = (headersDetails[0]?.el) || lastResizableCell || this.tableHeaders[this.tableHeaders.length - 1];
+      const lastCellWidth = lastCell.offsetWidth;
+      this.updateWidth(lastCell, lastCellWidth, true, true);
+    }
+    ResizableTableColumns.setWidth(this.table, wrapperWidth);
   }
 
   syncHandleWidths() {
-    const tableWidth = UtilitiesDOM.getWidth(this.table);
+    const tableWidth = this.table.clientWidth;
     ResizableTableColumns.setWidth(this.dragHandlesContainer as HTMLDivElement, tableWidth);
     (this.dragHandlesContainer as HTMLDivElement).style.minWidth = `${tableWidth}px`;
 
     const headers = this.getResizableHeaders();
     this.getDragHandlers()
       .forEach((el, idx) => {
-        const height = UtilitiesDOM.getInnerHeight((this.options.resizeFromBody ? this.table : this.table.tHead) as HTMLElement);
+        const height = ((this.options.resizeFromBody ? this.table : this.table.tHead) as HTMLElement).clientHeight;
 
         if (idx < headers.length) {
           const th = headers[idx];
-          let left = UtilitiesDOM.getOuterWidth(th);
-          left += UtilitiesDOM.getOffset(th).left;
-          left -= UtilitiesDOM.getOffset(this.dragHandlesContainer as HTMLElement).left;
+          let left = th.offsetWidth;
+          left += ResizableTableColumns.getOffset(th).left;
+          left -= ResizableTableColumns.getOffset(this.dragHandlesContainer as HTMLElement).left;
           el.style.left = `${left}px`;
           el.style.height = `${height}px`;
         }
@@ -389,7 +382,7 @@ export class ResizableTableColumns {
     if (target == null)
       return;
 
-    if (target.nodeName !== 'DIV' || !UtilitiesDOM.hasClass(target, ResizableConstants.classes.handle))
+    if (target.nodeName !== 'DIV' || !target.classList.contains(ResizableConstants.classes.handle))
       return;
 
     if (typeof (<any>event).button === 'number' && (<any>event).button !== 0)
@@ -404,16 +397,15 @@ export class ResizableTableColumns {
     const millisecondsNow = (new Date()).getTime();
     const isDoubleClick = (millisecondsNow - this.lastPointerDown) < this.options.doubleClickDelay;
     const column = resizableHeaders[gripIndex];
-    const columnWidth = ResizableTableColumns.getWidth(column);
-    const tableWidth = ResizableTableColumns.getWidth(this.table);
+    const columnWidth = column.offsetWidth;
 
     const widths = {
       column: columnWidth,
-      table: tableWidth
+      table: this.table.offsetWidth
     };
     const eventData: ResizableEventData = new ResizableEventData(column, dragHandler);
     eventData.pointer = {
-      x: UtilitiesDOM.getPointerX(event),
+      x: ResizableTableColumns.getPointerX(event),
       isDoubleClick: isDoubleClick
     };
     eventData.originalWidths = widths;
@@ -422,10 +414,10 @@ export class ResizableTableColumns {
     this.detachHandlers(); //make sure we do not have extra handlers
     this.attachHandlers();
 
-    UtilitiesDOM.addClass(this.table, ResizableConstants.classes.tableResizing);
-    UtilitiesDOM.addClass(this.wrapper as HTMLDivElement, ResizableConstants.classes.tableResizing);
-    UtilitiesDOM.addClass(dragHandler, ResizableConstants.classes.columnResizing);
-    UtilitiesDOM.addClass(column, ResizableConstants.classes.columnResizing);
+    this.table.classList.add(ResizableConstants.classes.tableResizing);
+    (this.wrapper as HTMLDivElement).classList.add(ResizableConstants.classes.tableResizing);
+    dragHandler.classList.add(ResizableConstants.classes.columnResizing);
+    column.classList.add(ResizableConstants.classes.columnResizing);
 
     this.lastPointerDown = millisecondsNow;
     this.eventData = eventData;
@@ -435,8 +427,7 @@ export class ResizableTableColumns {
         column: column,
         columnWidth: columnWidth,
         table: this.table,
-        tableWidth: tableWidth,
-        widthRatio: ResizableTableColumns.getWidthRatio(column)
+        tableWidth: this.table.clientWidth
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -447,13 +438,10 @@ export class ResizableTableColumns {
     if (!this.eventData || !event)
       return;
 
-    let difference = (UtilitiesDOM.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
+    let difference = (ResizableTableColumns.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
     if (difference === 0) {
       return;
     }
-
-    const widthRatio = ResizableTableColumns.getWidthRatio(this.eventData.column);
-    difference = difference * widthRatio;
 
     const tableWidth = this.eventData.originalWidths.table + difference;
     const columnWidth = this.constrainWidth(
@@ -473,8 +461,7 @@ export class ResizableTableColumns {
         column: this.eventData.column,
         columnWidth: columnWidth,
         table: this.table,
-        tableWidth: tableWidth,
-        widthRatio: widthRatio
+        tableWidth: tableWidth
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -490,10 +477,10 @@ export class ResizableTableColumns {
       this.handleDoubleClick()
     }
 
-    UtilitiesDOM.removeClass(this.table, ResizableConstants.classes.tableResizing);
-    UtilitiesDOM.removeClass(this.wrapper as HTMLDivElement, ResizableConstants.classes.tableResizing);
-    UtilitiesDOM.removeClass(this.eventData.dragHandler, ResizableConstants.classes.columnResizing);
-    UtilitiesDOM.removeClass(this.eventData.column, ResizableConstants.classes.columnResizing);
+    this.table.classList.remove(ResizableConstants.classes.tableResizing);
+    (this.wrapper as HTMLDivElement).classList.remove(ResizableConstants.classes.tableResizing);
+    this.eventData.dragHandler.classList.remove(ResizableConstants.classes.columnResizing);
+    this.eventData.column.classList.remove(ResizableConstants.classes.columnResizing);
 
     this.checkTableWidth();
     this.syncHandleWidths();
@@ -506,8 +493,7 @@ export class ResizableTableColumns {
         column: this.eventData.column,
         columnWidth: widths.column,
         table: this.table,
-        tableWidth: widths.table,
-        widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
+        tableWidth: widths.table
       }
     });
     this.table.dispatchEvent(eventToDispatch);
@@ -561,7 +547,7 @@ export class ResizableTableColumns {
         if (indicesToSkip.indexOf(cellIndex) === -1
           && colSpan === 1
           && currentIndex === colIndex) {
-          maxWidth = Math.max(maxWidth, UtilitiesDOM.getTextWidth(<HTMLElement>cell, span))
+          maxWidth = Math.max(maxWidth, ResizableTableColumns.getTextWidth(<HTMLElement>cell, span))
           break;
         }
 
@@ -572,13 +558,10 @@ export class ResizableTableColumns {
 
     this.ownerDocument.body.removeChild(span);
 
-    let difference = maxWidth - ResizableTableColumns.getComputedWidth(column);
+    let difference = maxWidth - column.offsetWidth;
     if (difference === 0) {
       return;
     }
-
-    const widthRatio = ResizableTableColumns.getWidthRatio(column);
-    difference = difference * widthRatio;
 
     const tableWidth = this.eventData.originalWidths.table + difference;
     const columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
@@ -594,14 +577,14 @@ export class ResizableTableColumns {
         column: this.eventData.column,
         columnWidth: columnWidth,
         table: this.table,
-        tableWidth: tableWidth,
-        widthRatio: ResizableTableColumns.getWidthRatio(this.eventData.column)
+        tableWidth: tableWidth
       }
     });
     this.table.dispatchEvent(eventToDispatch);
 
     this.checkTableWidth();
     this.syncHandleWidths();
+    this.saveColumnWidths();
   }
 
   attachHandlers(): void {
@@ -647,12 +630,12 @@ export class ResizableTableColumns {
 
 
     const data: { table: number, columns: IIndexedCollection<Number> } = {
-      table: ResizableTableColumns.getWidth(this.table),
+      table: this.table.offsetWidth,
       columns: {}
     };
     this.getResizableHeaders()
-      .forEach((el, idx) => {
-        data.columns[ResizableTableColumns.generateColumnId(el)] = ResizableTableColumns.getWidth(el);
+      .forEach(el => {
+        data.columns[ResizableTableColumns.generateColumnId(el)] = el.offsetWidth;
       });
     this.options.store.set(tableId, data);
   }
@@ -691,43 +674,45 @@ export class ResizableTableColumns {
 
   registerWindowResizeHandler(): void {
     const win = this.ownerDocument.defaultView;
-    if (ResizableTableColumns.windowResizeHandlerRegistered)
+    if (ResizableTableColumns.windowResizeHandlerRef)
       return;
 
-    ResizableTableColumns.windowResizeHandlerRegistered = true;
+    ResizableTableColumns.windowResizeHandlerRef = ResizableTableColumns.debounce(ResizableTableColumns.onWindowResize, 50, false);
     ResizableConstants.events.windowResize
       .forEach((evt, idx) => {
-        win?.addEventListener(evt, ResizableTableColumns.onWindowResize, false);
+        win?.addEventListener(evt, ResizableTableColumns.windowResizeHandlerRef as any, false);
       });
   }
 
   handleWindowResize(): void {
     this.checkTableWidth();
     this.syncHandleWidths();
+    this.saveColumnWidths();
   }
 
-  setCellWidth(cell: HTMLTableCellElement, suggestedWidth: number, skipConstrainCheck: boolean): number {
-    const widthRatio = ResizableTableColumns.getWidthRatio(cell);
-    const originalCellWidth = ResizableTableColumns.getWidth(cell);
-    let difference = suggestedWidth - originalCellWidth;
-    difference = difference * widthRatio;
-
-    const tableWidth = ResizableTableColumns.getWidth(this.table) + difference;
+  updateWidth(cell: HTMLElement, suggestedWidth: number, skipConstrainCheck: boolean, skipTableResize: boolean): number {
+    const originalCellWidth = cell.offsetWidth;
     const columnWidth = skipConstrainCheck
-      ? originalCellWidth + difference
-      : this.constrainWidth(cell, originalCellWidth + difference);
-    ResizableTableColumns.setWidth(this.table, tableWidth);
+      ? suggestedWidth
+      : this.constrainWidth(cell, suggestedWidth);
+
     ResizableTableColumns.setWidth(cell, columnWidth);
+    if (!skipTableResize) {
+      const difference = columnWidth - originalCellWidth;
+      const tableWidth = this.table.offsetWidth + difference;
+      ResizableTableColumns.setWidth(this.table, tableWidth);
+    }
+
 
     return columnWidth;
   }
 
   static onWindowResize(event: Event): void {
-    const target = event ? event.target as Window : null;
-    if (target == null)
+    const win = event ? event.target as Window : null;
+    if (win == null)
       return;
 
-    const tables = target.document.querySelectorAll(`.${ResizableConstants.classes.table}`);
+    const tables = win.document.querySelectorAll(`.${ResizableConstants.classes.table}`);
     for (let index = 0; index < tables.length; index++) {
       const table = tables[index];
       if (typeof (table as any)[ResizableConstants.dataPropertyName] !== 'object')
@@ -754,29 +739,6 @@ export class ResizableTableColumns {
       ? `rtc/${tableId}`
       : tableId;
   }
-
-  static getWidth(el: HTMLElement): number {
-    if (el.style.width === '')
-      return UtilitiesDOM.getWidth(el);
-
-    return <number>Utilities.parseStyleDimension(el.style.width, false);
-  }
-
-  static getComputedWidth(el: HTMLElement): number {
-    return <number>Utilities.parseStyleDimension(el.ownerDocument.defaultView?.getComputedStyle(el).width, false);
-  }
-
-  static getWidthRatio(el: HTMLElement): number {
-    const width = ResizableTableColumns.getWidth(el);
-    const computedWidth = ResizableTableColumns.getComputedWidth(el);
-    const ratio = width / computedWidth;
-    return ResizableTableColumns.round(Math.min(1, ratio), 2);
-  }
-
-  static round(value: number, places: number): number {
-    const multiplier = Math.pow(10, places);
-    return (Math.round(value * multiplier) / multiplier);
-}
 
   static setWidth(element: HTMLElement, width: number) {
     let strWidth = width.toFixed(2);
@@ -808,5 +770,47 @@ export class ResizableTableColumns {
       }
     };
     return debounced as (...args: Parameters<F>) => ReturnType<F>;
+  }
+
+  static getPointerX(event: Event): number | null {
+    if (event.type.indexOf('touch') === 0) {
+      const tEvent = event as TouchEvent;
+      if (tEvent.touches && tEvent.touches.length) {
+        return tEvent.touches[0].pageX;
+      }
+
+      if (tEvent.changedTouches && tEvent.changedTouches.length) {
+        return tEvent.changedTouches[0].pageX
+      }
+    }
+    return (event as MouseEvent).pageX;
+  }
+
+  static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number {
+    if (!contentElement || !measurementElement)
+      return 0;
+
+    var text = contentElement.textContent?.trim().replace(/\s/g, '&nbsp;') + '&nbsp;'; //add extra space to ensure we are not add the `...`
+
+    const styles = contentElement.ownerDocument.defaultView?.getComputedStyle(contentElement);
+    ['fontFamily', 'fontSize', 'fontWeight', 'padding', 'border', 'boxSizing']
+      .forEach((prop) => {
+        (measurementElement.style as any)[prop] = (styles as any)[prop];
+      });
+
+    measurementElement.innerHTML = text;
+    return measurementElement.offsetWidth;
+  }
+
+  static getOffset(el: HTMLElement): { top: number, left: number } {
+    if (!el)
+      return { top: 0, left: 0 };
+
+    const rect = el.getBoundingClientRect();
+
+    return {
+      top: rect.top + el.ownerDocument.body.scrollTop,
+      left: rect.left + el.ownerDocument.body.scrollLeft
+    }
   }
 }

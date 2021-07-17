@@ -1,8 +1,12 @@
 import { ResizableEventData } from './resizable-event-data';
 import { ResizableOptions } from './resizable-options';
+interface IHeaderDetails<T> {
+    el: HTMLElement;
+    detail: T;
+}
 export declare class ResizableTableColumns {
     static instancesCount: number;
-    static windowResizeHandlerRegistered: boolean;
+    static windowResizeHandlerRef: null | ((event: Event) => void);
     table: HTMLTableElement;
     options: ResizableOptions;
     id: number;
@@ -10,9 +14,7 @@ export declare class ResizableTableColumns {
     ownerDocument: Document;
     tableHeaders: HTMLTableHeaderCellElement[];
     dragHandlesContainer: HTMLDivElement | null;
-    originalWidths: {
-        [id: string]: string;
-    };
+    originalWidths: IHeaderDetails<string>[];
     eventData: ResizableEventData | null;
     lastPointerDown: number;
     onPointerDownRef: any;
@@ -47,15 +49,18 @@ export declare class ResizableTableColumns {
     createHandlerReferences(): void;
     registerWindowResizeHandler(): void;
     handleWindowResize(): void;
-    setCellWidth(cell: HTMLTableCellElement, suggestedWidth: number, skipConstrainCheck: boolean): number;
+    updateWidth(cell: HTMLElement, suggestedWidth: number, skipConstrainCheck: boolean, skipTableResize: boolean): number;
     static onWindowResize(event: Event): void;
     static generateColumnId(el: HTMLElement): string;
     static generateTableId(table: HTMLTableElement): string;
-    static getWidth(el: HTMLElement): number;
-    static getComputedWidth(el: HTMLElement): number;
-    static getWidthRatio(el: HTMLElement): number;
-    static round(value: number, places: number): number;
     static setWidth(element: HTMLElement, width: number): void;
     static getInstanceId(): number;
     static debounce: <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => (...args: Parameters<F>) => ReturnType<F>;
+    static getPointerX(event: Event): number | null;
+    static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number;
+    static getOffset(el: HTMLElement): {
+        top: number;
+        left: number;
+    };
 }
+export {};

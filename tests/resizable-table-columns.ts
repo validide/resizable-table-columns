@@ -112,8 +112,8 @@ describe('ResizableTableColumns', function () {
       const wrapper = el.parentNode as HTMLElement;
       assert.isNotNull(wrapper, 'Table wrapper is missing.');
       assert.equal(wrapper.nodeName, 'DIV', 'Table wrapper is not a DIV.');
-      assert.isTrue(UtilitiesDOM.hasClass(wrapper, 'rtc-wrapper'), 'Table wrapper does not have the required class.');
-      assert.isTrue(UtilitiesDOM.hasClass(el, 'rtc-table'), 'Table does not have the required class.');
+      assert.isTrue(wrapper.classList.contains('rtc-wrapper'), 'Table wrapper does not have the required class.');
+      assert.isTrue(el.classList.contains('rtc-table'), 'Table does not have the required class.');
     });
 
     it('Should ".asignTableHeaders()"', function () {
@@ -127,20 +127,18 @@ describe('ResizableTableColumns', function () {
 
     it('Should ".storeOriginalWidths()"', function () {
       assert.isNotNull(rtc.originalWidths, '"originalWidths" is null.');
-      assert.equal(typeof rtc.originalWidths['___.table'], 'string', '"originalWidths[___.table]" is not string.');
-      assert.equal(rtc.originalWidths['___.table'], '7000px');
+      assert.equal(rtc.originalWidths[rtc.originalWidths.length - 1].detail, '7000px');
 
-      for (let index = 0; index < rtc.tableHeaders.length; index++) {
+      for (let index = 0; index < rtc.tableHeaders.length - 1; index++) {
         const th = rtc.tableHeaders[index];
-        assert.equal(typeof rtc.originalWidths[`___.${index}`], 'string', `"originalWidths[___.${index}] is not string.`);
-        assert.equal(rtc.originalWidths[`___.${index}`], (100 + ((index + 1) * 10)) + 'px');
+        assert.equal(rtc.originalWidths[index].detail, (100 + ((index + 1) * 10)) + 'px');
       }
     });
 
     it('Should ".setHeaderWidths()"', function () {
       for (let index = 0; index < rtc.tableHeaders.length; index++) {
         const th = rtc.tableHeaders[index];
-        let width = rtc.constrainWidth(th, UtilitiesDOM.getWidth(th));
+        let width = rtc.constrainWidth(th, th.offsetWidth);
         assert.equal(th.style.width, (width.toFixed(2)) + 'px', `Column index ${index}`);
       }
     });
@@ -149,13 +147,13 @@ describe('ResizableTableColumns', function () {
       const dragWrapper = el.parentNode?.childNodes[0] as HTMLElement;
       assert.isNotNull(dragWrapper, 'Drag wrapper is missing.');
       assert.equal(dragWrapper.nodeName, 'DIV', 'Drag wrapper is not a DIV.');
-      assert.isTrue(UtilitiesDOM.hasClass(dragWrapper, 'rtc-handle-container'), 'Drag wrapper does not have the required class.');
+      assert.isTrue(dragWrapper.classList.contains('rtc-handle-container'), 'Drag wrapper does not have the required class.');
 
       const resizableHeaders = rtc.getResizableHeaders();
       assert.equal(dragWrapper.childNodes.length, resizableHeaders.length);
 
       for (let index = 0; index < dragWrapper.childNodes.length; index++) {
-        assert.isTrue(UtilitiesDOM.hasClass((dragWrapper.childNodes as any)[index], 'rtc-handle'));
+        assert.isTrue((dragWrapper.childNodes as any)[index].classList.contains('rtc-handle'));
       }
     });
   });
@@ -178,7 +176,7 @@ describe('ResizableTableColumns', function () {
 
     it('Should ".unwrapTable()"', function () {
       assert.equal(el.parentNode, container, 'The "unwrapTable" method failed to restpre the original parent.');
-      assert.isFalse(UtilitiesDOM.hasClass(el, 'rtc-table'), 'Table still has the required class.');
+      assert.isFalse(el.classList.contains('rtc-table'), 'Table still has the required class.');
     });
 
     it('Should ".restoreOriginalWidths()"', function () {
@@ -208,7 +206,7 @@ describe('ResizableTableColumns', function () {
       const dragHandlers = rtc.getDragHandlers();
       for (let index = 0; index < dragHandlers.length; index++) {
         assert.equal(dragHandlers[index].nodeName, 'DIV');
-        assert.isTrue(UtilitiesDOM.hasClass(dragHandlers[index], 'rtc-handle'));
+        assert.isTrue(dragHandlers[index].classList.contains('rtc-handle'));
       }
     });
   });
@@ -229,7 +227,7 @@ describe('ResizableTableColumns', function () {
 
   describe('.registerWindowResizeHandler()', function () {
     it('Should be true "registerWindowResizeHandler"', function () {
-      assert.isTrue(ResizableTableColumns.windowResizeHandlerRegistered);
+      assert.isTrue(ResizableTableColumns.windowResizeHandlerRef != null);
     });
   });
 
@@ -274,22 +272,6 @@ describe('ResizableTableColumns', function () {
       el.setAttribute('data-rtc-resizable', 'cell.two.two')
       const id = ResizableTableColumns.generateColumnId(el);
       assert.equal(id, 'cell_two_two');
-    });
-  });
-
-  describe('static.getWidth()', function () {
-    it('Should be 23.12 for 23.12px', function () {
-      const el = DOM.window.document.createElement('span');
-      el.style.width = '23.12px';
-      const w = ResizableTableColumns.getWidth(el);
-      assert.equal(w, 23.12);
-    });
-
-    it('Shiuld be "UtilitiesDOM.getWidth(el)" if not set', function () {
-      const el = DOM.window.document.createElement('span');
-      const w1 = ResizableTableColumns.getWidth(el);
-      const w2 = UtilitiesDOM.getWidth(el)
-      assert.equal(w1, w2);
     });
   });
 

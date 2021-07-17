@@ -15,17 +15,23 @@
   width: auto;
 }
 
-.rtc-wrapper table.rtc-table thead, .rtc-wrapper table.rtc-table tbody, .rtc-wrapper table.rtc-table tfoot {
+.rtc-wrapper table.rtc-table thead,
+.rtc-wrapper table.rtc-table tbody,
+.rtc-wrapper table.rtc-table tfoot {
   margin: 0;
 }
 
-.rtc-wrapper table.rtc-table thead tr, .rtc-wrapper table.rtc-table tbody tr, .rtc-wrapper table.rtc-table tfoot tr {
+.rtc-wrapper table.rtc-table thead tr,
+.rtc-wrapper table.rtc-table tbody tr,
+.rtc-wrapper table.rtc-table tfoot tr {
   margin: 0;
 }
 
 .rtc-wrapper table.rtc-table thead tr th,
-.rtc-wrapper table.rtc-table thead tr td, .rtc-wrapper table.rtc-table tbody tr th,
-.rtc-wrapper table.rtc-table tbody tr td, .rtc-wrapper table.rtc-table tfoot tr th,
+.rtc-wrapper table.rtc-table thead tr td,
+.rtc-wrapper table.rtc-table tbody tr th,
+.rtc-wrapper table.rtc-table tbody tr td,
+.rtc-wrapper table.rtc-table tfoot tr th,
 .rtc-wrapper table.rtc-table tfoot tr td {
   margin: 0;
   white-space: nowrap;
@@ -37,7 +43,9 @@
   cursor: col-resize;
 }
 
-.rtc-wrapper table.rtc-table.rtc-table-resizing thead, .rtc-wrapper table.rtc-table.rtc-table-resizing thead > th, .rtc-wrapper table.rtc-table.rtc-table-resizing thead > th > a {
+.rtc-wrapper table.rtc-table.rtc-table-resizing thead,
+.rtc-wrapper table.rtc-table.rtc-table-resizing thead > th,
+.rtc-wrapper table.rtc-table.rtc-table-resizing thead > th > a {
   cursor: col-resize;
 }
 

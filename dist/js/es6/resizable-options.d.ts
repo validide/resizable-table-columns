@@ -3,8 +3,6 @@ export declare class ResizableOptions {
     minWidth: null | number;
     maxWidth: null | number;
     maxInitialWidthHint: null | number;
-    obeyCssMinWidth: boolean;
-    obeyCssMaxWidth: boolean;
     doubleClickDelay: number;
     store: any;
     constructor(options?: null | object, element?: null | HTMLElement);
