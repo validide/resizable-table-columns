@@ -30,12 +30,6 @@ var  options = {
   // null or number - The maximum width any column in the table should have
   maxWidth: null,
 
-  // boolean - Should the minimum width take into account CSS rules?
-  obeyCssMinWidth: false,
-
-  // boolean - Should the maximum width take into account CSS rules?
-  obeyCssMaxWidth: false,
-
   // number - The maximum number off milliseconds between to pointer down events to consider the action a 'double click'
   doubleClickDelay: 500,
 
