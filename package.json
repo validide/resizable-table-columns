@@ -58,7 +58,7 @@
     "postcss": "8.3.5",
     "postcss-cli": "8.3.1",
     "rimraf": "3.0.2",
-    "rollup": "2.53.2",
+    "rollup": "2.53.3",
     "ts-node": "10.1.0",
     "typescript": "4.3.5",
     "uglify-js": "3.13.10",

@@ -10,6 +10,7 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
+      - run: npm build
       - run: npm test
 
       # - uses: coverallsapp/github-action@master
