@@ -1,12 +1,17 @@
 import { UtilitiesDOM } from './utilities-dom';
 
+export interface IStore {
+  get(id: string): any;
+  set(id: string, data: any): void
+}
+
 export class ResizableOptions {
   resizeFromBody: boolean;
   minWidth: null | number;
   maxWidth: null | number;
   maxInitialWidthHint: null | number;
   doubleClickDelay: number;
-  store: any;
+  store: IStore | null;
 
   constructor(options: null | object = null, element: null | HTMLElement = null) {
     this.resizeFromBody = true;

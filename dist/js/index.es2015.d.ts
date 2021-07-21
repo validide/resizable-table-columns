@@ -61,46 +61,27 @@ declare module "utilities" {
         static falseRegex: RegExp;
         static onlyWhiteSpace: RegExp;
         static notEmptyOrWhiteSpace: RegExp;
-        static escapeRegExp(str: string): string;
         static kebabCaseToCamelCase(str: string): string;
         static parseStringToType(str: string): any;
-        static parseStyleDimension(dimension: string | number | undefined, returnOriginal: boolean): number | string | undefined;
     }
 }
 declare module "utilities-dom" {
     export class UtilitiesDOM {
-        static addClass(el: HTMLElement, className: string): void;
-        static removeClass(el: HTMLElement, className: string): void;
-        static hasClass(el: HTMLElement, className: string): boolean;
         static getDataAttributesValues(el: HTMLElement): object | null;
-        static getMinCssWidth(el: HTMLElement): number | null;
-        static getMaxCssWidth(el: HTMLElement): number | null;
-        static getOuterWidth(el: HTMLElement, includeMargin?: boolean): number;
-        static getInnerWidth(el: HTMLElement): number;
-        static getWidth(el: HTMLElement): number;
-        static getOuterHeight(el: HTMLElement, includeMargin?: boolean): number;
-        static getInnerHeight(el: HTMLElement): number;
-        static getHeight(el: HTMLElement): number;
-        static getOffset(el: HTMLElement): {
-            top: number;
-            left: number;
-        };
-        static matches(el: Element, selector: string): boolean;
-        static closest(el: Element, selector: string): Element | null;
-        static getPointerX(event: Event): number | null;
-        static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number;
     }
 }
 declare module "resizable-options" {
+    export interface IStore {
+        get(id: string): any;
+        set(id: string, data: any): void;
+    }
     export class ResizableOptions {
         resizeFromBody: boolean;
         minWidth: null | number;
         maxWidth: null | number;
         maxInitialWidthHint: null | number;
-        obeyCssMinWidth: boolean;
-        obeyCssMaxWidth: boolean;
         doubleClickDelay: number;
-        store: any;
+        store: IStore | null;
         constructor(options?: null | object, element?: null | HTMLElement);
         overrideValues(options?: null | object): void;
         overrideValuesFromElement(element?: null | HTMLElement): void;
@@ -109,9 +90,13 @@ declare module "resizable-options" {
 declare module "resizable-table-columns" {
     import { ResizableEventData } from "resizable-event-data";
     import { ResizableOptions } from "resizable-options";
+    interface IHeaderDetails<T> {
+        el: HTMLElement;
+        detail: T;
+    }
     export class ResizableTableColumns {
         static instancesCount: number;
-        static windowResizeHandlerRegistered: boolean;
+        static windowResizeHandlerRef: null | ((event: Event) => void);
         table: HTMLTableElement;
         options: ResizableOptions;
         id: number;
@@ -119,9 +104,7 @@ declare module "resizable-table-columns" {
         ownerDocument: Document;
         tableHeaders: HTMLTableHeaderCellElement[];
         dragHandlesContainer: HTMLDivElement | null;
-        originalWidths: {
-            [id: string]: string;
-        };
+        originalWidths: IHeaderDetails<string>[];
         eventData: ResizableEventData | null;
         lastPointerDown: number;
         onPointerDownRef: any;
@@ -156,17 +139,19 @@ declare module "resizable-table-columns" {
         createHandlerReferences(): void;
         registerWindowResizeHandler(): void;
         handleWindowResize(): void;
-        setCellWidth(cell: HTMLTableCellElement, suggestedWidth: number, skipConstrainCheck: boolean): number;
+        updateWidth(cell: HTMLElement, suggestedWidth: number, skipConstrainCheck: boolean, skipTableResize: boolean): number;
         static onWindowResize(event: Event): void;
         static generateColumnId(el: HTMLElement): string;
         static generateTableId(table: HTMLTableElement): string;
-        static getWidth(el: HTMLElement): number;
-        static getComputedWidth(el: HTMLElement): number;
-        static getWidthRatio(el: HTMLElement): number;
-        static round(value: number, places: number): number;
         static setWidth(element: HTMLElement, width: number): void;
         static getInstanceId(): number;
         static debounce: <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => (...args: Parameters<F>) => ReturnType<F>;
+        static getPointerX(event: Event): number | null;
+        static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number;
+        static getOffset(el: HTMLElement): {
+            top: number;
+            left: number;
+        };
     }
 }
 declare module "index" {

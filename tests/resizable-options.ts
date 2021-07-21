@@ -29,7 +29,7 @@ describe('ResizableOptions', function () {
     it('With "options" argument', function () {
       const store = {};
       const defaultOpts = new ResizableOptions();
-      defaultOpts.store = store;
+      defaultOpts.store = store as any;
       defaultOpts.maxWidth = Math.random();
 
       const opts = new ResizableOptions(defaultOpts);
@@ -57,7 +57,7 @@ describe('ResizableOptions', function () {
     it('With "options" and "element" arguments', function () {
       const store = {};
       const defaultOpts = new ResizableOptions();
-      defaultOpts.store = store;
+      defaultOpts.store = store as any;
       defaultOpts.maxWidth = 2000;
 
       const el = DOM.window.document.getElementById('the-table');

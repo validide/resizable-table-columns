@@ -64,9 +64,6 @@
     var Utilities = /** @class */ (function () {
         function Utilities() {
         }
-        Utilities.escapeRegExp = function (str) {
-            return str.replace(Utilities.regexEscapeRegex, "\\$&");
-        };
         Utilities.kebabCaseToCamelCase = function (str) {
             return str.replace(Utilities.kebabCaseRegex, function (m) { return m[1].toUpperCase(); });
         };
@@ -83,28 +80,6 @@
                     return temp;
             }
             return str;
-        };
-        Utilities.parseStyleDimension = function (dimension, returnOriginal) {
-            if (typeof dimension === 'string') {
-                if (dimension.length) {
-                    var toParse = dimension
-                        .replace('px', '')
-                        .replace(',', '.');
-                    var parsed = parseFloat(toParse);
-                    if (!isNaN(parsed)) {
-                        return parsed;
-                    }
-                }
-            }
-            else if (typeof dimension === 'number') {
-                return dimension;
-            }
-            if (returnOriginal) {
-                return dimension;
-            }
-            else {
-                return 0;
-            }
         };
         Utilities.regexEscapeRegex = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;
         Utilities.kebabCaseRegex = /(\-\w)/g;

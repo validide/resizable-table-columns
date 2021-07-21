@@ -10,11 +10,6 @@ export class Utilities {
   static onlyWhiteSpace: RegExp = /^\s$/;
   static notEmptyOrWhiteSpace: RegExp = /\S/;
 
-
-  static escapeRegExp(str: string) {
-    return str.replace(Utilities.regexEscapeRegex, "\\$&");
-  }
-
   static kebabCaseToCamelCase(str: string) {
     return str.replace(Utilities.kebabCaseRegex, function (m) { return m[1].toUpperCase(); });
   }
@@ -35,28 +30,5 @@ export class Utilities {
         return temp;
     }
     return str;
-  }
-
-  static parseStyleDimension(dimension: string | number | undefined, returnOriginal: boolean): number | string | undefined {
-    if (typeof dimension === 'string') {
-      if (dimension.length) {
-        const toParse = dimension
-          .replace('px', '')
-          .replace(',', '.');
-        const parsed = parseFloat(toParse);
-        if (!isNaN(parsed)) {
-          return parsed;
-        }
-      }
-    }
-    else if (typeof dimension === 'number') {
-      return dimension;
-    }
-
-    if (returnOriginal) {
-      return dimension;
-    } else {
-      return 0;
-    }
   }
 }
