@@ -2,8 +2,15 @@
   "name": "@validide/resizable-table-columns",
   "version": "0.0.1",
   "description": "Simple Javascript resizable table columns",
-  "main": "dist/bundle/index.js",
-  "module": "dist/js/index.js",
+  "main": "./dist/js/bundle/index.js",
+  "module": "./dist/js/es6/index.js",
+  "types": "./dist/js/index.es2015.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/js/es6/index.js",
+      "require": "./dist/js/bundle/index.js"
+    }
+  },
   "scripts": {
     "clean-dist": "node ./scripts/clean-dist.js",
     "minify-files": "node ./scripts/minify-files.js",
