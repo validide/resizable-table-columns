@@ -60,7 +60,7 @@
     "glob": "7.1.7",
     "jsdom": "16.6.0",
     "mocha": "9.0.2",
-    "node-sass": "6.0.1",
+    "node-sass": "7.0.0",
     "nyc": "15.1.0",
     "postcss": "8.3.6",
     "postcss-cli": "8.3.1",
