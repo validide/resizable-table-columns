@@ -8,8 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
       - run: npm ci
@@ -21,8 +21,8 @@ jobs:
     steps:
 
       # checkout the repo
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
@@ -50,7 +50,7 @@ jobs:
           SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
 
       # publish to NPMJS
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           registry-url: https://registry.npmjs.org/
           scope: '@validide'
@@ -60,7 +60,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
       # publish to GitHub Pacakge Registry
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           registry-url: https://npm.pkg.github.com/
           scope: '@validide'

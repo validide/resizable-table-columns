@@ -237,7 +237,7 @@ describe('ResizableTableColumns', function () {
       try {
         const rtc = new ResizableTableColumns(void (0) as unknown as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -249,7 +249,7 @@ describe('ResizableTableColumns', function () {
       try {
         const rtc = new ResizableTableColumns(null as unknown as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -261,7 +261,7 @@ describe('ResizableTableColumns', function () {
       try {
         const rtc = new ResizableTableColumns({} as unknown as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -276,7 +276,7 @@ describe('ResizableTableColumns', function () {
         (el as any)[ResizableConstants.dataPropertyName] = {};
         const rtc = new ResizableTableColumns(el, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -292,7 +292,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -308,7 +308,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -324,7 +324,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -340,7 +340,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -356,7 +356,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -372,7 +372,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -388,7 +388,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -404,7 +404,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -420,7 +420,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
@@ -436,7 +436,7 @@ describe('ResizableTableColumns', function () {
 
         const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error;
+        theError = error as string;
       }
 
       assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');

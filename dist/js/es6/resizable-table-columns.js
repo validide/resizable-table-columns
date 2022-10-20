@@ -6,7 +6,7 @@ var ResizableTableColumns = /** @class */ (function () {
         if (typeof table !== 'object' || table === null || table.toString() !== '[object HTMLTableElement]')
             throw 'Invalid argument: "table".\nResizableTableColumns requires that the table element is a not null HTMLTableElement object!';
         if (typeof table[ResizableConstants.dataPropertyName] !== 'undefined')
-            throw "Existing \"" + ResizableConstants.dataPropertyName + "\" property.\nTable element already has a '" + ResizableConstants.dataPropertyName + "' attached object!";
+            throw "Existing \"".concat(ResizableConstants.dataPropertyName, "\" property.\nTable element already has a '").concat(ResizableConstants.dataPropertyName, "' attached object!");
         this.id = ResizableTableColumns.getInstanceId();
         this.table = table;
         this.options = new ResizableOptions(options, table);
@@ -57,9 +57,9 @@ var ResizableTableColumns = /** @class */ (function () {
             }
         }
         if (thead === null || theadCount !== 1)
-            throw "Markup validation: thead count.\nResizableTableColumns requires that the table element has one(1) table head element. Current count: " + theadCount;
+            throw "Markup validation: thead count.\nResizableTableColumns requires that the table element has one(1) table head element. Current count: ".concat(theadCount);
         if (tbodyCount !== 1)
-            throw "Markup validation: tbody count.\nResizableTableColumns requires that the table element has one(1) table body element. Current count: " + tbodyCount;
+            throw "Markup validation: tbody count.\nResizableTableColumns requires that the table element has one(1) table body element. Current count: ".concat(tbodyCount);
         var theadRowCount = 0;
         var firstRow = null;
         for (var index = 0; index < thead.childNodes.length; index++) {
@@ -72,7 +72,7 @@ var ResizableTableColumns = /** @class */ (function () {
             }
         }
         if (firstRow === null || theadRowCount < 1)
-            throw "Markup validation: thead row count.\nResizableTableColumns requires that the table head element has at least one(1) table row element. Current count: " + theadRowCount;
+            throw "Markup validation: thead row count.\nResizableTableColumns requires that the table head element has at least one(1) table row element. Current count: ".concat(theadRowCount);
         var headerCellsCount = 0;
         var invalidHeaderCellsCount = 0;
         for (var index = 0; index < firstRow.childNodes.length; index++) {
@@ -85,9 +85,9 @@ var ResizableTableColumns = /** @class */ (function () {
             }
         }
         if (headerCellsCount < 1)
-            throw "Markup validation: thead first row cells count.\nResizableTableColumns requires that the table head's first row element has at least one(1) table header cell element. Current count: " + headerCellsCount;
+            throw "Markup validation: thead first row cells count.\nResizableTableColumns requires that the table head's first row element has at least one(1) table header cell element. Current count: ".concat(headerCellsCount);
         if (invalidHeaderCellsCount !== 0)
-            throw "Markup validation: thead first row invalid.\nResizableTableColumns requires that the table head's first row element has no(0) table cell(TD) elements. Current count: " + invalidHeaderCellsCount;
+            throw "Markup validation: thead first row invalid.\nResizableTableColumns requires that the table head's first row element has no(0) table cell(TD) elements. Current count: ".concat(invalidHeaderCellsCount);
     };
     ResizableTableColumns.prototype.wrapTable = function () {
         if (this.wrapper)
@@ -211,7 +211,7 @@ var ResizableTableColumns = /** @class */ (function () {
     ResizableTableColumns.prototype.getDragHandlers = function () {
         var nodes = this.dragHandlesContainer == null
             ? null
-            : this.dragHandlesContainer.querySelectorAll("." + ResizableConstants.classes.handle);
+            : this.dragHandlesContainer.querySelectorAll(".".concat(ResizableConstants.classes.handle));
         return nodes
             ? Array.prototype.slice.call(nodes).filter(function (el) { return el.nodeName === 'DIV'; })
             : new Array();
@@ -282,7 +282,7 @@ var ResizableTableColumns = /** @class */ (function () {
         var _this = this;
         var tableWidth = this.table.clientWidth;
         ResizableTableColumns.setWidth(this.dragHandlesContainer, tableWidth);
-        this.dragHandlesContainer.style.minWidth = tableWidth + "px";
+        this.dragHandlesContainer.style.minWidth = "".concat(tableWidth, "px");
         var headers = this.getResizableHeaders();
         this.getDragHandlers()
             .forEach(function (el, idx) {
@@ -292,8 +292,8 @@ var ResizableTableColumns = /** @class */ (function () {
                 var left = th.offsetWidth;
                 left += ResizableTableColumns.getOffset(th).left;
                 left -= ResizableTableColumns.getOffset(_this.dragHandlesContainer).left;
-                el.style.left = left + "px";
-                el.style.height = height + "px";
+                el.style.left = "".concat(left, "px");
+                el.style.height = "".concat(height, "px");
             }
         });
     };
@@ -570,7 +570,7 @@ var ResizableTableColumns = /** @class */ (function () {
         var win = event ? event.target : null;
         if (win == null)
             return;
-        var tables = win.document.querySelectorAll("." + ResizableConstants.classes.table);
+        var tables = win.document.querySelectorAll(".".concat(ResizableConstants.classes.table));
         for (var index = 0; index < tables.length; index++) {
             var table = tables[index];
             if (typeof table[ResizableConstants.dataPropertyName] !== 'object')
@@ -589,13 +589,13 @@ var ResizableTableColumns = /** @class */ (function () {
             .trim()
             .replace(/\./g, '_');
         return tableId.length
-            ? "rtc/" + tableId
+            ? "rtc/".concat(tableId)
             : tableId;
     };
     ResizableTableColumns.setWidth = function (element, width) {
         var strWidth = width.toFixed(2);
         strWidth = width > 0 ? strWidth : '0';
-        element.style.width = strWidth + "px";
+        element.style.width = "".concat(strWidth, "px");
     };
     ResizableTableColumns.getInstanceId = function () {
         return ResizableTableColumns.instancesCount++;
