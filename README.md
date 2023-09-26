@@ -1,6 +1,10 @@
 # Simple JavaScript resizable table columns
 Inspired by **[jquery-resizable-columns](https://github.com/dobtco/jquery-resizable-columns)**
 ## Status
+
+At the moment the project is in "maintenance mode". I will not be investing any more time into developing new features of fixing any bugs.
+
+
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f963825a192e4c9a8fd148212fec5c13)](https://www.codacy.com/gh/validide/resizable-table-columns/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=validide/resizable-table-columns&amp;utm_campaign=Badge_Grade)
 [![npm version](https://img.shields.io/npm/v/@validide/resizable-table-columns)](https://www.npmjs.com/package/@validide/resizable-table-columns)
 
