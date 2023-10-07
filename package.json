@@ -62,7 +62,7 @@
     "mocha": "10.2.0",
     "node-sass": "9.0.0",
     "nyc": "15.1.0",
-    "postcss": "8.4.21",
+    "postcss": "8.4.31",
     "postcss-cli": "10.1.0",
     "rimraf": "3.0.2",
     "rollup": "3.10.0",
