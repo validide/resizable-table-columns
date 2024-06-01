@@ -292,6 +292,7 @@ var ResizableTableColumns = /** @class */ (function () {
                 var left = th.offsetWidth;
                 left += ResizableTableColumns.getOffset(th).left;
                 left -= ResizableTableColumns.getOffset(_this.dragHandlesContainer).left;
+                left -= th.clientWidth;
                 el.style.left = "".concat(left, "px");
                 el.style.height = "".concat(height, "px");
             }
@@ -355,6 +356,8 @@ var ResizableTableColumns = /** @class */ (function () {
         if (!this.eventData || !event)
             return;
         var difference = (ResizableTableColumns.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
+        if (this.options.isRtl(this.table))
+            difference = (this.eventData.pointer.x || 0) - (ResizableTableColumns.getPointerX(event) || 0);
         if (difference === 0) {
             return;
         }

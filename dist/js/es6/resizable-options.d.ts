@@ -9,7 +9,10 @@ export declare class ResizableOptions {
     maxInitialWidthHint: null | number;
     doubleClickDelay: number;
     store: IStore | null;
+    rtl: boolean;
+    rtlClass: string | null;
     constructor(options?: null | object, element?: null | HTMLElement);
     overrideValues(options?: null | object): void;
     overrideValuesFromElement(element?: null | HTMLElement): void;
+    isRtl(element: null | HTMLElement): boolean;
 }

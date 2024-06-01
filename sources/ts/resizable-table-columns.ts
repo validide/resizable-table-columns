@@ -362,6 +362,7 @@ export class ResizableTableColumns {
           let left = th.offsetWidth;
           left += ResizableTableColumns.getOffset(th).left;
           left -= ResizableTableColumns.getOffset(this.dragHandlesContainer as HTMLElement).left;
+          left -= th.clientWidth;
           el.style.left = `${left}px`;
           el.style.height = `${height}px`;
         }
@@ -439,6 +440,8 @@ export class ResizableTableColumns {
       return;
 
     let difference = (ResizableTableColumns.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
+    if (this.options.isRtl(this.table))
+      difference = (this.eventData.pointer.x || 0) - (ResizableTableColumns.getPointerX(event) || 0);
     if (difference === 0) {
       return;
     }

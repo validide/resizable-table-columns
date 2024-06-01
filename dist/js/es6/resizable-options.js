@@ -9,6 +9,8 @@ var ResizableOptions = /** @class */ (function () {
         this.doubleClickDelay = 500;
         this.maxInitialWidthHint = null;
         this.store = null;
+        this.rtl = false;
+        this.rtlClass = null;
         this.overrideValues(options);
         this.overrideValuesFromElement(element);
     }
@@ -28,6 +30,12 @@ var ResizableOptions = /** @class */ (function () {
             return;
         var elementOptions = UtilitiesDOM.getDataAttributesValues(element);
         this.overrideValues(elementOptions);
+    };
+    ResizableOptions.prototype.isRtl = function (element) {
+        if (this.rtlClass != null && (element === null || element === void 0 ? void 0 : element.classList.contains(this.rtlClass))) {
+            return true;
+        }
+        return this.rtl;
     };
     return ResizableOptions;
 }());

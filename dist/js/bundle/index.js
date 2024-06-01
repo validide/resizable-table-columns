@@ -127,6 +127,8 @@
             this.doubleClickDelay = 500;
             this.maxInitialWidthHint = null;
             this.store = null;
+            this.rtl = false;
+            this.rtlClass = null;
             this.overrideValues(options);
             this.overrideValuesFromElement(element);
         }
@@ -146,6 +148,12 @@
                 return;
             var elementOptions = UtilitiesDOM.getDataAttributesValues(element);
             this.overrideValues(elementOptions);
+        };
+        ResizableOptions.prototype.isRtl = function (element) {
+            if (this.rtlClass != null && (element === null || element === void 0 ? void 0 : element.classList.contains(this.rtlClass))) {
+                return true;
+            }
+            return this.rtl;
         };
         return ResizableOptions;
     }());
@@ -441,6 +449,7 @@
                     var left = th.offsetWidth;
                     left += ResizableTableColumns.getOffset(th).left;
                     left -= ResizableTableColumns.getOffset(_this.dragHandlesContainer).left;
+                    left -= th.clientWidth;
                     el.style.left = "".concat(left, "px");
                     el.style.height = "".concat(height, "px");
                 }
@@ -504,6 +513,8 @@
             if (!this.eventData || !event)
                 return;
             var difference = (ResizableTableColumns.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
+            if (this.options.isRtl(this.table))
+                difference = (this.eventData.pointer.x || 0) - (ResizableTableColumns.getPointerX(event) || 0);
             if (difference === 0) {
                 return;
             }
