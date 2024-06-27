@@ -12,6 +12,8 @@ export class ResizableOptions {
   maxInitialWidthHint: null | number;
   doubleClickDelay: number;
   store: IStore | null;
+  rtl: boolean;
+  rtlClass: string | null;
 
   constructor(options: null | object = null, element: null | HTMLElement = null) {
     this.resizeFromBody = true;
@@ -20,6 +22,8 @@ export class ResizableOptions {
     this.doubleClickDelay = 500;
     this.maxInitialWidthHint = null;
     this.store = null;
+    this.rtl = false;
+    this.rtlClass = null;
 
     this.overrideValues(options);
     this.overrideValuesFromElement(element);
@@ -43,5 +47,12 @@ export class ResizableOptions {
 
     const elementOptions = UtilitiesDOM.getDataAttributesValues(element);
     this.overrideValues(elementOptions)
+  }
+
+  isRtl(element: null | HTMLElement) {
+    if (this.rtlClass != null && element?.classList.contains(this.rtlClass)) {
+      return true;
+    }
+    return this.rtl;
   }
 }
