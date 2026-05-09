@@ -1,8 +1,12 @@
-import { UtilitiesDOM } from './utilities-dom';
-var ResizableOptions = /** @class */ (function () {
-    function ResizableOptions(options, element) {
-        if (options === void 0) { options = null; }
-        if (element === void 0) { element = null; }
+import { UtilitiesDOM } from "./utilities-dom";
+export class ResizableOptions {
+    resizeFromBody;
+    minWidth;
+    maxWidth;
+    maxInitialWidthHint;
+    doubleClickDelay;
+    store;
+    constructor(options = null, element = null) {
         this.resizeFromBody = true;
         this.minWidth = 40;
         this.maxWidth = null;
@@ -12,24 +16,20 @@ var ResizableOptions = /** @class */ (function () {
         this.overrideValues(options);
         this.overrideValuesFromElement(element);
     }
-    ResizableOptions.prototype.overrideValues = function (options) {
-        if (options === void 0) { options = null; }
+    overrideValues(options = null) {
         if (!options)
             return;
-        for (var prop in options) {
-            if (this.hasOwnProperty(prop)) {
+        for (const prop in options) {
+            if (Object.hasOwn(this, prop)) {
                 this[prop] = options[prop];
             }
         }
-    };
-    ResizableOptions.prototype.overrideValuesFromElement = function (element) {
-        if (element === void 0) { element = null; }
+    }
+    overrideValuesFromElement(element = null) {
         if (!element)
             return;
-        var elementOptions = UtilitiesDOM.getDataAttributesValues(element);
+        const elementOptions = UtilitiesDOM.getDataAttributesValues(element);
         this.overrideValues(elementOptions);
-    };
-    return ResizableOptions;
-}());
-export { ResizableOptions };
+    }
+}
 //# sourceMappingURL=resizable-options.js.map

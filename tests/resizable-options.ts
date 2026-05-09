@@ -1,124 +1,111 @@
-/// <reference path="../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../node_modules/@types/chai/index.d.ts" />
-/// <reference path="../node_modules/@types/jsdom/index.d.ts" />
+import { beforeAll, describe, expect, it } from "vitest";
+import { type IStore, ResizableOptions } from "../sources/ts/resizable-options";
 
-import { assert } from 'chai';
-import { JSDOM } from 'jsdom';
-import { ResizableOptions } from '../sources/ts/resizable-options';
+describe("ResizableOptions", () => {
+  beforeAll(() => {
+    document.body.innerHTML = `<table id="the-table"
+      data-min-width="-10"
+      data-max-width="213"
+      data-resize-from-body="true"
+      ><tbody><tr><td><td></tr></tbody></table>`;
+  });
 
-describe('ResizableOptions', function () {
-  const DOM = new JSDOM(`<!DOCTYPE html>
-  <html>
-    <head></head>
-    <body>
-      <table id="the-table"
-        data-min-width="-10"
-        data-max-width="213"
-        data-resize-from-body="true"
-        ><tbody><tr><td><td></tr></tbody></table>
-    </body>
-  </html>`);
-
-  describe('.constructor', function () {
-    it('No params', function () {
+  describe(".constructor", () => {
+    it("No params", () => {
       const opts = new ResizableOptions();
-      assert.isObject(opts);
-      assert.isNotNull(opts);
+      expect(opts).toBeTypeOf("object");
+      expect(opts).not.toBeNull();
     });
 
-    it('With "options" argument', function () {
+    it('With "options" argument', () => {
       const store = {};
       const defaultOpts = new ResizableOptions();
-      defaultOpts.store = store as any;
+      defaultOpts.store = store as unknown as IStore;
       defaultOpts.maxWidth = Math.random();
 
       const opts = new ResizableOptions(defaultOpts);
 
-      assert.isObject(opts);
-      assert.isNotNull(opts);
-      assert.deepEqual(defaultOpts.store, opts.store);
-      assert.deepEqual(defaultOpts.maxWidth, opts.maxWidth);
+      expect(opts).toBeTypeOf("object");
+      expect(opts).not.toBeNull();
+      expect(defaultOpts.store).toEqual(opts.store);
+      expect(defaultOpts.maxWidth).toBe(opts.maxWidth);
     });
 
-    it('With "element" argument', function () {
-      const el = DOM.window.document.getElementById('the-table');
-      assert.isNotNull(el, 'Table element should be found in dom');
+    it('With "element" argument', () => {
+      const el = document.getElementById("the-table");
+      expect(el).not.toBeNull();
 
       const opts = new ResizableOptions(null, el);
 
-      assert.isObject(opts);
-      assert.isNotNull(opts);
-      assert.isTrue(opts.resizeFromBody);
-      assert.isNumber(opts.maxWidth);
-      assert.equal(opts.maxWidth, 213);
-
+      expect(opts).toBeTypeOf("object");
+      expect(opts).not.toBeNull();
+      expect(opts.resizeFromBody).toBe(true);
+      expect(opts.maxWidth).toBeTypeOf("number");
+      expect(opts.maxWidth).toBe(213);
     });
 
-    it('With "options" and "element" arguments', function () {
-      const store = {};
+    it('With "options" and "element" arguments', () => {
       const defaultOpts = new ResizableOptions();
-      defaultOpts.store = store as any;
+      defaultOpts.store = null;
       defaultOpts.maxWidth = 2000;
 
-      const el = DOM.window.document.getElementById('the-table');
-      assert.isNotNull(el, 'Table element should be found in dom');
+      const el = document.getElementById("the-table");
+      expect(el).not.toBeNull();
 
       const opts = new ResizableOptions(defaultOpts, el);
 
-      assert.isObject(opts);
-      assert.isNotNull(opts);
-      assert.deepEqual(opts.store, opts.store);
-      assert.isTrue(opts.resizeFromBody);
-      assert.isNumber(opts.maxWidth);
-      assert.equal(opts.maxWidth, 213);
+      expect(opts).toBeTypeOf("object");
+      expect(opts).not.toBeNull();
+      expect(opts.resizeFromBody).toBe(true);
+      expect(opts.maxWidth).toBeTypeOf("number");
+      expect(opts.maxWidth).toBe(213);
     });
   });
 
-  describe('.overrideValues', function () {
-    it('Should not fail when called with no params', function () {
+  describe(".overrideValues", () => {
+    it("Should not fail when called with no params", () => {
       const opts = new ResizableOptions();
       opts.overrideValues();
-      assert.equal(opts.minWidth, opts.minWidth);
+      expect(opts.minWidth).toBe(opts.minWidth);
     });
 
-    it('Should not fail when called with null param', function () {
+    it("Should not fail when called with null param", () => {
       const opts = new ResizableOptions();
       opts.overrideValues(null);
-      assert.equal(opts.minWidth, opts.minWidth);
+      expect(opts.minWidth).toBe(opts.minWidth);
     });
 
-    it('Should override values', function () {
+    it("Should override values", () => {
       const opts = new ResizableOptions();
       const obj = { minWidth: -10 };
       opts.overrideValues(obj);
-      assert.equal(obj.minWidth, opts.minWidth);
+      expect(obj.minWidth).toBe(opts.minWidth);
     });
   });
 
-  describe('.overrideValuesFromElement', function () {
-    it('Should not fail when called with no params', function () {
+  describe(".overrideValuesFromElement", () => {
+    it("Should not fail when called with no params", () => {
       const opts = new ResizableOptions();
       opts.overrideValuesFromElement();
-      assert.equal(opts.minWidth, opts.minWidth);
+      expect(opts.minWidth).toBe(opts.minWidth);
     });
 
-    it('Should not fail when called with null param', function () {
+    it("Should not fail when called with null param", () => {
       const opts = new ResizableOptions();
       opts.overrideValuesFromElement(null);
-      assert.equal(opts.minWidth, opts.minWidth);
+      expect(opts.minWidth).toBe(opts.minWidth);
     });
 
-    it('Should override values', function () {
+    it("Should override values", () => {
       const opts = new ResizableOptions();
-      const el = DOM.window.document.getElementById('the-table');
-      assert.isNotNull(el, 'Table element should be found in dom');
+      const el = document.getElementById("the-table");
+      expect(el).not.toBeNull();
 
       opts.overrideValuesFromElement(el);
-      assert.equal(opts.minWidth, -10);
-      assert.isTrue(opts.resizeFromBody);
-      assert.isNumber(opts.maxWidth);
-      assert.equal(opts.maxWidth, 213);
+      expect(opts.minWidth).toBe(-10);
+      expect(opts.resizeFromBody).toBe(true);
+      expect(opts.maxWidth).toBeTypeOf("number");
+      expect(opts.maxWidth).toBe(213);
     });
   });
-
 });

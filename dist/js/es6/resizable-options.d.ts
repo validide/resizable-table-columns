@@ -1,6 +1,6 @@
 export interface IStore {
-    get(id: string): any;
-    set(id: string, data: any): void;
+    get(id: string): unknown;
+    set(id: string, data: unknown): void;
 }
 export declare class ResizableOptions {
     resizeFromBody: boolean;

@@ -1,12 +1,12 @@
-import { ResizableEventData } from './resizable-event-data';
-import { ResizableOptions } from './resizable-options';
+import { ResizableEventData } from "./resizable-event-data";
+import { ResizableOptions } from "./resizable-options";
 interface IHeaderDetails<T> {
     el: HTMLElement;
     detail: T;
 }
 export declare class ResizableTableColumns {
     static instancesCount: number;
-    static windowResizeHandlerRef: null | ((event: Event) => void);
+    static windowResizeHandlerRef: EventListener | null;
     table: HTMLTableElement;
     options: ResizableOptions;
     id: number;
@@ -17,9 +17,9 @@ export declare class ResizableTableColumns {
     originalWidths: IHeaderDetails<string>[];
     eventData: ResizableEventData | null;
     lastPointerDown: number;
-    onPointerDownRef: any;
-    onPointerMoveRef: any;
-    onPointerUpRef: any;
+    onPointerDownRef: EventListener | null;
+    onPointerMoveRef: EventListener | null;
+    onPointerUpRef: EventListener | null;
     constructor(table: HTMLTableElement, options: ResizableOptions | null);
     init(): void;
     dispose(): void;
@@ -30,7 +30,7 @@ export declare class ResizableTableColumns {
     storeOriginalWidths(): void;
     restoreOriginalWidths(): void;
     setHeaderWidths(): void;
-    constrainWidth(el: HTMLElement, width: number): number;
+    constrainWidth(_el: HTMLElement, width: number): number;
     createDragHandles(): void;
     destroyDragHandles(): void;
     getDragHandlers(): Array<HTMLDivElement>;
@@ -55,7 +55,7 @@ export declare class ResizableTableColumns {
     static generateTableId(table: HTMLTableElement): string;
     static setWidth(element: HTMLElement, width: number): void;
     static getInstanceId(): number;
-    static debounce: <F extends (...args: any[]) => any>(func: Function, wait: number, immediate: boolean) => (...args: Parameters<F>) => ReturnType<F>;
+    static debounce: (func: (event: Event) => void, wait: number, immediate: boolean) => ((event: Event) => void);
     static getPointerX(event: Event): number | null;
     static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number;
     static getOffset(el: HTMLElement): {

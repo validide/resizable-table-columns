@@ -1,28 +1,25 @@
-import { IIndexedCollection, Utilities } from './utilities'
+import { Utilities } from "./utilities";
 
-export class UtilitiesDOM {
-  static getDataAttributesValues(el: HTMLElement): object | null {
-    if (!el)
-      return null;
+export const UtilitiesDOM = {
+  getDataAttributesValues(el?: HTMLElement): Record<string, string | number | boolean> | null {
+    if (!el) return null;
 
-    const returnValue: IIndexedCollection<any> = {};
+    const returnValue: Record<string, string | number | boolean> = {};
     if (el.dataset) {
-      for (let prop in el.dataset) {
-        if (el.dataset.hasOwnProperty(prop)) {
-          returnValue[prop] = Utilities.parseStringToType(el.dataset[prop] || '');
+      for (const prop in el.dataset) {
+        if (Object.hasOwn(el.dataset, prop)) {
+          returnValue[prop] = Utilities.parseStringToType(el.dataset[prop] || "");
         }
       }
-    }
-    else {
+    } else {
       for (let i = 0; i < el.attributes.length; i++) {
-        if (!/^data\-/.test(el.attributes[i].name))
-          continue;
+        if (!/^data-/.test(el.attributes[i].name)) continue;
 
-        const name = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace('data-', ''));
+        const name = Utilities.kebabCaseToCamelCase(el.attributes[i].name.replace("data-", ""));
         returnValue[name] = Utilities.parseStringToType(el.attributes[i].value);
       }
     }
 
     return returnValue;
-  }
-}
+  },
+};

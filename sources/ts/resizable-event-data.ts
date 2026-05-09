@@ -16,7 +16,7 @@ export class ResizableEventData {
   newWidths: WidthsData = new WidthsData();
 
   constructor(column: HTMLTableCellElement, dragHandler: HTMLDivElement) {
-      this.column = column;
-      this.dragHandler = dragHandler;
+    this.column = column;
+    this.dragHandler = dragHandler;
   }
 }

@@ -1,8 +1,8 @@
-import { UtilitiesDOM } from './utilities-dom';
+import { UtilitiesDOM } from "./utilities-dom";
 
 export interface IStore {
-  get(id: string): any;
-  set(id: string, data: any): void
+  get(id: string): unknown;
+  set(id: string, data: unknown): void;
 }
 
 export class ResizableOptions {
@@ -25,23 +25,20 @@ export class ResizableOptions {
     this.overrideValuesFromElement(element);
   }
 
-
   overrideValues(options: null | object = null): void {
-    if (!options)
-      return;
+    if (!options) return;
 
-    for (let prop in options) {
-      if (this.hasOwnProperty(prop)) {
-        (this as any)[prop] = (options as any)[prop];
+    for (const prop in options) {
+      if (Object.hasOwn(this, prop)) {
+        (this as unknown as Record<string, unknown>)[prop] = (options as unknown as Record<string, unknown>)[prop];
       }
     }
   }
 
   overrideValuesFromElement(element: null | HTMLElement = null): void {
-    if (!element)
-      return;
+    if (!element) return;
 
     const elementOptions = UtilitiesDOM.getDataAttributesValues(element);
-    this.overrideValues(elementOptions)
+    this.overrideValues(elementOptions);
   }
 }

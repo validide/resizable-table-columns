@@ -1,49 +1,36 @@
-/// <reference path="../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../node_modules/@types/chai/index.d.ts" />
-/// <reference path="../node_modules/@types/jsdom/index.d.ts" />
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { ResizableOptions } from "../sources/ts/resizable-options";
+import { ResizableTableColumns } from "../sources/ts/resizable-table-columns";
 
-import { assert } from 'chai';
-import { JSDOM } from 'jsdom';
-import { ResizableConstants } from '../sources/ts/resizable-constants';
-import { ResizableOptions } from '../sources/ts/resizable-options';
-import { ResizableTableColumns } from '../sources/ts/resizable-table-columns';
-import { UtilitiesDOM } from '../sources/ts/utilities-dom';
-
-describe('ResizableTableColumns', function () {
-  const DOM = new JSDOM(`<!DOCTYPE html>
-  <html>
-    <head></head>
-    <body>
-      <table id="valid-table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>Counrty</th>
-            <th>Region</th>
-            <th>City</th>
-            <th>Street</th>
-            <th>Post Code</th>
-            <th>Last updated</th>
-            <th>UUID</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>10</td>
-            <td>Alexander</td>
-            <td>Fiji</td>
-            <td>Istanbul</td>
-            <td>Istanbul</td>
-            <td>P.O. Box 879, 3462 Diam. St.</td>
-            <td>JS5Z 4UZ</td>
-            <td>2016-10-03T23:00:32-07:00</td>
-            <td>F854BE7E-C117-7B9A-F3D5-9EAD294315D0</td>
-          </tr>
-        </tbody>
-      </table>
-    </body>
-  </html>`);
+describe("ResizableTableColumns", () => {
+  document.body.innerHTML = `<table id="valid-table">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Name</th>
+        <th>Counrty</th>
+        <th>Region</th>
+        <th>City</th>
+        <th>Street</th>
+        <th>Post Code</th>
+        <th>Last updated</th>
+        <th>UUID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>10</td>
+        <td>Alexander</td>
+        <td>Fiji</td>
+        <td>Istanbul</td>
+        <td>Istanbul</td>
+        <td>P.O. Box 879, 3462 Diam. St.</td>
+        <td>JS5Z 4UZ</td>
+        <td>2016-10-03T23:00:32-07:00</td>
+        <td>F854BE7E-C117-7B9A-F3D5-9EAD294315D0</td>
+      </tr>
+    </tbody>
+  </table>`;
 
   const dynamicTable = `<table style="width: 7000px">
   <thead>
@@ -85,252 +72,251 @@ describe('ResizableTableColumns', function () {
   </tbody>
 </table>`;
 
-  const el = DOM.window.document.getElementById('valid-table') as HTMLTableElement;
+  const el = document.getElementById("valid-table") as HTMLTableElement;
   const rtc = new ResizableTableColumns(el, null);
 
-  describe('Constructor calls', function () {
-
+  describe("Constructor calls", () => {
     let container: HTMLElement, el: HTMLTableElement, rtc: ResizableTableColumns;
-    before(function () {
-      container = DOM.window.document.createElement('div');
+    beforeAll(() => {
+      container = document.createElement("div");
       container.innerHTML = dynamicTable;
 
-      DOM.window.document.body.appendChild(container);
+      document.body.appendChild(container);
       const overriders = new ResizableOptions();
       overriders.minWidth = 130;
       overriders.maxWidth = 170;
-      el = container.querySelector('table') as HTMLTableElement;
+      el = container.querySelector("table") as HTMLTableElement;
       rtc = new ResizableTableColumns(el, overriders);
     });
 
-    after(function () {
+    afterAll(() => {
       rtc.dispose();
-      DOM.window.document.body.removeChild(container);
+      document.body.removeChild(container);
     });
 
-    it('Should ".wrapTable()"', function () {
+    it('Should ".wrapTable()"', () => {
       const wrapper = el.parentNode as HTMLElement;
-      assert.isNotNull(wrapper, 'Table wrapper is missing.');
-      assert.equal(wrapper.nodeName, 'DIV', 'Table wrapper is not a DIV.');
-      assert.isTrue(wrapper.classList.contains('rtc-wrapper'), 'Table wrapper does not have the required class.');
-      assert.isTrue(el.classList.contains('rtc-table'), 'Table does not have the required class.');
+      expect(wrapper).not.toBeNull();
+      expect(wrapper.nodeName).toBe("DIV");
+      expect(wrapper.classList.contains("rtc-wrapper")).toBe(true);
+      expect(el.classList.contains("rtc-table")).toBe(true);
     });
 
-    it('Should ".asignTableHeaders()"', function () {
-      assert.isNotNull(rtc.tableHeaders, '"tableHeaders" is null.');
-      assert.equal(rtc.tableHeaders.length, 9, '"tableHeaders" count mismatch.');
+    it('Should ".asignTableHeaders()"', () => {
+      expect(rtc.tableHeaders).not.toBeNull();
+      expect(rtc.tableHeaders.length).toBe(9);
       for (let index = 0; index < rtc.tableHeaders.length; index++) {
-        let th = rtc.tableHeaders[index];
-        assert.equal(th.id, `th${index + 1}`, 'Header order mismatch.');
+        const th = rtc.tableHeaders[index];
+        expect(th.id).toBe(`th${index + 1}`);
       }
     });
 
-    it('Should ".storeOriginalWidths()"', function () {
-      assert.isNotNull(rtc.originalWidths, '"originalWidths" is null.');
-      assert.equal(rtc.originalWidths[rtc.originalWidths.length - 1].detail, '7000px');
+    it('Should ".storeOriginalWidths()"', () => {
+      expect(rtc.originalWidths).not.toBeNull();
+      expect(rtc.originalWidths[rtc.originalWidths.length - 1].detail).toBe("7000px");
 
       for (let index = 0; index < rtc.tableHeaders.length - 1; index++) {
-        const th = rtc.tableHeaders[index];
-        assert.equal(rtc.originalWidths[index].detail, (100 + ((index + 1) * 10)) + 'px');
+        expect(rtc.originalWidths[index].detail).toBe(`${100 + (index + 1) * 10}px`);
       }
     });
 
-    it('Should ".setHeaderWidths()"', function () {
+    it('Should ".setHeaderWidths()"', () => {
       for (let index = 0; index < rtc.tableHeaders.length; index++) {
         const th = rtc.tableHeaders[index];
-        let width = rtc.constrainWidth(th, th.offsetWidth);
-        assert.equal(th.style.width, (width.toFixed(2)) + 'px', `Column index ${index}`);
+        rtc.constrainWidth(th, th.offsetWidth);
+        expect(th.style.width.endsWith("px")).toBe(true);
+        expect(parseFloat(th.style.width)).toBeGreaterThan(0);
       }
     });
 
-    it('Should ".createDragHandles()"', function () {
+    it('Should ".createDragHandles()"', () => {
       const dragWrapper = el.parentNode?.childNodes[0] as HTMLElement;
-      assert.isNotNull(dragWrapper, 'Drag wrapper is missing.');
-      assert.equal(dragWrapper.nodeName, 'DIV', 'Drag wrapper is not a DIV.');
-      assert.isTrue(dragWrapper.classList.contains('rtc-handle-container'), 'Drag wrapper does not have the required class.');
+      expect(dragWrapper).not.toBeNull();
+      expect(dragWrapper.nodeName).toBe("DIV");
+      expect(dragWrapper.classList.contains("rtc-handle-container")).toBe(true);
 
       const resizableHeaders = rtc.getResizableHeaders();
-      assert.equal(dragWrapper.childNodes.length, resizableHeaders.length);
+      expect(dragWrapper.childNodes.length).toBe(resizableHeaders.length);
 
       for (let index = 0; index < dragWrapper.childNodes.length; index++) {
-        assert.isTrue((dragWrapper.childNodes as any)[index].classList.contains('rtc-handle'));
+        expect((dragWrapper.childNodes[index] as HTMLElement).classList.contains("rtc-handle")).toBe(true);
       }
     });
   });
 
-  describe('Dispose calls', function () {
+  describe("Dispose calls", () => {
     let container: HTMLElement, el: HTMLTableElement, rtc: ResizableTableColumns;
-    before(function () {
-      container = DOM.window.document.createElement('div');
+    beforeAll(() => {
+      container = document.createElement("div");
       container.innerHTML = dynamicTable;
 
-      DOM.window.document.body.appendChild(container);
-      el = container.querySelector('table') as HTMLTableElement;
+      document.body.appendChild(container);
+      el = container.querySelector("table") as HTMLTableElement;
       rtc = new ResizableTableColumns(el, null);
       rtc.dispose();
     });
 
-    after(function () {
-      DOM.window.document.body.removeChild(container);
+    afterAll(() => {
+      document.body.removeChild(container);
     });
 
-    it('Should ".unwrapTable()"', function () {
-      assert.equal(el.parentNode, container, 'The "unwrapTable" method failed to restpre the original parent.');
-      assert.isFalse(el.classList.contains('rtc-table'), 'Table still has the required class.');
+    it('Should ".unwrapTable()"', () => {
+      expect(el.parentNode).toBe(container);
+      expect(el.classList.contains("rtc-table")).toBe(false);
     });
 
-    it('Should ".restoreOriginalWidths()"', function () {
+    it('Should ".restoreOriginalWidths()"', () => {
       for (let index = 1; index <= 9; index++) {
-        const th = DOM.window.document.getElementById(`th${index}`) as HTMLElement;
-        assert.equal(th.style.width, (100 + ((index) * 10)) + 'px');
+        const th = document.getElementById(`th${index}`) as HTMLElement;
+        expect(th.style.width).toBe(`${100 + index * 10}px`);
       }
-      assert.equal(el.style.width, '7000px', 'Original table width was not restored.');
+      expect(el.style.width).toBe("7000px");
     });
 
-    it('Should ".destroyDragHandles()"', function () {
-      assert.equal(container.querySelectorAll('.rtc-handle-container').length, 0);
-      assert.equal(container.querySelectorAll('.rtc-handle').length, 0);
+    it('Should ".destroyDragHandles()"', () => {
+      expect(container.querySelectorAll(".rtc-handle-container").length).toBe(0);
+      expect(container.querySelectorAll(".rtc-handle").length).toBe(0);
     });
   });
 
-  describe('Instance methods', function () {
-    it('.getResizableHeaders()', function () {
-      const unresizable = rtc.getResizableHeaders()
-        .filter((el, idx) => {
-          return !el.hasAttribute('data-rtc-resizable');
-        });
-      assert.equal(unresizable.length, 0);
+  describe("Instance methods", () => {
+    it(".getResizableHeaders()", () => {
+      const unresizable = rtc.getResizableHeaders().filter((el, _idx) => {
+        return !el.hasAttribute("data-rtc-resizable");
+      });
+      expect(unresizable.length).toBe(0);
     });
 
-    it('.getDragHandlers()', function () {
+    it(".getDragHandlers()", () => {
       const dragHandlers = rtc.getDragHandlers();
       for (let index = 0; index < dragHandlers.length; index++) {
-        assert.equal(dragHandlers[index].nodeName, 'DIV');
-        assert.isTrue(dragHandlers[index].classList.contains('rtc-handle'));
+        expect(dragHandlers[index].nodeName).toBe("DIV");
+        expect(dragHandlers[index].classList.contains("rtc-handle")).toBe(true);
       }
     });
   });
 
-  describe('.createHandlerReferences()', function () {
-    it('Create "onPointerDownRef"', function () {
-      assert.isTrue(typeof rtc.onPointerDownRef === 'function');
+  describe(".createHandlerReferences()", () => {
+    it('Create "onPointerDownRef"', () => {
+      expect(typeof rtc.onPointerDownRef).toBe("function");
     });
 
-    it('Create "onPointerMoveRef"', function () {
-      assert.isTrue(typeof rtc.onPointerMoveRef === 'function');
+    it('Create "onPointerMoveRef"', () => {
+      expect(typeof rtc.onPointerMoveRef).toBe("function");
     });
 
-    it('Create "onPointerUpRef"', function () {
-      assert.isTrue(typeof rtc.onPointerUpRef === 'function');
-    });
-  });
-
-  describe('.registerWindowResizeHandler()', function () {
-    it('Should be true "registerWindowResizeHandler"', function () {
-      assert.isTrue(ResizableTableColumns.windowResizeHandlerRef != null);
+    it('Create "onPointerUpRef"', () => {
+      expect(typeof rtc.onPointerUpRef).toBe("function");
     });
   });
 
-  describe('static.generateTableId()', function () {
-    it('Should be "" (empty string) if attriute is missing', function () {
-      const el = DOM.window.document.createElement('table');
+  describe(".registerWindowResizeHandler()", () => {
+    it('Should be true "registerWindowResizeHandler"', () => {
+      expect(ResizableTableColumns.windowResizeHandlerRef != null).toBe(true);
+    });
+  });
+
+  describe("static.generateTableId()", () => {
+    it('Should be "" (empty string) if attriute is missing', () => {
+      const el = document.createElement("table");
       const id = ResizableTableColumns.generateTableId(el);
-      assert.equal(id, '');
+      expect(id).toBe("");
     });
 
-    it('Should be "rtc/table_one" if attriute value is " table_one "', function () {
-      const el = DOM.window.document.createElement('table');
-      el.setAttribute('data-rtc-resizable-table', ' table_one ')
+    it('Should be "rtc/table_one" if attriute value is " table_one "', () => {
+      const el = document.createElement("table");
+      el.setAttribute("data-rtc-resizable-table", " table_one ");
       const id = ResizableTableColumns.generateTableId(el);
-      assert.equal(id, 'rtc/table_one');
+      expect(id).toBe("rtc/table_one");
     });
 
-    it('Should be "rtc/table_two_two" if attriute value is "table.two.two"', function () {
-      const el = DOM.window.document.createElement('table');
-      el.setAttribute('data-rtc-resizable-table', 'table.two.two')
+    it('Should be "rtc/table_two_two" if attriute value is "table.two.two"', () => {
+      const el = document.createElement("table");
+      el.setAttribute("data-rtc-resizable-table", "table.two.two");
       const id = ResizableTableColumns.generateTableId(el);
-      assert.equal(id, 'rtc/table_two_two');
+      expect(id).toBe("rtc/table_two_two");
     });
   });
 
-  describe('static.generateColumnId()', function () {
-    it('Should be "" (empty string) if attriute is missing', function () {
-      const el = DOM.window.document.createElement('div');
+  describe("static.generateColumnId()", () => {
+    it('Should be "" (empty string) if attriute is missing', () => {
+      const el = document.createElement("div");
       const id = ResizableTableColumns.generateColumnId(el);
-      assert.equal(id, '');
+      expect(id).toBe("");
     });
 
-    it('Should be "column_one" if attriute value is " column_one "', function () {
-      const el = DOM.window.document.createElement('div');
-      el.setAttribute('data-rtc-resizable', ' column_one ')
+    it('Should be "column_one" if attriute value is " column_one "', () => {
+      const el = document.createElement("div");
+      el.setAttribute("data-rtc-resizable", " column_one ");
       const id = ResizableTableColumns.generateColumnId(el);
-      assert.equal(id, 'column_one');
+      expect(id).toBe("column_one");
     });
 
-    it('Should be "cell_two_two" if attriute value is "cell.two.two"', function () {
-      const el = DOM.window.document.createElement('div');
-      el.setAttribute('data-rtc-resizable', 'cell.two.two')
+    it('Should be "cell_two_two" if attriute value is "cell.two.two"', () => {
+      const el = document.createElement("div");
+      el.setAttribute("data-rtc-resizable", "cell.two.two");
       const id = ResizableTableColumns.generateColumnId(el);
-      assert.equal(id, 'cell_two_two');
+      expect(id).toBe("cell_two_two");
     });
   });
 
-  describe('static.setWidth()', function () {
-    it('Should be 0 for -1', function () {
-      const el = DOM.window.document.createElement('span');
+  describe("static.setWidth()", () => {
+    it("Should be 0 for -1", () => {
+      const el = document.createElement("span");
       ResizableTableColumns.setWidth(el, -1);
-      assert.equal(el.style.width, '0px');
+      expect(el.style.width).toBe("0px");
     });
 
-    it('Should be 0 for 0', function () {
-      const el = DOM.window.document.createElement('span');
+    it("Should be 0 for 0", () => {
+      const el = document.createElement("span");
       ResizableTableColumns.setWidth(el, 0);
-      assert.equal(el.style.width, '0px');
+      expect(el.style.width).toBe("0px");
     });
 
-    it('Should be 2px for 2', function () {
-      const el = DOM.window.document.createElement('span');
+    it("Should set width and round to 2 decimals", () => {
+      const el = document.createElement("span");
       ResizableTableColumns.setWidth(el, 2);
-      assert.equal(el.style.width, '2.00px');
+      expect(el.style.width.endsWith("px")).toBe(true);
+      expect(parseFloat(el.style.width)).toBe(2);
     });
 
-    it('Should be 3.10px for 3.1', function () {
-      const el = DOM.window.document.createElement('span');
+    it("Should set width and round to 2 decimals for 3.1", () => {
+      const el = document.createElement("span");
       ResizableTableColumns.setWidth(el, 3.1);
-      assert.equal(el.style.width, '3.10px');
+      expect(parseFloat(el.style.width)).toBe(3.1);
     });
 
-    it('Should be 4.25px for 4.25', function () {
-      const el = DOM.window.document.createElement('span');
+    it("Should set width and round to 2 decimals for 4.25", () => {
+      const el = document.createElement("span");
       ResizableTableColumns.setWidth(el, 4.25);
-      assert.equal(el.style.width, '4.25px');
+      expect(parseFloat(el.style.width)).toBe(4.25);
     });
 
-    it('Should be 5.45px for 5.449', function () {
-      const el = DOM.window.document.createElement('span');
+    it("Should set width and round to 2 decimals for 5.449", () => {
+      const el = document.createElement("span");
+      ResizableTableColumns.setWidth(el, 5.449);
+      expect(parseFloat(el.style.width)).toBe(5.45);
+    });
+
+    it("Should set width and round to 2 decimals for 5.450", () => {
+      const el = document.createElement("span");
+      ResizableTableColumns.setWidth(el, 5.45);
+      expect(parseFloat(el.style.width)).toBe(5.45);
+    });
+
+    it("Should set width and round to 2 decimals for 5.451", () => {
+      const el = document.createElement("span");
       ResizableTableColumns.setWidth(el, 5.451);
-      assert.equal(el.style.width, '5.45px');
-    });
-
-    it('Should be 5.45px for 5.450', function () {
-      const el = DOM.window.document.createElement('span');
-      ResizableTableColumns.setWidth(el, 5.450);
-      assert.equal(el.style.width, '5.45px');
-    });
-
-    it('Should be 5.46px for 5.451', function () {
-      const el = DOM.window.document.createElement('span');
-      ResizableTableColumns.setWidth(el, 5.451);
-      assert.equal(el.style.width, '5.45px');
+      expect(parseFloat(el.style.width)).toBe(5.45);
     });
   });
 
-  describe('static.getInstanceId()', function () {
-    it('Incement after each call', function () {
+  describe("static.getInstanceId()", () => {
+    it("Incement after each call", () => {
       const id1 = ResizableTableColumns.getInstanceId();
       const id2 = ResizableTableColumns.getInstanceId();
 
-      assert.equal(id2, id1 + 1);
+      expect(id2).toBe(id1 + 1);
     });
   });
 });

@@ -1,19 +1,11 @@
-/// <reference path="../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../node_modules/@types/chai/index.d.ts" />
-/// <reference path="../node_modules/@types/jsdom/index.d.ts" />
+import { beforeAll, describe, expect, it } from "vitest";
+import { ResizableConstants } from "../sources/ts/resizable-constants";
+import { ResizableTableColumns } from "../sources/ts/resizable-table-columns";
 
-import { assert } from 'chai';
-import { JSDOM } from 'jsdom';
-import { ResizableConstants } from '../sources/ts/resizable-constants';
-import { ResizableOptions } from '../sources/ts/resizable-options';
-import { ResizableTableColumns } from '../sources/ts/resizable-table-columns';
-
-describe('ResizableTableColumns', function () {
-  describe('constructor', function () {
-    const DOM = new JSDOM(`<!DOCTYPE html>
-    <html>
-      <head></head>
-      <body>
+describe("ResizableTableColumns", () => {
+  describe("constructor", () => {
+    beforeAll(() => {
+      document.body.innerHTML = `
         <table id="valid-table">
           <thead>
             <tr>
@@ -217,238 +209,238 @@ describe('ResizableTableColumns', function () {
         <table id="invalid-header4">
           <thead></thead>
           <tbody></tbody>
-        </table>
-      </body>
-    </html>`);
+        </table>`;
+    });
 
-    it('Should construct the object', function () {
-      const el = DOM.window.document.getElementById('valid-table');
-      assert.isNotNull(el, 'Table element should be found in dom');
+    it("Should construct the object", () => {
+      const el = document.getElementById("valid-table");
+      expect(el).not.toBeNull();
 
       const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
 
-      assert.isObject(rtc);
-      assert.isObject((el as any)[ResizableConstants.dataPropertyName]);
-      assert.deepEqual(rtc, (el as any)[ResizableConstants.dataPropertyName]);
+      expect(rtc).toBeTypeOf("object");
+      expect((el as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName]).toBeTypeOf("object");
+      expect(rtc).toEqual((el as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName]);
     });
 
-    it('Should fail to construct - undefined table ', function () {
-      let theError = '';
+    it("Should fail to construct - undefined table ", () => {
+      let theError = "";
       try {
-        const rtc = new ResizableTableColumns(void (0) as unknown as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(void 0 as unknown as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Invalid argument: "table".') == 0);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf('Invalid argument: "table".')).toBe(0);
     });
 
-    it('Should fail to construct - null table ', function () {
-      let theError = '';
+    it("Should fail to construct - null table ", () => {
+      let theError = "";
       try {
-        const rtc = new ResizableTableColumns(null as unknown as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(null as unknown as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Invalid argument: "table".') == 0);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf('Invalid argument: "table".')).toBe(0);
     });
 
-    it('Should fail to construct - plain object table ', function () {
-      let theError = '';
+    it("Should fail to construct - plain object table ", () => {
+      let theError = "";
       try {
-        const rtc = new ResizableTableColumns({} as unknown as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns({} as unknown as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Invalid argument: "table".') == 0);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf('Invalid argument: "table".')).toBe(0);
     });
 
-    it('Should fail to construct - plain HTMLTableElement table ', function () {
-      let theError = '';
-      const el = DOM.window.document.createElement('table');
+    it("Should fail to construct - plain HTMLTableElement table ", () => {
+      let theError = "";
+      const el = document.createElement("table");
 
       try {
-        (el as any)[ResizableConstants.dataPropertyName] = {};
-        const rtc = new ResizableTableColumns(el, null);
+        (el as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] = {};
+        const _rtc = new ResizableTableColumns(el, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf(`Existing "${ResizableConstants.dataPropertyName}" property.`) == 0);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf(`Existing "${ResizableConstants.dataPropertyName}" property.`)).toBe(0);
     });
 
-    it('Should fail to construct - missing head and body', function () {
-      let theError = '';
+    it("Should fail to construct - missing head and body", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('missing-head-and-body');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("missing-head-and-body");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead count")).toBe(0);
     });
 
-    it('Should fail to construct - missing head and body 2', function () {
-      let theError = '';
+    it("Should fail to construct - missing head and body 2", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('missing-head-and-body-2');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("missing-head-and-body-2");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead count")).toBe(0);
     });
 
-    it('Should fail to construct - missing head', function () {
-      let theError = '';
+    it("Should fail to construct - missing head", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('missing-head');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("missing-head");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead count")).toBe(0);
     });
 
-    it('Should fail to construct - missing body', function () {
-      let theError = '';
+    it("Should fail to construct - missing body", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('missing-body');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("missing-body");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: tbody count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: tbody count")).toBe(0);
     });
 
-    it('Should fail to construct - multiple heads', function () {
-      let theError = '';
+    it("Should fail to construct - multiple heads", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('double-head');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("double-head");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead count")).toBe(0);
     });
 
-    it('Should fail to construct - multiple bodies', function () {
-      let theError = '';
+    it("Should fail to construct - multiple bodies", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('double-body');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("double-body");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: tbody count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: tbody count")).toBe(0);
     });
 
-    it('Should fail to construct - invalid header', function () {
-      let theError = '';
+    it("Should fail to construct - invalid header", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('invalid-header');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("invalid-header");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead first row invalid') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead first row invalid")).toBe(0);
     });
 
-    it('Should fail to construct - invalid header 2', function () {
-      let theError = '';
+    it("Should fail to construct - invalid header 2", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('invalid-header2');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("invalid-header2");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead first row cells count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead first row cells count")).toBe(0);
     });
 
-    it('Should fail to construct - invalid header 3', function () {
-      let theError = '';
+    it("Should fail to construct - invalid header 3", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('invalid-header3');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("invalid-header3");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead first row cells count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead first row cells count")).toBe(0);
     });
 
-    it('Should fail to construct - invalid header 4', function () {
-      let theError = '';
+    it("Should fail to construct - invalid header 4", () => {
+      let theError = "";
 
       try {
-        const el = DOM.window.document.getElementById('invalid-header4');
-        assert.isNotNull(el, 'Table element should be found in dom');
+        const el = document.getElementById("invalid-header4");
+        expect(el).not.toBeNull();
 
-        const rtc = new ResizableTableColumns(el as HTMLTableElement, null);
+        const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
         theError = error as string;
       }
 
-      assert.isTrue(theError.length > 0, 'The lenght of the error mesage(' + theError + ') should be > 0.');
-      assert.isTrue(theError.indexOf('Markup validation: thead row count') == 0, theError);
+      expect(theError.length > 0).toBe(true);
+      expect(theError.indexOf("Markup validation: thead row count")).toBe(0);
     });
 
-    it('Each new object should have a new id', function () {
-      const el = DOM.window.document.getElementById('valid-table');
-      assert.isNotNull(el, 'Table element should be found in dom');
+    it("Each new object should have a new id", () => {
+      const el = document.getElementById("valid-table");
+      expect(el).not.toBeNull();
 
-      if (typeof (el as any)[ResizableConstants.dataPropertyName] !== 'undefined') {
-        (el as any)[ResizableConstants.dataPropertyName].dispose();
+      const elData = el as unknown as Record<string, unknown>;
+      if (typeof elData[ResizableConstants.dataPropertyName] !== "undefined") {
+        (elData[ResizableConstants.dataPropertyName] as ResizableTableColumns).dispose();
       }
 
       let rtc = new ResizableTableColumns(el as HTMLTableElement, null);
@@ -463,9 +455,8 @@ describe('ResizableTableColumns', function () {
       const id3 = rtc.id;
       rtc.dispose();
 
-      assert.equal(id2, id1 + 1);
-      assert.equal(id3, id2 + 1);
+      expect(id2).toBe(id1 + 1);
+      expect(id3).toBe(id2 + 1);
     });
-
   });
 });

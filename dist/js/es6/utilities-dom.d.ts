@@ -1,3 +1,3 @@
-export declare class UtilitiesDOM {
-    static getDataAttributesValues(el: HTMLElement): object | null;
-}
+export declare const UtilitiesDOM: {
+    getDataAttributesValues(el?: HTMLElement): Record<string, string | number | boolean> | null;
+};

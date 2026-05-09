@@ -39,8 +39,8 @@ $handleMargin: 2px;
       cursor: $cursorResize;
 
       thead,
-      thead > th,
-      thead > th > a {
+      thead>th,
+      thead>th>a {
         cursor: $cursorResize;
       }
     }
@@ -63,7 +63,7 @@ $handleMargin: 2px;
     .rtc-handle {
       position: absolute;
       width: 2 * $handleMargin + $handleWidth;
-      margin-left: -1.1 * ($handleMargin + $handleWidth/2);
+      margin-left: -1.1 * ($handleMargin + calc($handleWidth / 2));
       z-index: 2;
       cursor: $cursorResize;
 

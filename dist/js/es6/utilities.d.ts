@@ -1,13 +1,13 @@
 export interface IIndexedCollection<T> {
     [name: string]: T;
 }
-export declare class Utilities {
-    static regexEscapeRegex: RegExp;
-    static kebabCaseRegex: RegExp;
-    static trueRegex: RegExp;
-    static falseRegex: RegExp;
-    static onlyWhiteSpace: RegExp;
-    static notEmptyOrWhiteSpace: RegExp;
-    static kebabCaseToCamelCase(str: string): string;
-    static parseStringToType(str: string): any;
-}
+export declare const Utilities: {
+    regexEscapeRegex: RegExp;
+    kebabCaseRegex: RegExp;
+    trueRegex: RegExp;
+    falseRegex: RegExp;
+    onlyWhiteSpace: RegExp;
+    notEmptyOrWhiteSpace: RegExp;
+    kebabCaseToCamelCase(str: string): string;
+    parseStringToType(str: string): string | number | boolean;
+};
