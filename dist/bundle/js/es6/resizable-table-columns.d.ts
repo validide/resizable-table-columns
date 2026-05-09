@@ -1,0 +1,66 @@
+import { ResizableEventData } from "./resizable-event-data";
+import { ResizableOptions } from "./resizable-options";
+interface IHeaderDetails<T> {
+    el: HTMLElement;
+    detail: T;
+}
+export declare class ResizableTableColumns {
+    static instancesCount: number;
+    static windowResizeHandlerRef: EventListener | null;
+    table: HTMLTableElement;
+    options: ResizableOptions;
+    id: number;
+    wrapper: HTMLDivElement | null;
+    ownerDocument: Document;
+    tableHeaders: HTMLTableHeaderCellElement[];
+    dragHandlesContainer: HTMLDivElement | null;
+    originalWidths: IHeaderDetails<string>[];
+    eventData: ResizableEventData | null;
+    lastPointerDown: number;
+    onPointerDownRef: EventListener | null;
+    onPointerMoveRef: EventListener | null;
+    onPointerUpRef: EventListener | null;
+    constructor(table: HTMLTableElement, options: ResizableOptions | null);
+    init(): void;
+    dispose(): void;
+    validateMarkup(): void;
+    wrapTable(): void;
+    unwrapTable(): void;
+    assignTableHeaders(): void;
+    storeOriginalWidths(): void;
+    restoreOriginalWidths(): void;
+    setHeaderWidths(): void;
+    constrainWidth(_el: HTMLElement, width: number): number;
+    createDragHandles(): void;
+    destroyDragHandles(): void;
+    getDragHandlers(): Array<HTMLDivElement>;
+    restoreColumnWidths(): void;
+    checkTableWidth(): void;
+    syncHandleWidths(): void;
+    getResizableHeaders(): HTMLTableCellElement[];
+    handlePointerDown(event: Event): void;
+    handlePointerMove(event: Event): void;
+    handlePointerUp(): void;
+    handleDoubleClick(): void;
+    attachHandlers(): void;
+    detachHandlers(): void;
+    refreshWrapperStyle(): void;
+    saveColumnWidths(): void;
+    createHandlerReferences(): void;
+    registerWindowResizeHandler(): void;
+    handleWindowResize(): void;
+    updateWidth(cell: HTMLElement, suggestedWidth: number, skipConstrainCheck: boolean, skipTableResize: boolean): number;
+    static onWindowResize(event: Event): void;
+    static generateColumnId(el: HTMLElement): string;
+    static generateTableId(table: HTMLTableElement): string;
+    static setWidth(element: HTMLElement, width: number): void;
+    static getInstanceId(): number;
+    static debounce: (func: (event: Event) => void, wait: number, immediate: boolean) => ((event: Event) => void);
+    static getPointerX(event: Event): number | null;
+    static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number;
+    static getOffset(el: HTMLElement): {
+        top: number;
+        left: number;
+    };
+}
+export {};

@@ -21,7 +21,7 @@
     "tsc:w": "tsc --watch",
     "prebuild": "node -e \"import('fs').then(f=>{f.rmSync('./dist',{recursive:true,force:true})})\"",
     "build": "npm run scss-base && tsc && vite build",
-    "dev": "concurrently --raw \"npm run scss-base:w\" \"npm run tsc:w\"",
+    "dev": "concurrently --raw \"npm run scss-base:w\" \"npm run tsc:w\" \"vite\"",
     "test": "vitest run --coverage",
     "lint": "biome check --write ./",
     "check": "tsc -p tsconfig.dev.json --noEmit && npm run lint && npm test"

@@ -95,5 +95,5 @@ var  options = {
 All modern browsers are supported. IE and older browsers might require polyfills for the library to work.
 
 ## Demos
-*  [Demo](https://validide.github.io/resizable-table-columns/dist/samples/index.html)
-*  [Bootstrap Demo](https://validide.github.io/resizable-table-columns/dist/samples/bootstrap.html)
+*  [Demo](https://validide.github.io/resizable-table-columns/pages/index.html)
+*  [Bootstrap Demo](https://validide.github.io/resizable-table-columns/pages/bootstrap.html)

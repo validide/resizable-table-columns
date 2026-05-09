@@ -1,6 +1,10 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  publicDir: "dist",
+  server: {
+    open: true,
+  },
   build: {
     lib: {
       entry: "./dist/js/es6/index.js",
