@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
           registry-url: https://registry.npmjs.org/
@@ -45,7 +45,7 @@ jobs:
           SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
           SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           registry-url: https://registry.npmjs.org/
           scope: '@validide'
@@ -54,7 +54,7 @@ jobs:
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           registry-url: https://npm.pkg.github.com/
           scope: '@validide'
