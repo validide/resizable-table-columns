@@ -45,13 +45,13 @@
     "dist"
   ],
   "devDependencies": {
-    "@biomejs/biome": "2.5.7",
-    "@vitest/coverage-v8": "4.1.10",
-    "concurrently": "10.0.4",
+    "@biomejs/biome": "2.5.12",
+    "@vitest/coverage-v8": "5.0.0",
+    "concurrently": "10.0.5",
     "jsdom": "30.0.1",
-    "sass": "1.102.0",
+    "sass": "1.104.0",
     "typescript": "7.0.2",
-    "vite": "8.0.16",
-    "vitest": "4.1.11"
+    "vite": "8.2.2",
+    "vitest": "5.0.0"
   }
 }
