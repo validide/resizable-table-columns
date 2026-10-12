@@ -47,7 +47,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.12",
     "@vitest/coverage-v8": "5.0.0",
-    "concurrently": "10.0.5",
+    "concurrently": "10.0.6",
     "jsdom": "30.0.1",
     "sass": "1.104.0",
     "typescript": "7.0.2",
