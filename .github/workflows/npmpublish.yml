@@ -4,62 +4,43 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing + provenance
+      packages: write # GitHub Packages
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6 # version comes from "packageManager" in package.json
       - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
-      - run: npm ci
-      - run: npm test
-
-  publish-packages:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: '.nvmrc'
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm run build
-
-      - id: branch_name
-        name: Get branch name
-        run: |
-          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
-      - id: update_version
-        name: Update version
-        run: |
-          echo $SOURCE_NAME
-          echo $SOURCE_BRANCH
-          echo $SOURCE_TAG
-          npm --no-git-tag-version version $SOURCE_TAG
-        env:
-          SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
-          SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
-          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
-
-      - uses: actions/setup-node@v7
-        with:
+          cache: pnpm
           registry-url: https://registry.npmjs.org/
           scope: '@validide'
-      - run: |
-          npm config set @validide:registry https://registry.npmjs.org/
-          npm publish --access public
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm run check
+      - run: pnpm run build
+
+      - name: Set version from release tag
+        run: pnpm version --no-git-tag-version "${RELEASE_TAG#v}"
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      - uses: actions/setup-node@v7
-        with:
-          registry-url: https://npm.pkg.github.com/
-          scope: '@validide'
-      - run: |
-          npm config set @validide:registry https://npm.pkg.github.com/
-          npm publish --access public
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+
+      - name: Publish to GitHub Packages
+        run: |
+          npm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
+          npm publish --access public --@validide:registry=https://npm.pkg.github.com/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

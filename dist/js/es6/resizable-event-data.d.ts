@@ -14,3 +14,14 @@ export declare class ResizableEventData {
     newWidths: WidthsData;
     constructor(column: HTMLTableCellElement, dragHandler: HTMLDivElement);
 }
+/**
+ * The `detail` payload of the `eventResizeStart.rtc`, `eventResize.rtc` and `eventResizeStop.rtc`
+ * custom events dispatched on the table element.
+ */
+export interface ResizableEventDetail {
+    column: HTMLTableCellElement;
+    columnWidth: number;
+    table: HTMLTableElement;
+    tableWidth: number;
+}
+//# sourceMappingURL=resizable-event-data.d.ts.map

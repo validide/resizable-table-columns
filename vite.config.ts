@@ -1,13 +1,23 @@
+import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
+import { pointerDoubleClick, pointerDrag } from "./tests/browser/support/commands.ts";
+
+// Browser engines for the "browser" test project, e.g. BROWSER_TEST_ENGINES=chromium,firefox,webkit.
+// Coverage (v8) is only collected in Chromium, so run other engines without --coverage.
+type Engine = "chromium" | "firefox" | "webkit";
+const browserEngines = (process.env.BROWSER_TEST_ENGINES ?? "chromium")
+  .split(",")
+  .map((name) => name.trim())
+  .filter((name): name is Engine => ["chromium", "firefox", "webkit"].includes(name));
 
 export default defineConfig({
-  publicDir: "dist",
+  publicDir: false,
   server: {
     open: true,
   },
   build: {
     lib: {
-      entry: "./dist/js/es6/index.js",
+      entry: "./sources/ts/index.ts",
       formats: ["es", "cjs", "umd"],
       name: "validide_resizableTableColumns",
       fileName: (format) => {
@@ -18,18 +28,43 @@ export default defineConfig({
       },
     },
     outDir: "./dist/bundle",
+    sourcemap: true,
     minify: true,
-    emptyOutDir: false,
+    emptyOutDir: true,
   },
   test: {
     globals: true,
-    environment: "jsdom",
-    include: ["tests/**/*.ts", "tests/**/*.js"],
     coverage: {
       provider: "v8",
       reporter: ["text", "lcovonly"],
       include: ["sources/ts/**"],
-      exclude: ["**/*.d.ts", "tests/**/*.*", "dist/**/*.*", "coverage/**/*.*", "scripts/**/*.*", "docs/**/*.*"],
+      exclude: ["**/*.d.ts"],
     },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          environment: "jsdom",
+          include: ["tests/*.ts"],
+        },
+      },
+      {
+        // Real-browser tests for layout and input behaviour that jsdom cannot emulate.
+        extends: true,
+        test: {
+          name: "browser",
+          include: ["tests/browser/**/*.test.ts"],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: browserEngines.map((browser) => ({ browser })),
+            viewport: { width: 1000, height: 700 },
+            commands: { pointerDrag, pointerDoubleClick },
+          },
+        },
+      },
+    ],
   },
 });

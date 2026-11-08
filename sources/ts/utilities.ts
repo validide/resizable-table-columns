@@ -11,7 +11,7 @@ export const Utilities = {
   notEmptyOrWhiteSpace: /\S/,
 
   kebabCaseToCamelCase(str: string): string {
-    return str.replace(Utilities.kebabCaseRegex, (m) => m[1].toUpperCase());
+    return str.replace(Utilities.kebabCaseRegex, (m) => m.charAt(1).toUpperCase());
   },
 
   parseStringToType(str: string): string | number | boolean {

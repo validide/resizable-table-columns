@@ -6,7 +6,7 @@ export const Utilities = {
     onlyWhiteSpace: /^\s$/,
     notEmptyOrWhiteSpace: /\S/,
     kebabCaseToCamelCase(str) {
-        return str.replace(Utilities.kebabCaseRegex, (m) => m[1].toUpperCase());
+        return str.replace(Utilities.kebabCaseRegex, (m) => m.charAt(1).toUpperCase());
     },
     parseStringToType(str) {
         if (str.length === 0 || Utilities.onlyWhiteSpace.test(str))

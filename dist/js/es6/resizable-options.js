@@ -19,17 +19,17 @@ export class ResizableOptions {
     overrideValues(options = null) {
         if (!options)
             return;
-        for (const prop in options) {
+        const self = this;
+        for (const [prop, value] of Object.entries(options)) {
             if (Object.hasOwn(this, prop)) {
-                this[prop] = options[prop];
+                self[prop] = value;
             }
         }
     }
     overrideValuesFromElement(element = null) {
         if (!element)
             return;
-        const elementOptions = UtilitiesDOM.getDataAttributesValues(element);
-        this.overrideValues(elementOptions);
+        this.overrideValues(UtilitiesDOM.getDataAttributesValues(element));
     }
 }
 //# sourceMappingURL=resizable-options.js.map

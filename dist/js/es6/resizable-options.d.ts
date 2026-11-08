@@ -2,6 +2,11 @@ export interface IStore {
     get(id: string): unknown;
     set(id: string, data: unknown): void;
 }
+/** The shape of the data persisted through {@link IStore} for a table. */
+export interface IStoredWidths {
+    table: number;
+    columns: Record<string, number>;
+}
 export declare class ResizableOptions {
     resizeFromBody: boolean;
     minWidth: null | number;
@@ -13,3 +18,4 @@ export declare class ResizableOptions {
     overrideValues(options?: null | object): void;
     overrideValuesFromElement(element?: null | HTMLElement): void;
 }
+//# sourceMappingURL=resizable-options.d.ts.map

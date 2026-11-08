@@ -4,3 +4,4 @@ export * from "./resizable-options";
 export * from "./resizable-table-columns";
 export * from "./utilities";
 export * from "./utilities-dom";
+//# sourceMappingURL=index.d.ts.map

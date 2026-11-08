@@ -228,7 +228,8 @@ describe("ResizableTableColumns", () => {
       try {
         const _rtc = new ResizableTableColumns(void 0 as unknown as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -240,7 +241,8 @@ describe("ResizableTableColumns", () => {
       try {
         const _rtc = new ResizableTableColumns(null as unknown as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -252,7 +254,8 @@ describe("ResizableTableColumns", () => {
       try {
         const _rtc = new ResizableTableColumns({} as unknown as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -267,7 +270,8 @@ describe("ResizableTableColumns", () => {
         (el as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] = {};
         const _rtc = new ResizableTableColumns(el, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -283,7 +287,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -299,7 +304,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -315,7 +321,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -331,7 +338,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -347,7 +355,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -363,7 +372,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -379,7 +389,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -395,7 +406,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -411,7 +423,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);
@@ -427,7 +440,8 @@ describe("ResizableTableColumns", () => {
 
         const _rtc = new ResizableTableColumns(el as HTMLTableElement, null);
       } catch (error) {
-        theError = error as string;
+        expect(error).toBeInstanceOf(Error);
+        theError = (error as Error).message;
       }
 
       expect(theError.length > 0).toBe(true);

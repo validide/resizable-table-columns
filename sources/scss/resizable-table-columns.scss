@@ -1,3 +1,5 @@
+@use "sass:math";
+
 $cursorResize: col-resize;
 $handleWidth: 2.5px;
 $handleMargin: 2px;
@@ -35,12 +37,18 @@ $handleMargin: 2px;
       }
     }
 
+    // Widths are written from measured offsetWidth (which includes padding and border),
+    // so header cells must size as border-box or every column grows by its padding.
+    thead th {
+      box-sizing: border-box;
+    }
+
     &.rtc-table-resizing {
       cursor: $cursorResize;
 
       thead,
-      thead>th,
-      thead>th>a {
+      thead > th,
+      thead > th > a {
         cursor: $cursorResize;
       }
     }
@@ -63,9 +71,10 @@ $handleMargin: 2px;
     .rtc-handle {
       position: absolute;
       width: 2 * $handleMargin + $handleWidth;
-      margin-left: -1.1 * ($handleMargin + calc($handleWidth / 2));
+      margin-left: -1.1 * ($handleMargin + math.div($handleWidth, 2));
       z-index: 2;
       cursor: $cursorResize;
+      touch-action: none;
 
       &:last-of-type {
         width: $handleMargin + $handleWidth;

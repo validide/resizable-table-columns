@@ -1,14 +1,28 @@
 name: Tests
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6 # version comes from "packageManager" in package.json
       - uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm test
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm run check # unit tests + Chromium browser tests, with coverage
+      - name: Browser tests in Firefox and WebKit
+        run: pnpm run test:browser
+        env:
+          BROWSER_TEST_ENGINES: firefox,webkit
+      - run: pnpm run build

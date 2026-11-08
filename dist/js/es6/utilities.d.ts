@@ -11,3 +11,4 @@ export declare const Utilities: {
     kebabCaseToCamelCase(str: string): string;
     parseStringToType(str: string): string | number | boolean;
 };
+//# sourceMappingURL=utilities.d.ts.map
