@@ -5,4 +5,4 @@ minimumReleaseAge: 10080
 # dependencies allowed (true) or denied (false) to run install scripts
 allowBuilds:
   # sass' optional file watcher ships prebuilt binaries; its install script is not needed
-  '@parcel/watcher': false
+  "@parcel/watcher": false

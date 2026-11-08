@@ -1,4 +1,5 @@
 # Simple JavaScript resizable table columns
+
 Inspired by **[jquery-resizable-columns](https://github.com/dobtco/jquery-resizable-columns)**
 ## Status
 
@@ -11,6 +12,7 @@ At the moment the project is in "maintenance mode". I will not be investing any 
 ## Usage
 
 ### Install
+
 ```sh
 npm install @validide/resizable-table-columns
 ```
@@ -30,6 +32,7 @@ Without a bundler, load the ES module directly:
 A UMD build (`dist/bundle/index.umd.cjs`) exposing the `validide_resizableTableColumns` global is also available.
 
 ### Basic
+
 - Add the `resizable-table-columns.css` file to the page.
 - Import the library (see above).
 - Optionally add a store library.
@@ -37,7 +40,7 @@ A UMD build (`dist/bundle/index.umd.cjs`) exposing the `validide_resizableTableC
 - Create a new instance of the resizable table like below.
 
 
-``` html
+```html
 
   <table class="data" data-rtc-resizable-table="table.one">
       <thead>
@@ -88,6 +91,7 @@ interface IStore {
 ```
 
 ### Events
+
 The table element dispatches `eventResizeStart.rtc`, `eventResize.rtc` and `eventResizeStop.rtc` custom events.
 Their `detail` is a `ResizableEventDetail`: `{ column, columnWidth, table, tableWidth }`.
 
@@ -96,8 +100,9 @@ table.addEventListener("eventResizeStop.rtc", (e) => console.log(e.detail.column
 ```
 
 ### Default configuration options
+
 ```js
-var  options = {
+var options = {
   // boolean - The resize handle will span the entire height of the table
   resizeFromBody: true,
 
@@ -114,11 +119,12 @@ var  options = {
   store: null,
 
   // null or number - The suggestion for how wide (in pixels) a cell might be in case the content is really wide.
-  maxInitialWidthHint: null
-}
+  maxInitialWidthHint: null,
+};
 ```
 
 ## Development
+
 This project uses [pnpm](https://pnpm.io); the exact version is pinned in `package.json` (`packageManager`).
 
 ```sh
@@ -131,12 +137,15 @@ pnpm run build
 ```
 
 ## Supported Browsers
+
 All modern (evergreen) browsers are supported. Dragging uses [Pointer Events](https://developer.mozilla.org/docs/Web/API/Pointer_events), so mouse, touch and pen input all work. Internet Explorer is not supported.
 
 ## Upgrading
+
 - Errors thrown on invalid input or markup are now `Error` instances (previously plain strings). The messages are unchanged; read them with `error.message`.
 - `ResizableConstants.events.pointerDown` / `pointerMove` / `pointerUp` are now `["pointerdown"]`, `["pointermove"]` and `["pointerup", "pointercancel"]` (previously separate mouse and touch events).
 
 ## Demos
-*  [Demo](https://validide.github.io/resizable-table-columns/pages/index.html)
-*  [Bootstrap Demo](https://validide.github.io/resizable-table-columns/pages/bootstrap.html)
+
+-  [Demo](https://validide.github.io/resizable-table-columns/pages/index.html)
+-  [Bootstrap Demo](https://validide.github.io/resizable-table-columns/pages/bootstrap.html)

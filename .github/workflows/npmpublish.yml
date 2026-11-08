@@ -2,27 +2,41 @@ name: Node.js Package
 
 on:
   release:
-    types: [created]
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to publish (for example v3.0.0)
+        required: true
+        type: string
 
 permissions:
   contents: read
+
+concurrency:
+  group: publish-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # npm trusted publishing + provenance
+      id-token: write # npm trusted publishing (OIDC) + provenance
       packages: write # GitHub Packages
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
       - uses: pnpm/action-setup@v6 # version comes from "packageManager" in package.json
       - uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
           cache: pnpm
-          registry-url: https://registry.npmjs.org/
-          scope: '@validide'
+          # No registry-url: it would write an .npmrc that expects NODE_AUTH_TOKEN.
+          # npm authenticates with the job's OIDC token instead (trusted publishing).
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run check
@@ -30,17 +44,17 @@ jobs:
 
       - name: Set version from release tag
         run: pnpm version --no-git-tag-version "${RELEASE_TAG#v}"
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
 
+      # Trusted publishing needs npm >= 11.5.1 and a trusted publisher configured on npmjs.com
+      # for this repository and workflow file. Provenance is generated automatically.
       - name: Publish to npm
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+        run: |
+          npm --version
+          npm publish --access public --registry=https://registry.npmjs.org/
 
       - name: Publish to GitHub Packages
         run: |
           npm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
-          npm publish --access public --@validide:registry=https://npm.pkg.github.com/
+          npm publish --access public --registry=https://npm.pkg.github.com/
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
