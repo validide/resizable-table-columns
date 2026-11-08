@@ -203,24 +203,29 @@ export class ResizableTableColumns {
             .map((el) => ({ el, detail: el.offsetWidth }));
         const resizableWidth = headersDetails.reduce((sum, d) => sum + d.detail, 0);
         let leftToAdd = 0;
-        let lastResizableCell = null;
+        // The last cell written and its new width. Widths are tracked here instead of re-read from the DOM,
+        // because offsetWidth is unreliable while the column widths and the table width disagree.
+        let lastResized = null;
         let currentDetail = headersDetails.shift();
         while (currentDetail) {
             leftToAdd = difference - addedWidth;
-            lastResizableCell = currentDetail.el;
             let extraWidth = Math.floor((currentDetail.detail / resizableWidth) * difference);
             extraWidth = Math.min(extraWidth, leftToAdd);
             const newWidth = this.updateWidth(currentDetail.el, currentDetail.detail + extraWidth, false, true);
             addedWidth += newWidth - currentDetail.detail;
+            lastResized = { el: currentDetail.el, detail: newWidth };
             if (addedWidth >= difference)
                 break;
             currentDetail = headersDetails.shift();
         }
         leftToAdd = difference - addedWidth;
         if (leftToAdd > 0) {
-            const lastCell = headersDetails[0]?.el ?? lastResizableCell ?? this.tableHeaders.at(-1);
-            if (lastCell) {
-                this.updateWidth(lastCell, lastCell.offsetWidth, true, true);
+            // Give the remainder that min/max clamping kept from being distributed to a single cell, so the column
+            // widths add up to the table width; otherwise the browser spreads it over every column.
+            const fallback = this.tableHeaders.at(-1);
+            const target = headersDetails[0] ?? lastResized ?? (fallback ? { el: fallback, detail: fallback.offsetWidth } : null);
+            if (target) {
+                this.updateWidth(target.el, target.detail + leftToAdd, true, true);
             }
         }
         ResizableTableColumns.setWidth(this.table, wrapperWidth);
@@ -430,8 +435,10 @@ export class ResizableTableColumns {
         const eventData = this.eventData;
         if (!eventData)
             return;
-        const tableWidth = eventData.originalWidths.table + difference;
         const columnWidth = this.constrainWidth(eventData.column, eventData.originalWidths.column + difference);
+        // Grow/shrink the table by what the column actually changed (after min/max clamping), not by the raw
+        // pointer delta; otherwise the browser spreads the excess over all columns and maxWidth is not honoured.
+        const tableWidth = eventData.originalWidths.table + (columnWidth - eventData.originalWidths.column);
         ResizableTableColumns.setWidth(this.table, tableWidth);
         ResizableTableColumns.setWidth(eventData.column, columnWidth);
         eventData.newWidths = { column: columnWidth, table: tableWidth };

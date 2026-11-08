@@ -34,6 +34,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.rtc-wrapper table.rtc-table thead th {
+  box-sizing: border-box;
+}
 .rtc-wrapper table.rtc-table.rtc-table-resizing {
   cursor: col-resize;
 }

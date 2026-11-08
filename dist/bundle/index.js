@@ -204,16 +204,22 @@ var e = {
 			detail: e.offsetWidth
 		})), a = i.reduce((e, t) => e + t.detail, 0), o = 0, s = null, c = i.shift();
 		for (; c;) {
-			o = n - r, s = c.el;
+			o = n - r;
 			let e = Math.floor(c.detail / a * n);
 			e = Math.min(e, o);
 			let t = this.updateWidth(c.el, c.detail + e, !1, !0);
-			if (r += t - c.detail, r >= n) break;
+			if (r += t - c.detail, s = {
+				el: c.el,
+				detail: t
+			}, r >= n) break;
 			c = i.shift();
 		}
 		if (o = n - r, o > 0) {
-			let e = i[0]?.el ?? s ?? this.tableHeaders.at(-1);
-			e && this.updateWidth(e, e.offsetWidth, !0, !0);
+			let e = this.tableHeaders.at(-1), t = i[0] ?? s ?? (e ? {
+				el: e,
+				detail: e.offsetWidth
+			} : null);
+			t && this.updateWidth(t.el, t.detail + o, !0, !0);
 		}
 		t.setWidth(this.table, e);
 	}
@@ -337,11 +343,11 @@ var e = {
 	applyColumnDelta(n) {
 		let r = this.eventData;
 		if (!r) return;
-		let i = r.originalWidths.table + n, a = this.constrainWidth(r.column, r.originalWidths.column + n);
-		t.setWidth(this.table, i), t.setWidth(r.column, a), r.newWidths = {
-			column: a,
-			table: i
-		}, this.dispatchResizeEvent(e.events.eventResize, r.column, a, i);
+		let i = this.constrainWidth(r.column, r.originalWidths.column + n), a = r.originalWidths.table + (i - r.originalWidths.column);
+		t.setWidth(this.table, a), t.setWidth(r.column, i), r.newWidths = {
+			column: i,
+			table: a
+		}, this.dispatchResizeEvent(e.events.eventResize, r.column, i, a);
 	}
 	dispatchResizeEvent(e, t, n, r) {
 		this.table.dispatchEvent(new CustomEvent(e, { detail: {

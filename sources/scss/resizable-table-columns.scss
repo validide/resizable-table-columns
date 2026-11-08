@@ -37,6 +37,12 @@ $handleMargin: 2px;
       }
     }
 
+    // Widths are written from measured offsetWidth (which includes padding and border),
+    // so header cells must size as border-box or every column grows by its padding.
+    thead th {
+      box-sizing: border-box;
+    }
+
     &.rtc-table-resizing {
       cursor: $cursorResize;
 
