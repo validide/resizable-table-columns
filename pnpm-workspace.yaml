@@ -1,0 +1,8 @@
+# pnpm settings (pnpm reads these from here rather than .npmrc)
+saveExact: true
+# only install package versions published at least 7 days ago (value in minutes)
+minimumReleaseAge: 10080
+# dependencies allowed (true) or denied (false) to run install scripts
+allowBuilds:
+  # sass' optional file watcher ships prebuilt binaries; its install script is not needed
+  '@parcel/watcher': false

@@ -20,7 +20,7 @@ export declare class ResizableTableColumns {
     onPointerDownRef: EventListener | null;
     onPointerMoveRef: EventListener | null;
     onPointerUpRef: EventListener | null;
-    constructor(table: HTMLTableElement, options: ResizableOptions | null);
+    constructor(table: HTMLTableElement, options?: Partial<ResizableOptions> | null);
     init(): void;
     dispose(): void;
     validateMarkup(): void;
@@ -50,6 +50,9 @@ export declare class ResizableTableColumns {
     registerWindowResizeHandler(): void;
     handleWindowResize(): void;
     updateWidth(cell: HTMLElement, suggestedWidth: number, skipConstrainCheck: boolean, skipTableResize: boolean): number;
+    /** Resize the column being dragged by `difference` pixels relative to its original width and notify listeners. */
+    private applyColumnDelta;
+    private dispatchResizeEvent;
     static onWindowResize(event: Event): void;
     static generateColumnId(el: HTMLElement): string;
     static generateTableId(table: HTMLTableElement): string;
@@ -64,3 +67,4 @@ export declare class ResizableTableColumns {
     };
 }
 export {};
+//# sourceMappingURL=resizable-table-columns.d.ts.map

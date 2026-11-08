@@ -5,6 +5,12 @@ export interface IStore {
   set(id: string, data: unknown): void;
 }
 
+/** The shape of the data persisted through {@link IStore} for a table. */
+export interface IStoredWidths {
+  table: number;
+  columns: Record<string, number>;
+}
+
 export class ResizableOptions {
   resizeFromBody: boolean;
   minWidth: null | number;
@@ -28,9 +34,10 @@ export class ResizableOptions {
   overrideValues(options: null | object = null): void {
     if (!options) return;
 
-    for (const prop in options) {
+    const self = this as unknown as Record<string, unknown>;
+    for (const [prop, value] of Object.entries(options)) {
       if (Object.hasOwn(this, prop)) {
-        (this as unknown as Record<string, unknown>)[prop] = (options as unknown as Record<string, unknown>)[prop];
+        self[prop] = value;
       }
     }
   }
@@ -38,7 +45,6 @@ export class ResizableOptions {
   overrideValuesFromElement(element: null | HTMLElement = null): void {
     if (!element) return;
 
-    const elementOptions = UtilitiesDOM.getDataAttributesValues(element);
-    this.overrideValues(elementOptions);
+    this.overrideValues(UtilitiesDOM.getDataAttributesValues(element));
   }
 }

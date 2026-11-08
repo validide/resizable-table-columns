@@ -307,33 +307,21 @@
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/store-js@2.0.4/dist/store.everything.min.js" integrity="sha256-errvL8hz1+3ech1k79bFEXjTNJgdW8Azoh/AGGjpHZA=" crossorigin="anonymous"></script>
-  <script src="../dist/bundle/index.js"></script>
-  <script>
-    ((window, ResizableTableColumns) => {
-      var store = window.store?.enabled
-        ? window.store
-        : null;
+  <script type="module">
+    import { ResizableTableColumns } from "../dist/bundle/index.js";
 
-      var els = document.querySelectorAll('table.data');
-      var index, table, options;
-      for (index = 0; index < els.length; index++) {
-        table = els[index];
-        if (table.rtc_data_object) {
-          continue;
-        }
+    const store = window.store?.enabled ? window.store : null;
 
-        options = {
-          store: store,
-          maxInitialWidthHint: 100
-        };
-        if (table.querySelectorAll('thead > tr').length > 1) {
-          options.resizeFromBody = false;
-        }
+    for (const table of document.querySelectorAll("table.data")) {
+      if (table.validide_rtc_data_object) continue;
 
-        new ResizableTableColumns(els[index], options);
+      const options = { store, maxInitialWidthHint: 100 };
+      if (table.querySelectorAll("thead > tr").length > 1) {
+        options.resizeFromBody = false;
       }
 
-    })(window, window.validide_resizableTableColumns.ResizableTableColumns);
+      new ResizableTableColumns(table, options);
+    }
   </script>
 </body>
 

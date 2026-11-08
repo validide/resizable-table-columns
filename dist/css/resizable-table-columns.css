@@ -61,6 +61,7 @@
   margin-left: -3.575px;
   z-index: 2;
   cursor: col-resize;
+  touch-action: none;
 }
 .rtc-wrapper .rtc-handle-container .rtc-handle:last-of-type {
   width: 4.5px;

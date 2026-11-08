@@ -2,6 +2,7 @@
   "name": "@validide/resizable-table-columns",
   "version": "0.0.1",
   "type": "module",
+  "packageManager": "pnpm@12.17.0",
   "description": "Simple Javascript resizable table columns",
   "main": "./dist/bundle/index.umd.cjs",
   "module": "./dist/bundle/index.js",
@@ -11,20 +12,23 @@
       "types": "./dist/js/es6/index.d.ts",
       "import": "./dist/bundle/index.js",
       "require": "./dist/bundle/index.umd.cjs"
-    }
+    },
+    "./css": "./dist/css/resizable-table-columns.css",
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "scripts": {
-    "clean": "node -e \"import('fs').then(f=>{f.rmSync('./dist',{recursive:true,force:true}); f.rmSync('./node_modules',{recursive:true,force:true}); f.rmSync('./package-lock.json',{recursive:true,force:true});})\"",
-    "scss-base": "sass ./sources/scss:./dist/css/ --style expanded --no-source-map",
-    "scss-base:w": "sass ./sources/scss:./dist/css/ --style expanded --no-source-map --watch",
-    "tsc": "tsc",
-    "tsc:w": "tsc --watch",
-    "prebuild": "node -e \"import('fs').then(f=>{f.rmSync('./dist',{recursive:true,force:true})})\"",
-    "build": "npm run scss-base && tsc && vite build",
-    "dev": "concurrently --raw \"npm run scss-base:w\" \"npm run tsc:w\" \"vite\"",
+    "clean": "node -e \"import('node:fs').then(f=>{for(const p of ['dist','node_modules','pnpm-lock.yaml'])f.rmSync(p,{recursive:true,force:true})})\"",
+    "clean:dist": "node -e \"import('node:fs').then(f=>f.rmSync('./dist',{recursive:true,force:true}))\"",
+    "build:css": "sass ./sources/scss:./dist/css/ --style expanded --no-source-map",
+    "build:types": "tsc",
+    "build": "pnpm run clean:dist && pnpm run build:css && pnpm run build:types && vite build",
+    "dev": "vite",
+    "typecheck": "tsc -p tsconfig.dev.json --noEmit",
     "test": "vitest run --coverage",
     "lint": "biome check --write ./",
-    "check": "tsc -p tsconfig.dev.json --noEmit && npm run lint && npm test"
+    "lint:ci": "biome ci ./",
+    "check": "pnpm run typecheck && pnpm run lint:ci && pnpm test"
   },
   "repository": {
     "type": "git",
@@ -47,11 +51,13 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@vitest/coverage-v8": "5.0.3",
-    "concurrently": "10.0.6",
     "jsdom": "30.1.2",
     "sass": "1.105.1",
     "typescript": "7.0.2",
     "vite": "8.3.5",
     "vitest": "5.0.3"
-  }
+  },
+  "sideEffects": [
+    "*.css"
+  ]
 }

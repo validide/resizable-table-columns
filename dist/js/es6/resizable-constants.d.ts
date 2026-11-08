@@ -26,3 +26,4 @@ export declare const ResizableConstants: {
         eventResizeStop: string;
     };
 };
+//# sourceMappingURL=resizable-constants.d.ts.map

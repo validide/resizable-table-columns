@@ -20,3 +20,14 @@ export class ResizableEventData {
     this.dragHandler = dragHandler;
   }
 }
+
+/**
+ * The `detail` payload of the `eventResizeStart.rtc`, `eventResize.rtc` and `eventResizeStop.rtc`
+ * custom events dispatched on the table element.
+ */
+export interface ResizableEventDetail {
+  column: HTMLTableCellElement;
+  columnWidth: number;
+  table: HTMLTableElement;
+  tableWidth: number;
+}

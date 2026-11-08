@@ -1,13 +1,13 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  publicDir: "dist",
+  publicDir: false,
   server: {
     open: true,
   },
   build: {
     lib: {
-      entry: "./dist/js/es6/index.js",
+      entry: "./sources/ts/index.ts",
       formats: ["es", "cjs", "umd"],
       name: "validide_resizableTableColumns",
       fileName: (format) => {
@@ -18,8 +18,9 @@ export default defineConfig({
       },
     },
     outDir: "./dist/bundle",
+    sourcemap: true,
     minify: true,
-    emptyOutDir: false,
+    emptyOutDir: true,
   },
   test: {
     globals: true,
@@ -29,7 +30,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcovonly"],
       include: ["sources/ts/**"],
-      exclude: ["**/*.d.ts", "tests/**/*.*", "dist/**/*.*", "coverage/**/*.*", "scripts/**/*.*", "docs/**/*.*"],
+      exclude: ["**/*.d.ts"],
     },
   },
 });

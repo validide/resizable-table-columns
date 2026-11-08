@@ -21,9 +21,9 @@ export const ResizableConstants = {
   },
 
   events: {
-    pointerDown: ["mousedown", "touchstart"],
-    pointerMove: ["mousemove", "touchmove"],
-    pointerUp: ["mouseup", "touchend"],
+    pointerDown: ["pointerdown"],
+    pointerMove: ["pointermove"],
+    pointerUp: ["pointerup", "pointercancel"],
     windowResize: ["resize"],
     eventResizeStart: "eventResizeStart.rtc",
     eventResize: "eventResize.rtc",

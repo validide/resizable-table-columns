@@ -1,11 +1,23 @@
 import { ResizableConstants } from "./resizable-constants";
-import { ResizableEventData } from "./resizable-event-data";
-import { ResizableOptions } from "./resizable-options";
+import { ResizableEventData, type ResizableEventDetail } from "./resizable-event-data";
+import { type IStoredWidths, ResizableOptions } from "./resizable-options";
 
 interface IHeaderDetails<T> {
   el: HTMLElement;
   detail: T;
 }
+
+const getAttachedInstance = (el: Element): unknown =>
+  (el as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName];
+
+const setAttachedInstance = (el: Element, value: unknown): void => {
+  (el as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] = value;
+};
+
+const childrenByName = (parent: Element, nodeName: string): Element[] =>
+  Array.from(parent.children).filter((child) => child.nodeName === nodeName);
+
+const isResizable = (el: Element): boolean => el.hasAttribute(ResizableConstants.attributes.dataResizable);
 
 export class ResizableTableColumns {
   static instancesCount: number = 0;
@@ -26,12 +38,20 @@ export class ResizableTableColumns {
   onPointerMoveRef!: EventListener | null;
   onPointerUpRef!: EventListener | null;
 
-  constructor(table: HTMLTableElement, options: ResizableOptions | null) {
-    if (typeof table !== "object" || table === null || (<object>table).toString() !== "[object HTMLTableElement]")
-      throw 'Invalid argument: "table".\nResizableTableColumns requires that the table element is a not null HTMLTableElement object!';
+  constructor(table: HTMLTableElement, options: Partial<ResizableOptions> | null = null) {
+    if (
+      typeof table !== "object" ||
+      table === null ||
+      Object.prototype.toString.call(table) !== "[object HTMLTableElement]"
+    )
+      throw new Error(
+        'Invalid argument: "table".\nResizableTableColumns requires that the table element is a not null HTMLTableElement object!',
+      );
 
-    if (typeof (table as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] !== "undefined")
-      throw `Existing "${ResizableConstants.dataPropertyName}" property.\nTable element already has a '${ResizableConstants.dataPropertyName}' attached object!`;
+    if (typeof getAttachedInstance(table) !== "undefined")
+      throw new Error(
+        `Existing "${ResizableConstants.dataPropertyName}" property.\nTable element already has a '${ResizableConstants.dataPropertyName}' attached object!`,
+      );
 
     this.id = ResizableTableColumns.getInstanceId();
     this.table = table;
@@ -47,7 +67,7 @@ export class ResizableTableColumns {
 
     this.init();
 
-    (this.table as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] = this;
+    setAttachedInstance(this.table, this);
   }
 
   init() {
@@ -65,66 +85,56 @@ export class ResizableTableColumns {
   }
 
   dispose() {
+    this.detachHandlers();
     this.destroyDragHandles();
     this.restoreOriginalWidths();
     this.unwrapTable();
+    this.tableHeaders = [];
+    this.originalWidths = [];
+    this.eventData = null;
     this.onPointerDownRef = null;
     this.onPointerMoveRef = null;
     this.onPointerUpRef = null;
-    (this.table as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] = void 0;
+    setAttachedInstance(this.table, undefined);
   }
 
   validateMarkup(): void {
-    let theadCount = 0;
-    let tbodyCount = 0;
-    let thead: ChildNode | null = null;
-    for (let index = 0; index < this.table.childNodes.length; index++) {
-      const element = this.table.childNodes[index];
-      if (element.nodeName === "THEAD") {
-        theadCount++;
-        thead = element;
-      } else if (element.nodeName === "TBODY") {
-        tbodyCount++;
-      }
-    }
+    const theads = childrenByName(this.table, "THEAD");
+    const theadCount = theads.length;
+    const tbodyCount = childrenByName(this.table, "TBODY").length;
+    const thead = theads[0];
 
-    if (thead === null || theadCount !== 1)
-      throw `Markup validation: thead count.\nResizableTableColumns requires that the table element has one(1) table head element. Current count: ${theadCount}`;
+    if (thead === undefined || theadCount !== 1)
+      throw new Error(
+        `Markup validation: thead count.\nResizableTableColumns requires that the table element has one(1) table head element. Current count: ${theadCount}`,
+      );
 
     if (tbodyCount !== 1)
-      throw `Markup validation: tbody count.\nResizableTableColumns requires that the table element has one(1) table body element. Current count: ${tbodyCount}`;
+      throw new Error(
+        `Markup validation: tbody count.\nResizableTableColumns requires that the table element has one(1) table body element. Current count: ${tbodyCount}`,
+      );
 
-    let theadRowCount = 0;
-    let firstRow: ChildNode | null = null;
-    for (let index = 0; index < thead.childNodes.length; index++) {
-      const element = thead.childNodes[index];
-      if (element.nodeName === "TR") {
-        theadRowCount++;
-        if (firstRow === null) {
-          firstRow = element;
-        }
-      }
-    }
+    const theadRows = childrenByName(thead, "TR");
+    const theadRowCount = theadRows.length;
+    const firstRow = theadRows[0];
 
-    if (firstRow === null || theadRowCount < 1)
-      throw `Markup validation: thead row count.\nResizableTableColumns requires that the table head element has at least one(1) table row element. Current count: ${theadRowCount}`;
+    if (firstRow === undefined)
+      throw new Error(
+        `Markup validation: thead row count.\nResizableTableColumns requires that the table head element has at least one(1) table row element. Current count: ${theadRowCount}`,
+      );
 
-    let headerCellsCount = 0;
-    let invalidHeaderCellsCount = 0;
-    for (let index = 0; index < firstRow.childNodes.length; index++) {
-      const element = firstRow.childNodes[index];
-      if (element.nodeName === "TH") {
-        headerCellsCount++;
-      } else if (element.nodeName === "TD") {
-        invalidHeaderCellsCount++;
-      }
-    }
+    const headerCellsCount = childrenByName(firstRow, "TH").length;
+    const invalidHeaderCellsCount = childrenByName(firstRow, "TD").length;
 
     if (headerCellsCount < 1)
-      throw `Markup validation: thead first row cells count.\nResizableTableColumns requires that the table head's first row element has at least one(1) table header cell element. Current count: ${headerCellsCount}`;
+      throw new Error(
+        `Markup validation: thead first row cells count.\nResizableTableColumns requires that the table head's first row element has at least one(1) table header cell element. Current count: ${headerCellsCount}`,
+      );
 
     if (invalidHeaderCellsCount !== 0)
-      throw `Markup validation: thead first row invalid.\nResizableTableColumns requires that the table head's first row element has no(0) table cell(TD) elements. Current count: ${invalidHeaderCellsCount}`;
+      throw new Error(
+        `Markup validation: thead first row invalid.\nResizableTableColumns requires that the table head's first row element has no(0) table cell(TD) elements. Current count: ${invalidHeaderCellsCount}`,
+      );
   }
 
   wrapTable() {
@@ -133,10 +143,8 @@ export class ResizableTableColumns {
     this.wrapper = this.ownerDocument.createElement("div");
     this.wrapper.classList.add(ResizableConstants.classes.wrapper);
 
-    const tableOriginalParent = this.table.parentNode as Node;
-    tableOriginalParent.insertBefore(this.wrapper, this.table);
-    tableOriginalParent.removeChild(this.table);
-    this.wrapper.appendChild(this.table);
+    this.table.before(this.wrapper);
+    this.wrapper.append(this.table);
     this.table.classList.add(ResizableConstants.classes.table);
   }
 
@@ -144,71 +152,41 @@ export class ResizableTableColumns {
     this.table.classList.remove(ResizableConstants.classes.table);
     if (!this.wrapper) return;
 
-    const tableOriginalParent = this.wrapper.parentNode as Node;
-    tableOriginalParent.insertBefore(this.table, this.wrapper);
-    tableOriginalParent.removeChild(this.wrapper);
+    this.wrapper.replaceWith(this.table);
     this.wrapper = null;
   }
 
   assignTableHeaders() {
-    let tableHeader: ChildNode | undefined;
-    let firstTableRow: ChildNode | undefined;
-    for (let index = 0; index < this.table.childNodes.length; index++) {
-      const element = this.table.childNodes[index];
-      if (element.nodeName === "THEAD") {
-        tableHeader = element;
-        break;
-      }
-    }
-
+    const tableHeader = childrenByName(this.table, "THEAD")[0];
     if (!tableHeader) return;
 
-    for (let index = 0; index < tableHeader.childNodes.length; index++) {
-      const element = tableHeader.childNodes[index];
-      if (element.nodeName === "TR") {
-        firstTableRow = element;
-        break;
-      }
-    }
-
+    const firstTableRow = childrenByName(tableHeader, "TR")[0];
     if (!firstTableRow) return;
 
-    for (let index = 0; index < firstTableRow.childNodes.length; index++) {
-      const element = firstTableRow.childNodes[index];
-      if (element.nodeName === "TH") {
-        this.tableHeaders.push(element as HTMLTableHeaderCellElement);
-      }
-    }
+    this.tableHeaders.push(...(childrenByName(firstTableRow, "TH") as HTMLTableHeaderCellElement[]));
   }
 
   storeOriginalWidths() {
-    this.tableHeaders.forEach((el) => {
-      this.originalWidths.push({
-        el: el,
-        detail: el.style.width,
-      });
-    });
-    this.originalWidths.push({
-      el: this.table,
-      detail: this.table.style.width,
-    });
+    for (const el of this.tableHeaders) {
+      this.originalWidths.push({ el, detail: el.style.width });
+    }
+    this.originalWidths.push({ el: this.table, detail: this.table.style.width });
   }
 
   restoreOriginalWidths() {
-    this.originalWidths.forEach((itm) => {
+    for (const itm of this.originalWidths) {
       itm.el.style.width = itm.detail;
-    });
+    }
   }
 
   setHeaderWidths() {
-    this.tableHeaders.forEach((el) => {
-      const width = el.offsetWidth;
-      let constrainedWidth = this.constrainWidth(el, width);
+    for (const el of this.tableHeaders) {
+      let constrainedWidth = this.constrainWidth(el, el.offsetWidth);
       if (typeof this.options.maxInitialWidthHint === "number") {
         constrainedWidth = Math.min(constrainedWidth, this.options.maxInitialWidthHint);
       }
       this.updateWidth(el, constrainedWidth, true, false);
-    });
+    }
   }
 
   constrainWidth(_el: HTMLElement, width: number): number {
@@ -220,43 +198,41 @@ export class ResizableTableColumns {
 
   createDragHandles() {
     if (this.dragHandlesContainer != null)
-      throw "Drag handlers already created. Call <destroyDragHandles> if you wish to recreate them";
+      throw new Error("Drag handlers already created. Call <destroyDragHandles> if you wish to recreate them");
 
-    this.dragHandlesContainer = this.ownerDocument.createElement("div");
-    this.wrapper?.insertBefore(this.dragHandlesContainer, this.table);
-    this.dragHandlesContainer.classList.add(ResizableConstants.classes.handleContainer);
+    const container = this.ownerDocument.createElement("div");
+    this.dragHandlesContainer = container;
+    this.wrapper?.insertBefore(container, this.table);
+    container.classList.add(ResizableConstants.classes.handleContainer);
 
-    this.getResizableHeaders().forEach(() => {
+    for (const _ of this.getResizableHeaders()) {
       const handler = this.ownerDocument.createElement("div");
       handler.classList.add(ResizableConstants.classes.handle);
-      this.dragHandlesContainer?.appendChild(handler);
-    });
+      container.append(handler);
+    }
 
-    ResizableConstants.events.pointerDown.forEach((evt, _evtIdx) => {
-      this.dragHandlesContainer?.addEventListener(evt, this.onPointerDownRef as EventListener, false);
-    });
-  }
-
-  destroyDragHandles() {
-    if (this.dragHandlesContainer !== null) {
-      ResizableConstants.events.pointerDown.forEach((evt, _evtIdx) => {
-        this.dragHandlesContainer?.removeEventListener(evt, this.onPointerDownRef as EventListener, false);
-      });
-      this.dragHandlesContainer?.parentElement?.removeChild(this.dragHandlesContainer);
+    for (const evt of ResizableConstants.events.pointerDown) {
+      container.addEventListener(evt, this.onPointerDownRef as EventListener, false);
     }
   }
 
-  getDragHandlers(): Array<HTMLDivElement> {
-    const nodes =
-      this.dragHandlesContainer == null
-        ? null
-        : this.dragHandlesContainer.querySelectorAll(`.${ResizableConstants.classes.handle}`);
+  destroyDragHandles() {
+    const container = this.dragHandlesContainer;
+    if (container === null) return;
 
-    return nodes
-      ? Array.prototype.slice.call(nodes).filter((el) => {
-          return el.nodeName === "DIV";
-        })
-      : ([] as HTMLDivElement[]);
+    for (const evt of ResizableConstants.events.pointerDown) {
+      container.removeEventListener(evt, this.onPointerDownRef as EventListener, false);
+    }
+    container.remove();
+    this.dragHandlesContainer = null;
+  }
+
+  getDragHandlers(): Array<HTMLDivElement> {
+    if (this.dragHandlesContainer == null) return [];
+
+    return Array.from(
+      this.dragHandlesContainer.querySelectorAll<HTMLDivElement>(`.${ResizableConstants.classes.handle}`),
+    ).filter((el) => el.nodeName === "DIV");
   }
 
   restoreColumnWidths() {
@@ -265,15 +241,15 @@ export class ResizableTableColumns {
     const tableId = ResizableTableColumns.generateTableId(this.table);
     if (tableId.length === 0) return;
 
-    const data = this.options.store.get(tableId) as { table: number; columns: Record<string, number> } | undefined;
+    const data = this.options.store.get(tableId) as IStoredWidths | undefined;
     if (!data) return;
 
-    this.getResizableHeaders().forEach((el) => {
+    for (const el of this.getResizableHeaders()) {
       const width = data.columns[ResizableTableColumns.generateColumnId(el)];
       if (typeof width !== "undefined") {
         ResizableTableColumns.setWidth(el, width);
       }
-    });
+    }
 
     if (typeof data.table !== "undefined") {
       ResizableTableColumns.setWidth(this.table, data.table);
@@ -286,27 +262,17 @@ export class ResizableTableColumns {
     const difference = wrapperWidth - tableWidth;
     if (difference <= 0) return;
 
-    let resizableWidth = 0;
     let addedWidth = 0;
-    const headersDetails: IHeaderDetails<number>[] = [];
-
-    this.tableHeaders.forEach((el, _idx) => {
-      if (el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
-        const detail: IHeaderDetails<number> = {
-          el: el,
-          detail: el.offsetWidth,
-        };
-        headersDetails.push(detail);
-        resizableWidth += detail.detail;
-      }
-    });
+    const headersDetails: IHeaderDetails<number>[] = this.tableHeaders
+      .filter(isResizable)
+      .map((el) => ({ el, detail: el.offsetWidth }));
+    const resizableWidth = headersDetails.reduce((sum, d) => sum + d.detail, 0);
 
     let leftToAdd = 0;
     let lastResizableCell: HTMLElement | null = null;
-    let currentDetail: IHeaderDetails<number> | undefined;
 
-    while (headersDetails.length > 0) {
-      currentDetail = headersDetails.shift() as IHeaderDetails<number>;
+    let currentDetail = headersDetails.shift();
+    while (currentDetail) {
       leftToAdd = difference - addedWidth;
 
       lastResizableCell = currentDetail.el;
@@ -316,71 +282,70 @@ export class ResizableTableColumns {
       addedWidth += newWidth - currentDetail.detail;
 
       if (addedWidth >= difference) break;
+      currentDetail = headersDetails.shift();
     }
 
     leftToAdd = difference - addedWidth;
     if (leftToAdd > 0) {
-      const lastCell = headersDetails[0]?.el || lastResizableCell || this.tableHeaders[this.tableHeaders.length - 1];
-      const lastCellWidth = lastCell.offsetWidth;
-      this.updateWidth(lastCell, lastCellWidth, true, true);
+      const lastCell = headersDetails[0]?.el ?? lastResizableCell ?? this.tableHeaders.at(-1);
+      if (lastCell) {
+        this.updateWidth(lastCell, lastCell.offsetWidth, true, true);
+      }
     }
     ResizableTableColumns.setWidth(this.table, wrapperWidth);
   }
 
   syncHandleWidths() {
+    const container = this.dragHandlesContainer as HTMLDivElement;
     const tableWidth = this.table.clientWidth;
-    ResizableTableColumns.setWidth(this.dragHandlesContainer as HTMLDivElement, tableWidth);
-    (this.dragHandlesContainer as HTMLDivElement).style.minWidth = `${tableWidth}px`;
+    ResizableTableColumns.setWidth(container, tableWidth);
+    container.style.minWidth = `${tableWidth}px`;
 
     const headers = this.getResizableHeaders();
-    this.getDragHandlers().forEach((el, idx) => {
-      const height = ((this.options.resizeFromBody ? this.table : this.table.tHead) as HTMLElement).clientHeight;
+    const height = ((this.options.resizeFromBody ? this.table : this.table.tHead) as HTMLElement).clientHeight;
+    const containerLeft = ResizableTableColumns.getOffset(container).left;
 
-      if (idx < headers.length) {
-        const th = headers[idx];
-        let left = th.offsetWidth;
-        left += ResizableTableColumns.getOffset(th).left;
-        left -= ResizableTableColumns.getOffset(this.dragHandlesContainer as HTMLElement).left;
-        el.style.left = `${left}px`;
-        el.style.height = `${height}px`;
-      }
+    this.getDragHandlers().forEach((el, idx) => {
+      const th = headers[idx];
+      if (!th) return;
+
+      const left = th.offsetWidth + ResizableTableColumns.getOffset(th).left - containerLeft;
+      el.style.left = `${left}px`;
+      el.style.height = `${height}px`;
     });
   }
 
   getResizableHeaders(): HTMLTableCellElement[] {
-    return this.tableHeaders.filter((el, _idx) => {
-      return el.hasAttribute(ResizableConstants.attributes.dataResizable);
-    });
+    return this.tableHeaders.filter(isResizable);
   }
 
   handlePointerDown(event: Event): void {
     this.handlePointerUp();
 
-    const target = event ? (event.target as HTMLElement) : null;
+    const target = event ? (event.target as HTMLElement | null) : null;
     if (target == null) return;
 
     if (target.nodeName !== "DIV" || !target.classList.contains(ResizableConstants.classes.handle)) return;
 
     if (typeof (event as MouseEvent).button === "number" && (event as MouseEvent).button !== 0) return; // this is not a left click
 
-    const dragHandler = <HTMLDivElement>target;
+    const dragHandler = target as HTMLDivElement;
     const gripIndex = this.getDragHandlers().indexOf(dragHandler);
-    const resizableHeaders = this.getResizableHeaders();
-    if (gripIndex >= resizableHeaders.length) return;
+    const column = this.getResizableHeaders()[gripIndex];
+    if (!column) return;
 
     const millisecondsNow = Date.now();
     const isDoubleClick = millisecondsNow - this.lastPointerDown < this.options.doubleClickDelay;
-    const column = resizableHeaders[gripIndex];
     const columnWidth = column.offsetWidth;
 
     const widths = {
       column: columnWidth,
       table: this.table.offsetWidth,
     };
-    const eventData: ResizableEventData = new ResizableEventData(column, dragHandler);
+    const eventData = new ResizableEventData(column, dragHandler);
     eventData.pointer = {
       x: ResizableTableColumns.getPointerX(event),
-      isDoubleClick: isDoubleClick,
+      isDoubleClick,
     };
     eventData.originalWidths = widths;
     eventData.newWidths = widths;
@@ -388,23 +353,24 @@ export class ResizableTableColumns {
     this.detachHandlers(); //make sure we do not have extra handlers
     this.attachHandlers();
 
+    const pointerId = (event as PointerEvent).pointerId;
+    if (typeof pointerId === "number" && typeof dragHandler.setPointerCapture === "function") {
+      try {
+        dragHandler.setPointerCapture(pointerId);
+      } catch {
+        // the pointer may no longer be active; capture is a best effort
+      }
+    }
+
     this.table.classList.add(ResizableConstants.classes.tableResizing);
-    (this.wrapper as HTMLDivElement).classList.add(ResizableConstants.classes.tableResizing);
+    this.wrapper?.classList.add(ResizableConstants.classes.tableResizing);
     dragHandler.classList.add(ResizableConstants.classes.columnResizing);
     column.classList.add(ResizableConstants.classes.columnResizing);
 
     this.lastPointerDown = millisecondsNow;
     this.eventData = eventData;
 
-    var eventToDispatch = new CustomEvent(ResizableConstants.events.eventResizeStart, {
-      detail: {
-        column: column,
-        columnWidth: columnWidth,
-        table: this.table,
-        tableWidth: this.table.clientWidth,
-      },
-    });
-    this.table.dispatchEvent(eventToDispatch);
+    this.dispatchResizeEvent(ResizableConstants.events.eventResizeStart, column, columnWidth, this.table.clientWidth);
     event.preventDefault();
   }
 
@@ -412,29 +378,9 @@ export class ResizableTableColumns {
     if (!this.eventData || !event) return;
 
     const difference = (ResizableTableColumns.getPointerX(event) || 0) - (this.eventData.pointer.x || 0);
-    if (difference === 0) {
-      return;
-    }
+    if (difference === 0) return;
 
-    const tableWidth = this.eventData.originalWidths.table + difference;
-    const columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
-    ResizableTableColumns.setWidth(this.table, tableWidth);
-    ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
-
-    this.eventData.newWidths = {
-      column: columnWidth,
-      table: tableWidth,
-    };
-
-    var eventToDispatch = new CustomEvent(ResizableConstants.events.eventResize, {
-      detail: {
-        column: this.eventData.column,
-        columnWidth: columnWidth,
-        table: this.table,
-        tableWidth: tableWidth,
-      },
-    });
-    this.table.dispatchEvent(eventToDispatch);
+    this.applyColumnDelta(difference);
   }
 
   handlePointerUp(): void {
@@ -447,7 +393,7 @@ export class ResizableTableColumns {
     }
 
     this.table.classList.remove(ResizableConstants.classes.tableResizing);
-    (this.wrapper as HTMLDivElement).classList.remove(ResizableConstants.classes.tableResizing);
+    this.wrapper?.classList.remove(ResizableConstants.classes.tableResizing);
     this.eventData.dragHandler.classList.remove(ResizableConstants.classes.columnResizing);
     this.eventData.column.classList.remove(ResizableConstants.classes.columnResizing);
 
@@ -457,15 +403,12 @@ export class ResizableTableColumns {
     this.saveColumnWidths();
 
     const widths = this.eventData.newWidths || this.eventData.originalWidths;
-    var eventToDispatch = new CustomEvent(ResizableConstants.events.eventResizeStop, {
-      detail: {
-        column: this.eventData.column,
-        columnWidth: widths.column,
-        table: this.table,
-        tableWidth: widths.table,
-      },
-    });
-    this.table.dispatchEvent(eventToDispatch);
+    this.dispatchResizeEvent(
+      ResizableConstants.events.eventResizeStop,
+      this.eventData.column,
+      widths.column,
+      widths.table,
+    );
 
     this.eventData = null;
   }
@@ -479,39 +422,25 @@ export class ResizableTableColumns {
     let maxWidth = 0;
     const indicesToSkip: number[] = [];
     this.tableHeaders.forEach((el, idx) => {
-      if (!el.hasAttribute(ResizableConstants.attributes.dataResizable)) {
+      if (!isResizable(el)) {
         indicesToSkip.push(idx);
       }
     });
 
     const span = this.ownerDocument.createElement("span");
-    span.style.position = "absolute";
-    span.style.left = "-99999px";
-    span.style.top = "-99999px";
-    span.style.visibility = "hidden";
-    this.ownerDocument.body.appendChild(span);
+    Object.assign(span.style, { position: "absolute", left: "-99999px", top: "-99999px", visibility: "hidden" });
+    this.ownerDocument.body.append(span);
 
-    const rows = this.table.querySelectorAll("tr");
-    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      const element = rows[rowIndex];
-      const cells = element.querySelectorAll("td, th");
+    for (const row of Array.from(this.table.querySelectorAll("tr"))) {
+      const cells = Array.from(row.querySelectorAll<HTMLElement>("td, th"));
       let currentIndex = 0;
 
-      for (let cellIndex = 0; cellIndex < cells.length; cellIndex++) {
-        const cell = cells[cellIndex];
-        let colSpan = 1;
-        if (cell.hasAttribute("colspan")) {
-          const colSpanString = cell.getAttribute("colspan") || "1";
-          const parsed = parseInt(colSpanString, 10);
-          if (!Number.isNaN(parsed)) {
-            colSpan = parsed;
-          } else {
-            colSpan = 1;
-          }
-        }
+      for (const [cellIndex, cell] of cells.entries()) {
+        const parsed = Number.parseInt(cell.getAttribute("colspan") ?? "1", 10);
+        const colSpan = Number.isNaN(parsed) ? 1 : parsed;
 
-        if (indicesToSkip.indexOf(cellIndex) === -1 && colSpan === 1 && currentIndex === colIndex) {
-          maxWidth = Math.max(maxWidth, ResizableTableColumns.getTextWidth(<HTMLElement>cell, span));
+        if (!indicesToSkip.includes(cellIndex) && colSpan === 1 && currentIndex === colIndex) {
+          maxWidth = Math.max(maxWidth, ResizableTableColumns.getTextWidth(cell, span));
           break;
         }
 
@@ -519,31 +448,12 @@ export class ResizableTableColumns {
       }
     }
 
-    this.ownerDocument.body.removeChild(span);
+    span.remove();
 
     const difference = maxWidth - column.offsetWidth;
-    if (difference === 0) {
-      return;
-    }
+    if (difference === 0) return;
 
-    const tableWidth = this.eventData.originalWidths.table + difference;
-    const columnWidth = this.constrainWidth(this.eventData.column, this.eventData.originalWidths.column + difference);
-    ResizableTableColumns.setWidth(this.table, tableWidth);
-    ResizableTableColumns.setWidth(this.eventData.column, columnWidth);
-
-    this.eventData.newWidths = {
-      column: columnWidth,
-      table: tableWidth,
-    };
-    var eventToDispatch = new CustomEvent(ResizableConstants.events.eventResize, {
-      detail: {
-        column: this.eventData.column,
-        columnWidth: columnWidth,
-        table: this.table,
-        tableWidth: tableWidth,
-      },
-    });
-    this.table.dispatchEvent(eventToDispatch);
+    this.applyColumnDelta(difference);
 
     this.checkTableWidth();
     this.syncHandleWidths();
@@ -551,23 +461,23 @@ export class ResizableTableColumns {
   }
 
   attachHandlers(): void {
-    ResizableConstants.events.pointerMove.forEach((evt, _evtIdx) => {
+    for (const evt of ResizableConstants.events.pointerMove) {
       this.ownerDocument.addEventListener(evt, this.onPointerMoveRef as EventListener, false);
-    });
+    }
 
-    ResizableConstants.events.pointerUp.forEach((evt, _evtIdx) => {
+    for (const evt of ResizableConstants.events.pointerUp) {
       this.ownerDocument.addEventListener(evt, this.onPointerUpRef as EventListener, false);
-    });
+    }
   }
 
   detachHandlers(): void {
-    ResizableConstants.events.pointerMove.forEach((evt, _evtIdx) => {
+    for (const evt of ResizableConstants.events.pointerMove) {
       this.ownerDocument.removeEventListener(evt, this.onPointerMoveRef as EventListener, false);
-    });
+    }
 
-    ResizableConstants.events.pointerUp.forEach((evt, _evtIdx) => {
+    for (const evt of ResizableConstants.events.pointerUp) {
       this.ownerDocument.removeEventListener(evt, this.onPointerUpRef as EventListener, false);
-    });
+    }
   }
 
   refreshWrapperStyle(): void {
@@ -584,60 +494,31 @@ export class ResizableTableColumns {
     const tableId = ResizableTableColumns.generateTableId(this.table);
     if (tableId.length === 0) return;
 
-    const data: { table: number; columns: Record<string, number> } = {
+    const data: IStoredWidths = {
       table: this.table.offsetWidth,
       columns: {},
     };
-    this.getResizableHeaders().forEach((el) => {
+    for (const el of this.getResizableHeaders()) {
       data.columns[ResizableTableColumns.generateColumnId(el)] = el.offsetWidth;
-    });
+    }
     this.options.store.set(tableId, data);
   }
 
   createHandlerReferences() {
-    if (!this.onPointerDownRef) {
-      this.onPointerDownRef = ResizableTableColumns.debounce(
-        (evt: Event) => {
-          this.handlePointerDown(evt);
-        },
-        100,
-        true,
-      );
-    }
-
-    if (!this.onPointerMoveRef) {
-      this.onPointerMoveRef = ResizableTableColumns.debounce(
-        (evt: Event) => {
-          this.handlePointerMove(evt);
-        },
-        5,
-        false,
-      );
-    }
-
-    if (!this.onPointerUpRef) {
-      this.onPointerUpRef = ResizableTableColumns.debounce(
-        (_evt: Event) => {
-          this.handlePointerUp();
-        },
-        100,
-        true,
-      );
-    }
+    this.onPointerDownRef ??= ResizableTableColumns.debounce((evt) => this.handlePointerDown(evt), 100, true);
+    this.onPointerMoveRef ??= ResizableTableColumns.debounce((evt) => this.handlePointerMove(evt), 5, false);
+    this.onPointerUpRef ??= ResizableTableColumns.debounce(() => this.handlePointerUp(), 100, true);
   }
 
   registerWindowResizeHandler(): void {
-    const win = this.ownerDocument.defaultView;
     if (ResizableTableColumns.windowResizeHandlerRef) return;
 
-    ResizableTableColumns.windowResizeHandlerRef = ResizableTableColumns.debounce(
-      ResizableTableColumns.onWindowResize,
-      50,
-      false,
-    );
-    ResizableConstants.events.windowResize.forEach((evt, _idx) => {
-      win?.addEventListener(evt, ResizableTableColumns.windowResizeHandlerRef as EventListener, false);
-    });
+    const win = this.ownerDocument.defaultView;
+    const handler = ResizableTableColumns.debounce(ResizableTableColumns.onWindowResize, 50, false);
+    ResizableTableColumns.windowResizeHandlerRef = handler;
+    for (const evt of ResizableConstants.events.windowResize) {
+      win?.addEventListener(evt, handler, false);
+    }
   }
 
   handleWindowResize(): void {
@@ -658,46 +539,65 @@ export class ResizableTableColumns {
     ResizableTableColumns.setWidth(cell, columnWidth);
     if (!skipTableResize) {
       const difference = columnWidth - originalCellWidth;
-      const tableWidth = this.table.offsetWidth + difference;
-      ResizableTableColumns.setWidth(this.table, tableWidth);
+      ResizableTableColumns.setWidth(this.table, this.table.offsetWidth + difference);
     }
 
     return columnWidth;
   }
 
+  /** Resize the column being dragged by `difference` pixels relative to its original width and notify listeners. */
+  private applyColumnDelta(difference: number): void {
+    const eventData = this.eventData;
+    if (!eventData) return;
+
+    const tableWidth = eventData.originalWidths.table + difference;
+    const columnWidth = this.constrainWidth(eventData.column, eventData.originalWidths.column + difference);
+    ResizableTableColumns.setWidth(this.table, tableWidth);
+    ResizableTableColumns.setWidth(eventData.column, columnWidth);
+
+    eventData.newWidths = { column: columnWidth, table: tableWidth };
+    this.dispatchResizeEvent(ResizableConstants.events.eventResize, eventData.column, columnWidth, tableWidth);
+  }
+
+  private dispatchResizeEvent(
+    name: string,
+    column: HTMLTableCellElement,
+    columnWidth: number,
+    tableWidth: number,
+  ): void {
+    this.table.dispatchEvent(
+      new CustomEvent<ResizableEventDetail>(name, {
+        detail: { column, columnWidth, table: this.table, tableWidth },
+      }),
+    );
+  }
+
   static onWindowResize(event: Event): void {
-    const win = event ? (event.target as Window) : null;
+    const win = event ? (event.target as Window | null) : null;
     if (win == null) return;
 
-    const tables = win.document.querySelectorAll(`.${ResizableConstants.classes.table}`);
-    for (let index = 0; index < tables.length; index++) {
-      const table = tables[index];
-      if (typeof (table as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] !== "object")
-        continue;
+    for (const table of Array.from(win.document.querySelectorAll(`.${ResizableConstants.classes.table}`))) {
+      const instance = getAttachedInstance(table);
+      if (typeof instance !== "object" || instance === null) continue;
 
-      (
-        (table as unknown as Record<string, unknown>)[ResizableConstants.dataPropertyName] as ResizableTableColumns
-      ).handleWindowResize();
+      (instance as ResizableTableColumns).handleWindowResize();
     }
   }
 
   static generateColumnId(el: HTMLElement): string {
-    const columnId = (el.getAttribute(ResizableConstants.attributes.dataResizable) || "").trim().replace(/\./g, "_");
-
-    return columnId;
+    return (el.getAttribute(ResizableConstants.attributes.dataResizable) ?? "").trim().replaceAll(".", "_");
   }
 
   static generateTableId(table: HTMLTableElement): string {
-    const tableId = (table.getAttribute(ResizableConstants.attributes.dataResizableTable) || "")
+    const tableId = (table.getAttribute(ResizableConstants.attributes.dataResizableTable) ?? "")
       .trim()
-      .replace(/\./g, "_");
+      .replaceAll(".", "_");
 
     return tableId.length ? `rtc/${tableId}` : tableId;
   }
 
   static setWidth(element: HTMLElement, width: number) {
-    let strWidth = width.toFixed(2);
-    strWidth = width > 0 ? strWidth : "0";
+    const strWidth = width > 0 ? width.toFixed(2) : "0";
     element.style.width = `${strWidth}px`;
   }
 
@@ -707,36 +607,28 @@ export class ResizableTableColumns {
 
   static debounce = (func: (event: Event) => void, wait: number, immediate: boolean): ((event: Event) => void) => {
     let timeout: ReturnType<typeof setTimeout> | null = null;
-    const debounced = (event: Event) => {
-      const later = () => {
-        timeout = null;
-        if (!immediate) {
-          func(event);
-        }
-      };
-
+    return (event: Event) => {
       const callNow = immediate && !timeout;
       if (timeout) {
         clearTimeout(timeout);
       }
-      timeout = setTimeout(later, wait);
+      timeout = setTimeout(() => {
+        timeout = null;
+        if (!immediate) {
+          func(event);
+        }
+      }, wait);
       if (callNow) {
         func(event);
       }
     };
-    return debounced;
   };
 
   static getPointerX(event: Event): number | null {
-    if (event.type.indexOf("touch") === 0) {
+    if (event.type.startsWith("touch")) {
       const tEvent = event as TouchEvent;
-      if (tEvent.touches?.length) {
-        return tEvent.touches[0].pageX;
-      }
-
-      if (tEvent.changedTouches?.length) {
-        return tEvent.changedTouches[0].pageX;
-      }
+      const touch = tEvent.touches?.[0] ?? tEvent.changedTouches?.[0];
+      if (touch) return touch.pageX;
     }
     return (event as MouseEvent).pageX;
   }
@@ -744,14 +636,18 @@ export class ResizableTableColumns {
   static getTextWidth(contentElement: HTMLElement, measurementElement: HTMLElement): number {
     if (!contentElement || !measurementElement) return 0;
 
-    var text = `${contentElement.textContent?.trim().replace(/\s/g, "&nbsp;")}&nbsp;`; //add extra space to ensure we are not add the `...`
+    // Non-breaking spaces keep the text on one line; the trailing one ensures we do not get the `...`.
+    // Assign via textContent so cell text is never parsed as HTML.
+    const text = `${(contentElement.textContent ?? "").trim().replace(/\s/g, " ")} `;
 
     const styles = contentElement.ownerDocument.defaultView?.getComputedStyle(contentElement);
-    (["fontFamily", "fontSize", "fontWeight", "padding", "border", "boxSizing"] as const).forEach((prop) => {
-      (measurementElement.style as CSSStyleDeclaration)[prop] = (styles as CSSStyleDeclaration)[prop];
-    });
+    if (styles) {
+      for (const prop of ["fontFamily", "fontSize", "fontWeight", "padding", "border", "boxSizing"] as const) {
+        measurementElement.style[prop] = styles[prop];
+      }
+    }
 
-    measurementElement.innerHTML = text;
+    measurementElement.textContent = text;
     return measurementElement.offsetWidth;
   }
 
@@ -759,10 +655,11 @@ export class ResizableTableColumns {
     if (!el) return { top: 0, left: 0 };
 
     const rect = el.getBoundingClientRect();
+    const win = el.ownerDocument.defaultView;
 
     return {
-      top: rect.top + el.ownerDocument.body.scrollTop,
-      left: rect.left + el.ownerDocument.body.scrollLeft,
+      top: rect.top + (win?.scrollY ?? 0),
+      left: rect.left + (win?.scrollX ?? 0),
     };
   }
 }
