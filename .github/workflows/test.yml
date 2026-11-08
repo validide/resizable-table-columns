@@ -15,5 +15,10 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run check
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm run check # unit tests + Chromium browser tests, with coverage
+      - name: Browser tests in Firefox and WebKit
+        run: pnpm run test:browser
+        env:
+          BROWSER_TEST_ENGINES: firefox,webkit
       - run: pnpm run build

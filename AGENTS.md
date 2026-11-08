@@ -13,7 +13,8 @@ Guidance for coding agents working in this repository.
 
 - `sources/ts/`: TypeScript source. `index.ts` is the public entry point.
 - `sources/scss/`: stylesheet, compiled to `dist/css/resizable-table-columns.css`.
-- `tests/`: Vitest tests (jsdom).
+- `tests/*.ts`: unit tests (Vitest + jsdom). jsdom has no layout engine, so every size reads as 0.
+- `tests/browser/*.test.ts`: tests that run in a real browser (Vitest Browser Mode + Playwright) and cover layout, real pointer input and window resize. `tests/browser/support/commands.ts` holds Node-side commands that drive the real mouse.
 - `pages/`, `index.html`: demo pages. `pages/` is served via GitHub Pages and loads the committed `dist/` build.
 - `dist/`: build output, **committed** (used by the demo pages).
 
@@ -24,12 +25,17 @@ The package manager is pnpm, with the version pinned in `package.json` (`package
 ```sh
 pnpm install
 pnpm dev          # Vite dev server for index.html
-pnpm run check    # typecheck + Biome (CI mode) + tests with coverage
+pnpm exec playwright install chromium   # once, for the browser tests
+pnpm run check    # typecheck + Biome (CI mode) + unit and Chromium browser tests with coverage
+pnpm run test:unit      # jsdom unit tests only
+pnpm run test:browser   # browser tests only
+BROWSER_TEST_ENGINES=chromium,firefox,webkit pnpm run test:browser   # other engines (no coverage)
 pnpm run lint     # Biome with auto-fix
 pnpm run build    # CSS (sass) + declarations (tsc) + bundles (vite)
 ```
 
 - Run `pnpm run check` before you finish any change.
+- Anything that depends on measured sizes, real input or CSS belongs in `tests/browser/`. Assert with small tolerances (fonts differ between machines) rather than exact pixel values, keep the pointer inside the viewport, and remember the library debounces pointer events (100 ms) and treats two presses within `doubleClickDelay` (500 ms) as a double-click.
 - Run `pnpm run build` when you change sources or styles, so that `dist/` stays in sync.
 - Formatting and linting are done by Biome (`biome.json`). Don't add Prettier or ESLint.
 - pnpm settings (exact versions, 7-day minimum release age, allowed build scripts) live in `pnpm-workspace.yaml`. Respect the release-age rule when you pick dependency versions.

@@ -24,6 +24,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           scope: '@validide'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run check
       - run: pnpm run build
 

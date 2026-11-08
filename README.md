@@ -124,6 +124,7 @@ This project uses [pnpm](https://pnpm.io); the exact version is pinned in `packa
 ```sh
 corepack enable   # once, makes the pinned pnpm version available
 pnpm install
+pnpm exec playwright install chromium   # browser for the browser-mode tests
 pnpm dev          # demo page with live reload
 pnpm run check    # typecheck, lint and test
 pnpm run build

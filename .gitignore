@@ -59,4 +59,7 @@ typings/
 
 # Build output
 .build/
+.vitest/
 
+# Vitest browser mode attachments (failure screenshots)
+.vitest/
